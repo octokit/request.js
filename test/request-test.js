@@ -1,6 +1,6 @@
 const chai = require('chai')
 const getUserAgent = require('universal-user-agent')
-const fetchMock = require('fetch-mock')
+const fetchMock = require('fetch-mock/es5/server')
 const sinonChai = require('sinon-chai')
 
 const octokitRequest = require('..')
@@ -20,7 +20,7 @@ describe('octokitRequest()', () => {
     expect(octokitRequest).to.be.a('function')
   })
 
-  it('README example', async () => {
+  it('README example', () => {
     octokitRequest.fetch = fetchMock.sandbox()
       .mock('https://api.github.com/orgs/octokit/repos?type=private', [], {
         headers: {
@@ -30,7 +30,7 @@ describe('octokitRequest()', () => {
         }
       })
 
-    const result = await octokitRequest('GET /orgs/:org/repos', {
+    return octokitRequest('GET /orgs/:org/repos', {
       headers: {
         authorization: 'token 0000000000000000000000000000000000000001'
       },
@@ -38,10 +38,12 @@ describe('octokitRequest()', () => {
       type: 'private'
     })
 
-    expect(result.data).to.deep.equal([])
+      .then(response => {
+        expect(response.data).to.deep.equal([])
+      })
   })
 
-  it('README example alternative', async () => {
+  it('README example alternative', () => {
     octokitRequest.fetch = fetchMock.sandbox()
       .mock('https://api.github.com/orgs/octokit/repos?type=private', [], {
         headers: {
@@ -54,7 +56,7 @@ describe('octokitRequest()', () => {
     octokitRequest.fetch = fetchMock.sandbox()
       .mock('https://api.github.com/orgs/octokit/repos?type=private', [])
 
-    const result = await octokitRequest({
+    return octokitRequest({
       method: 'GET',
       url: '/orgs/:org/repos',
       headers: {
@@ -64,10 +66,12 @@ describe('octokitRequest()', () => {
       type: 'private'
     })
 
-    expect(result.data).to.deep.equal([])
+      .then(response => {
+        expect(response.data).to.deep.equal([])
+      })
   })
 
-  it('Request with body', async () => {
+  it('Request with body', () => {
     octokitRequest.fetch = fetchMock.sandbox()
       .mock('https://api.github.com/repos/octocat/hello-world/issues', 201, {
         headers: {
@@ -75,7 +79,7 @@ describe('octokitRequest()', () => {
         }
       })
 
-    const response = await octokitRequest('POST /repos/:owner/:repo/issues', {
+    octokitRequest('POST /repos/:owner/:repo/issues', {
       owner: 'octocat',
       repo: 'hello-world',
       headers: {
@@ -92,10 +96,12 @@ describe('octokitRequest()', () => {
       ]
     })
 
-    expect(response.status).to.equal(201)
+      .then(response => {
+        expect(response.status).to.equal(201)
+      })
   })
 
-  it('Put without request body', async () => {
+  it('Put without request body', () => {
     octokitRequest.fetch = fetchMock.sandbox()
       .mock('https://api.github.com/user/starred/octocat/hello-world', 204, {
         headers: {
@@ -103,7 +109,7 @@ describe('octokitRequest()', () => {
         }
       })
 
-    const response = await octokitRequest('PUT /user/starred/:owner/:repo', {
+    octokitRequest('PUT /user/starred/:owner/:repo', {
       headers: {
         authorization: `token 0000000000000000000000000000000000000001`
       },
@@ -111,10 +117,12 @@ describe('octokitRequest()', () => {
       repo: 'hello-world'
     })
 
-    expect(response.status).to.equal(204)
+      .then(response => {
+        expect(response.status).to.equal(204)
+      })
   })
 
-  it('HEAD requests (octokit/rest.js#841)', async () => {
+  it('HEAD requests (octokit/rest.js#841)', () => {
     octokitRequest.fetch = fetchMock.sandbox()
       .head('https://api.github.com/repos/whatwg/html/pulls/1', {
         status: 200,
@@ -136,20 +144,25 @@ describe('octokitRequest()', () => {
       repo: 'html',
       number: 1
     }
-    let error
-    const response = await octokitRequest(`HEAD /repos/:owner/:repo/pulls/:number`, options)
-    try {
-      await octokitRequest(`HEAD /repos/:owner/:repo/pulls/:number`, Object.assign(options, { number: 2 }))
-      throw new Error('should not resolve')
-    } catch (error_) {
-      error = error_
-    }
 
-    expect(response.status).to.equal(200)
-    expect(error.code).to.equal(404)
+    octokitRequest(`HEAD /repos/:owner/:repo/pulls/:number`, options)
+
+      .then(response => {
+        expect(response.status).to.equal(200)
+
+        return octokitRequest(`HEAD /repos/:owner/:repo/pulls/:number`, Object.assign(options, { number: 2 }))
+      })
+
+      .then(() => {
+        throw new Error('should not resolve')
+      })
+
+      .catch(error => {
+        expect(error.code).to.equal(404)
+      })
   })
 
-  it.skip('Binary response with redirect (🤔 unclear how to mock fetch redirect properly)', async () => {
+  it.skip('Binary response with redirect (🤔 unclear how to mock fetch redirect properly)', () => {
     octokitRequest.fetch = fetchMock.sandbox()
       .get('https://codeload.github.com/octokit-fixture-org/get-archive/legacy.tar.gz/master', {
         status: 200,
@@ -160,19 +173,21 @@ describe('octokitRequest()', () => {
         }
       })
 
-    const response = await octokitRequest('GET /repos/:owner/:repo/:archive_format/:ref', {
+    return octokitRequest('GET /repos/:owner/:repo/:archive_format/:ref', {
       owner: 'octokit-fixture-org',
       repo: 'get-archive',
       archive_format: 'tarball',
       ref: 'master'
     })
 
-    expect(response.data.length).to.equal(172)
+      .then(response => {
+        expect(response.data.length).to.equal(172)
+      })
   })
 
   // TODO: fails with "response.buffer is not a function" in browser
   if (!process.browser) {
-    it('Binary response', async () => {
+    it('Binary response', () => {
       octokitRequest.fetch = fetchMock.sandbox()
         .get('https://codeload.github.com/octokit-fixture-org/get-archive/legacy.tar.gz/master', {
           status: 200,
@@ -186,44 +201,49 @@ describe('octokitRequest()', () => {
           }
         })
 
-      await octokitRequest('GET https://codeload.github.com/octokit-fixture-org/get-archive/legacy.tar.gz/master')
+      return octokitRequest('GET https://codeload.github.com/octokit-fixture-org/get-archive/legacy.tar.gz/master')
     })
   }
 
-  it('304 etag', async () => {
+  it('304 etag', () => {
     octokitRequest.fetch = fetchMock.sandbox()
       .get((url, { headers }) => {
         return url === 'https://api.github.com/orgs/myorg' &&
                headers['if-none-match'] === 'etag'
       }, 304)
 
-    try {
-      await octokitRequest('GET /orgs/:org', {
-        org: 'myorg',
-        headers: { 'If-None-Match': 'etag' }
+    return octokitRequest('GET /orgs/:org', {
+      org: 'myorg',
+      headers: { 'If-None-Match': 'etag' }
+    })
+
+      .then(() => {
+        throw new Error('should not resolve')
       })
-      throw new Error('should not resolve')
-    } catch (error) {
-      expect(error.code).to.equal(304)
-    }
+
+      .catch(error => {
+        expect(error.code).to.equal(304)
+      })
   })
 
-  it('Not found', async () => {
+  it('Not found', () => {
     octokitRequest.fetch = fetchMock.sandbox()
       .get('path:/orgs/nope', 404)
 
-    try {
-      await octokitRequest('GET /orgs/:org', {
-        org: 'nope'
+    return octokitRequest('GET /orgs/:org', {
+      org: 'nope'
+    })
+
+      .then(() => {
+        throw new Error('should not resolve')
       })
 
-      throw new Error('should not resolve')
-    } catch (error) {
-      expect(error.code).to.equal(404)
-    }
+      .catch(error => {
+        expect(error.code).to.equal(404)
+      })
   })
 
-  it('non-JSON response', async () => {
+  it('non-JSON response', () => {
     octokitRequest.fetch = fetchMock.sandbox()
       .get('path:/repos/octokit-fixture-org/hello-world/contents/README.md', {
         status: 200,
@@ -234,7 +254,7 @@ describe('octokitRequest()', () => {
         }
       })
 
-    const response = await octokitRequest('GET /repos/:owner/:repo/contents/:path', {
+    return octokitRequest('GET /repos/:owner/:repo/contents/:path', {
       headers: {
         accept: 'application/vnd.github.v3.raw'
       },
@@ -243,25 +263,31 @@ describe('octokitRequest()', () => {
       path: 'README.md'
     })
 
-    expect(response.data).to.equal('# hello-world')
+      .then((response) => {
+        expect(response.data).to.equal('# hello-world')
+      })
   })
 
   if (!process.browser) {
-    it('Request error', async () => {
-      try {
-        await octokitRequest('GET https://127.0.0.1:8/') // port: 8 // officially unassigned port. See https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
-        throw new Error('should not resolve')
-      } catch (error) {
-        expect(error.code).to.equal(500)
-      }
+    it('Request error', () => {
+      // port: 8 // officially unassigned port. See https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
+      return octokitRequest('GET https://127.0.0.1:8/')
+
+        .then(() => {
+          throw new Error('should not resolve')
+        })
+
+        .catch(error => {
+          expect(error.code).to.equal(500)
+        })
     })
   }
 
-  it('custom user-agent', async () => {
+  it('custom user-agent', () => {
     octokitRequest.fetch = fetchMock.sandbox()
       .get((url, { headers }) => headers['user-agent'] === 'funky boom boom pow', 200)
 
-    await octokitRequest('GET /', {
+    return octokitRequest('GET /', {
       headers: {
         'user-agent': 'funky boom boom pow'
       }
