@@ -266,6 +266,10 @@ const myProjectRequestWithAuth = myProjectRequest.defaults({
 `org` and `headers['authorization']` on top of `headers['accept']` that is set
 by the global default.
 
+## `request.endpoint`
+
+See https://github.com/octokit/endpoint.js
+
 ## Special cases
 
 <a name="data-parameter"></a>
