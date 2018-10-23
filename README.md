@@ -233,7 +233,7 @@ Override or set default options. Example:
 
 ```js
 const myOctokitRequest = require('@octokit/request').defaults({
-  baseUrl: 'http://github-enterprise.acme-inc.com/api/v3',
+  baseUrl: 'https://github-enterprise.acme-inc.com/api/v3',
   headers: {
     'user-agent': 'myApp/1.2.3',
     authorization: `token 0000000000000000000000000000000000000001`
@@ -249,7 +249,7 @@ You can call `.defaults()` again on the returned method, the defaults will casca
 
 ```js
 const myProjectRequest = request.defaults({
-  baseUrl: 'http://github-enterprise.acme-inc.com/api/v3',
+  baseUrl: 'https://github-enterprise.acme-inc.com/api/v3',
   headers: {
     'user-agent': 'myApp/1.2.3'
   },
