@@ -174,6 +174,17 @@ const result = await octokitRequest({
       Set request body directly instead of setting it to JSON based on additional parameters. See <a href="#data-parameter">"The `data` parameter"</a> below.
     </td>
   </tr>
+  <tr>
+    <th align=left>
+      <code>request</code>
+    </th>
+    <td>
+      Object
+    </td>
+    <td>
+      Pass [node-fetch extensions options](https://github.com/bitinn/node-fetch#options), such as `agent` or `timeout`
+    </td>
+  </tr>
 </table>
 
 All other options will passed depending on the `method` and `url` options.
