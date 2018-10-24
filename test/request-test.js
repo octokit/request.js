@@ -293,4 +293,29 @@ describe('octokitRequest()', () => {
       }
     })
   })
+
+  it('passes node-fetch options to fetch only', () => {
+    octokitRequest.fetch = (url, options) => {
+      expect(url).to.equal('https://api.github.com/')
+      expect(options.timeout).to.equal(100)
+      return Promise.reject(new Error('ok'))
+    }
+
+    return octokitRequest('GET /', {
+      headers: {
+        'user-agent': 'funky boom boom pow'
+      },
+      'request': {
+        timeout: 100
+      }
+    })
+
+      .catch(error => {
+        if (error.message === 'ok') {
+          return
+        }
+
+        throw error
+      })
+  })
 })
