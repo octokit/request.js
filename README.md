@@ -210,19 +210,9 @@ All other options will passed depending on the `method` and `url` options.
     <td>Response status code</td>
   </tr>
   <tr>
-    <th align=left><code>redirect</code></th>
-    <td>String</td>
-    <td>Set to <code>"manual"</code> to extract redirect headers, <code>"error"</code> to reject redirect. Defaults to <code>"follow"</code></td>
-  </tr>
-  <tr>
     <th align=left><code>data</code></th>
     <td>Any</td>
     <td>The response body as returned from server. If the response is JSON then it will be parsed into an object</td>
-  </tr>
-  <tr>
-    <th align=left><code>agent</code></th>
-    <td>Node http(s).Agent</td>
-    <td>For advanced request options in node you can pass in a node Agent (<a href="https://nodejs.org/api/http.html#http_class_http_agent">http</a>, <a href="https://nodejs.org/api/https.html#https_class_https_agent">https</a>)</td>
   </tr>
 </table>
 
