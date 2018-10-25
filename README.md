@@ -153,18 +153,6 @@ const result = await octokitRequest({
   </tr>
   <tr>
     <th align=left>
-      <code>url</code>
-    </th>
-    <td>
-      String
-    </td>
-    <td>
-      <strong>Required.</strong> A path or full URL which may contain <code>:variable</code> or <code>{variable}</code> placeholders,
-      e.g. <code>/orgs/:org/repos</code>. The <code>url</code> is parsed using <a href="https://github.com/bramstein/url-template">url-template</a>.
-    </td>
-  </tr>
-  <tr>
-    <th align=left>
       <code>data</code>
     </th>
     <td>
