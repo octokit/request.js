@@ -325,7 +325,8 @@ describe('octokitRequest()', () => {
       .post('https://api.github.com/repos/octocat/hello-world/labels', {
         status: 422,
         headers: {
-          'Content-Type': 'application/json; charset=utf-8'
+          'Content-Type': 'application/json; charset=utf-8',
+          'X-Foo': 'bar'
         },
         body: {
           message: 'Validation Failed',
@@ -347,6 +348,7 @@ describe('octokitRequest()', () => {
 
       .catch(error => {
         expect(error.code).to.equal(422)
+        expect(error.headers['x-foo']).to.equal('bar')
         expect(error.documentation_url).to.equal('https://developer.github.com/v3/issues/labels/#create-a-label')
         expect(error.errors).to.deep.equal([{ resource: 'Label', code: 'invalid', field: 'color' }])
       })
