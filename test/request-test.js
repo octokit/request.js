@@ -319,4 +319,36 @@ describe('octokitRequest()', () => {
         throw error
       })
   })
+
+  it('422 error with details', () => {
+    mockable.fetch = fetchMock.sandbox()
+      .post('https://api.github.com/repos/octocat/hello-world/labels', {
+        status: 422,
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8'
+        },
+        body: {
+          message: 'Validation Failed',
+          errors: [
+            {
+              resource: 'Label',
+              code: 'invalid',
+              field: 'color'
+            }
+          ],
+          documentation_url: 'https://developer.github.com/v3/issues/labels/#create-a-label'
+        }
+      })
+
+    return octokitRequest('POST /repos/octocat/hello-world/labels', {
+      name: 'foo',
+      color: 'invalid'
+    })
+
+      .catch(error => {
+        expect(error.code).to.equal(422)
+        expect(error.documentation_url).to.equal('https://developer.github.com/v3/issues/labels/#create-a-label')
+        expect(error.errors).to.deep.equal([{ resource: 'Label', code: 'invalid', field: 'color' }])
+      })
+  })
 })
