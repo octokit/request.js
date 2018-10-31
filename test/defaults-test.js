@@ -3,6 +3,7 @@ const fetchMock = require('fetch-mock/es5/server')
 const sinonChai = require('sinon-chai')
 
 const octokitRequest = require('..')
+const mockable = require('../lib/fetch')
 
 const expect = chai.expect
 chai.use(sinonChai)
@@ -13,7 +14,7 @@ describe('endpoint.defaults()', () => {
   })
 
   it('README example', () => {
-    octokitRequest.fetch = fetchMock.sandbox()
+    mockable.fetch = fetchMock.sandbox()
       .mock('https://github-enterprise.acme-inc.com/api/v3/orgs/my-project/repos?per_page=100', [], {
         headers: {
           accept: 'application/vnd.github.v3+json',
@@ -40,7 +41,7 @@ describe('endpoint.defaults()', () => {
   })
 
   it('repeated defaults', () => {
-    octokitRequest.fetch = fetchMock.sandbox()
+    mockable.fetch = fetchMock.sandbox()
       .get('https://github-enterprise.acme-inc.com/api/v3/orgs/my-project/repos', [], {
         headers: {
           accept: 'application/vnd.github.v3+json',
