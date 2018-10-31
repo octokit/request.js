@@ -15,6 +15,26 @@ It uses [`@octokit/endpoint`](https://github.com/octokit/endpoint.js) to parse
 the passed options and sends the request using [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
  ([node-fetch](https://github.com/bitinn/node-fetch) in Node).
 
+<!-- update table of contents by running `npx markdown-toc README.md -i` -->
+
+<!-- toc -->
+
+- [Usage](#usage)
+  * [Node](#node)
+  * [Browser](#browser)
+  * [REST API example](#rest-api-example)
+  * [GraphQL example](#graphql-example)
+  * [Alternative: pass `method` & `url` as part of options](#alternative-pass-method--url-as-part-of-options)
+- [octokitRequest()](#octokitrequest)
+- [`octokitRequest.defaults()`](#octokitrequestdefaults)
+- [`octokitRequest.endpoint`](#octokitrequestendpoint)
+- [Special cases](#special-cases)
+  * [The `data` parameter – set request body directly](#the-data-parameter-%E2%80%93-set-request-body-directly)
+  * [Set parameters for both the URL/query and the request body](#set-parameters-for-both-the-urlquery-and-the-request-body)
+- [LICENSE](#license)
+
+<!-- tocstop -->
+
 ## Usage
 
 ### Node
@@ -89,7 +109,11 @@ const result = await octokitRequest({
 })
 ```
 
-## Options
+## octokitRequest()
+
+`octokitRequest(route, options)` or `octokitRequest(options)`.
+
+**Options**
 
 <table>
   <thead>
@@ -107,7 +131,18 @@ const result = await octokitRequest({
   </thead>
   <tr>
     <th align=left>
-      <code>baseUrl</code>
+      <code>route</code>
+    </th>
+    <td>
+      String
+    </td>
+    <td>
+      If <code>route</code> is set it has to be a string consisting of the request method and URL, e.g. <code>GET /orgs/:org</code>
+    </td>
+  </tr>
+  <tr>
+    <th align=left>
+      <code>options.baseUrl</code>
     </th>
     <td>
       String
@@ -117,7 +152,7 @@ const result = await octokitRequest({
     </td>
   </tr>
     <th align=left>
-      <code>headers</code>
+      <code>options.headers</code>
     </th>
     <td>
       Object
@@ -130,7 +165,7 @@ const result = await octokitRequest({
   </tr>
   <tr>
     <th align=left>
-      <code>method</code>
+      <code>options.method</code>
     </th>
     <td>
       String
@@ -141,7 +176,7 @@ const result = await octokitRequest({
   </tr>
   <tr>
     <th align=left>
-      <code>url</code>
+      <code>options.url</code>
     </th>
     <td>
       String
@@ -153,7 +188,7 @@ const result = await octokitRequest({
   </tr>
   <tr>
     <th align=left>
-      <code>data</code>
+      <code>options.data</code>
     </th>
     <td>
       Any
@@ -164,13 +199,13 @@ const result = await octokitRequest({
   </tr>
   <tr>
     <th align=left>
-      <code>request</code>
+      <code>options.request</code>
     </th>
     <td>
       Object
     </td>
     <td>
-     Pass <a href="https://github.com/bitinn/node-fetch#options">node-fetch extensions options</a>, such as <code>agent</code> or <code>timeout</code>
+     Pass <a href="https://github.com/bitinn/node-fetch#options">node-fetch extensions options</a>, such as <code>agent</code> or <code>timeout</code>. All other `options.request.*` keys will be ignored.
     </td>
   </tr>
 </table>
@@ -181,7 +216,7 @@ All other options will passed depending on the `method` and `url` options.
 2. If the `method` is `GET` or `HEAD`, the option is passed as query parameter
 3. Otherwise the parameter is passed in the request body as JSON key.
 
-## Result
+**Result**
 
 `octokitRequest` returns a promise and resolves with 3 keys
 
@@ -216,7 +251,7 @@ All other options will passed depending on the `method` and `url` options.
   </tr>
 </table>
 
-## `request.defaults()`
+## `octokitRequest.defaults()`
 
 Override or set default options. Example:
 
@@ -237,7 +272,7 @@ myOctokitRequest(`GET /orgs/:org/repos`)
 You can call `.defaults()` again on the returned method, the defaults will cascade.
 
 ```js
-const myProjectRequest = request.defaults({
+const myProjectRequest = octokitRequest.defaults({
   baseUrl: 'https://github-enterprise.acme-inc.com/api/v3',
   headers: {
     'user-agent': 'myApp/1.2.3'
@@ -255,9 +290,33 @@ const myProjectRequestWithAuth = myProjectRequest.defaults({
 `org` and `headers['authorization']` on top of `headers['accept']` that is set
 by the global default.
 
-## `request.endpoint`
+## `octokitRequest.endpoint`
 
-See https://github.com/octokit/endpoint.js
+See https://github.com/octokit/endpoint.js. Example
+
+```js
+const options = octokitRequest.endpoint('GET /orgs/:org/repos', {
+  org: 'my-project',
+  type: 'private'
+})
+
+// {
+//   method: 'GET',
+//   url: 'https://api.github.com/orgs/my-project/repos?type=private',
+//   headers: {
+//     accept: 'application/vnd.github.v3+json',
+//     authorization: 'token 0000000000000000000000000000000000000001',
+//     'user-agent': 'octokit/endpoint.js v1.2.3'
+//   }
+// }
+```
+
+All of the [`@octokit/endpoint`](https://github.com/octokit/endpoint.js) API can be used:
+
+- [`ocotkitRequest.endpoint()`](#endpoint)
+- [`ocotkitRequest.endpoint.defaults()`](#endpointdefaults)
+- [`ocotkitRequest.endpoint.merge()`](#endpointdefaults)
+- [`ocotkitRequest.endpoint.parse()`](#endpointmerge)
 
 ## Special cases
 
