@@ -170,7 +170,7 @@ const result = await octokitRequest({
       Object
     </td>
     <td>
-      Pass [node-fetch extensions options](https://github.com/bitinn/node-fetch#options), such as `agent` or `timeout`
+     Pass <a href="https://github.com/bitinn/node-fetch#options">node-fetch extensions options</a>, such as <code>agent</code> or <code>timeout</code>
     </td>
   </tr>
 </table>
