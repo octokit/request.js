@@ -159,7 +159,7 @@ describe('octokitRequest()', () => {
       })
 
       .catch(error => {
-        expect(error.code).to.equal(404)
+        expect(error.status).to.equal(404)
       })
   })
 
@@ -223,7 +223,7 @@ describe('octokitRequest()', () => {
       })
 
       .catch(error => {
-        expect(error.code).to.equal(304)
+        expect(error.status).to.equal(304)
       })
   })
 
@@ -240,7 +240,7 @@ describe('octokitRequest()', () => {
       })
 
       .catch(error => {
-        expect(error.code).to.equal(404)
+        expect(error.status).to.equal(404)
       })
   })
 
@@ -279,7 +279,7 @@ describe('octokitRequest()', () => {
         })
 
         .catch(error => {
-          expect(error.code).to.equal(500)
+          expect(error.status).to.equal(500)
         })
     })
   }
@@ -347,10 +347,27 @@ describe('octokitRequest()', () => {
     })
 
       .catch(error => {
-        expect(error.code).to.equal(422)
+        expect(error.status).to.equal(422)
         expect(error.headers['x-foo']).to.equal('bar')
         expect(error.documentation_url).to.equal('https://developer.github.com/v3/issues/labels/#create-a-label')
         expect(error.errors).to.deep.equal([{ resource: 'Label', code: 'invalid', field: 'color' }])
+      })
+  })
+
+  it('error.code (deprecated)', () => {
+    mockable.fetch = fetchMock.sandbox()
+      .get('path:/orgs/nope', 404)
+
+    return octokitRequest('GET /orgs/:org', {
+      org: 'nope'
+    })
+
+      .then(() => {
+        throw new Error('should not resolve')
+      })
+
+      .catch(error => {
+        expect(error.code).to.equal(404)
       })
   })
 })
