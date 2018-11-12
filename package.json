@@ -91,5 +91,8 @@
       "it",
       "expect"
     ]
-  }
+  },
+  "files": [
+    "lib" 
+  ]
 }
