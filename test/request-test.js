@@ -1,12 +1,10 @@
 const chai = require('chai')
 const getUserAgent = require('universal-user-agent')
 const fetchMock = require('fetch-mock/es5/server')
-const sinonChai = require('sinon-chai')
 
 const octokitRequest = require('..')
 const mockable = require('../lib/fetch')
 
-chai.use(sinonChai)
 const expect = chai.expect
 const originalFetch = mockable.fetch
 
