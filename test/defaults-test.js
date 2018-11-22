@@ -1,12 +1,10 @@
 const chai = require('chai')
 const fetchMock = require('fetch-mock/es5/server')
-const sinonChai = require('sinon-chai')
 
 const octokitRequest = require('..')
 const mockable = require('../lib/fetch')
 
 const expect = chai.expect
-chai.use(sinonChai)
 
 describe('endpoint.defaults()', () => {
   it('is a function', () => {
