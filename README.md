@@ -251,6 +251,12 @@ All other options will passed depending on the `method` and `url` options.
   </tr>
 </table>
 
+If an error occurs, the `error` instance has additional properties to help with debugging
+
+- `error.status` The http response status code
+- `error.headers` The http response headers as an object
+- `error.request` The request options such as `method`, `url` and `data`
+
 ## `octokitRequest.defaults()`
 
 Override or set default options. Example:
