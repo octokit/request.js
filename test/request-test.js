@@ -375,4 +375,15 @@ describe('octokitRequest()', () => {
         console.warn = consoleWarn
       })
   })
+
+  it('Just URL', () => {
+    mockable.fetch = fetchMock.sandbox()
+      .get('path:/', 200)
+
+    return octokitRequest('/')
+
+      .then(({ status }) => {
+        expect(status).to.equal(200)
+      })
+  })
 })
