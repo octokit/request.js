@@ -239,6 +239,8 @@ describe('octokitRequest()', () => {
 
       .catch(error => {
         expect(error.status).to.equal(404)
+        expect(error.request.method).to.equal('GET')
+        expect(error.request.url).to.equal('https://api.github.com/orgs/nope')
       })
   })
 
@@ -356,6 +358,9 @@ describe('octokitRequest()', () => {
     mockable.fetch = fetchMock.sandbox()
       .get('path:/orgs/nope', 404)
 
+    const consoleWarn = console.warn
+    let warnCalled = 0
+    console.warn = () => warnCalled++
     return octokitRequest('GET /orgs/:org', {
       org: 'nope'
     })
@@ -366,6 +371,8 @@ describe('octokitRequest()', () => {
 
       .catch(error => {
         expect(error.code).to.equal(404)
+        expect(warnCalled).to.equal(1)
+        console.warn = consoleWarn
       })
   })
 })
