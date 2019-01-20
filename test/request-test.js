@@ -386,4 +386,15 @@ describe('octokitRequest()', () => {
         expect(status).to.equal(200)
       })
   })
+
+  it('Resolves with url', () => {
+    mockable.fetch = fetchMock.sandbox()
+      .get('path:/', 200)
+
+    return octokitRequest('/')
+
+      .then(({ url }) => {
+        expect(url).to.equal('https://api.github.com/')
+      })
+  })
 })
