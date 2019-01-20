@@ -218,7 +218,7 @@ All other options will passed depending on the `method` and `url` options.
 
 **Result**
 
-`octokitRequest` returns a promise and resolves with 3 keys
+`octokitRequest` returns a promise and resolves with 4 keys
 
 <table>
   <thead>
@@ -235,14 +235,19 @@ All other options will passed depending on the `method` and `url` options.
     </tr>
   </thead>
   <tr>
+    <th align=left><code>status</code></th>
+    <td>Integer</td>
+    <td>Response status status</td>
+  </tr>
+  <tr>
+    <th align=left><code>url</code></th>
+    <td>String</td>
+    <td>URL of response. If a request results in redirects, this is the final URL. You can send a <code>HEAD</code> request to retrieve it without loading the full response body.</td>
+  </tr>
+  <tr>
     <th align=left><code>headers</code></th>
     <td>Object</td>
     <td>All response headers</td>
-  </tr>
-  <tr>
-    <th align=left><code>code</code></th>
-    <td>Integer</td>
-    <td>Response status code</td>
   </tr>
   <tr>
     <th align=left><code>data</code></th>
