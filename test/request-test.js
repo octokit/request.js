@@ -388,9 +388,10 @@ describe('octokitRequest()', () => {
   })
 
   it('Resolves with url', () => {
-    mockable.fetch = fetchMock.sandbox()
-      .get('path:/', 200)
-
+    // this test cannot be mocked with `fetch-mock`. I don’t like to rely on
+    // external websites to run tests, but in this case I’ll make an exception.
+    // The alternative would be to start a local server we then send a request to,
+    // this would only work in Node, so we would need to adapt the test setup, too.
     return octokitRequest('/')
 
       .then(({ url }) => {
