@@ -1,11 +1,11 @@
-const { endpoint } = require('@octokit/endpoint')
-const getUserAgent = require('universal-user-agent')
+import { endpoint } from '@octokit/endpoint'
+import getUserAgent from 'universal-user-agent'
 
-const version = require('./package.json').version
+import { version } from './package.json';
 const userAgent = `octokit-request.js/${version} ${getUserAgent()}`
-const withDefaults = require('./lib/with-defaults')
+import withDefaults from './lib/with-defaults'
 
-module.exports = withDefaults(endpoint, {
+export default withDefaults(endpoint, {
   headers: {
     'user-agent': userAgent
   }
