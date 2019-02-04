@@ -392,16 +392,12 @@ describe('octokitRequest()', () => {
     // external websites to run tests, but in this case I’ll make an exception.
     // The alternative would be to start a local server we then send a request to,
     // this would only work in Node, so we would need to adapt the test setup, too.
-    // We also can’t test this on Travis because it’s an unauthenticated request
-    // and these are usually blocked due to IP rate limiting
-    if (process.env.TRAVIS) {
-      return this.skip()
-    }
-
-    return octokitRequest('/')
+    // We also can’t test the GitHub API, because on Travis unauthenticated
+    // GitHub API requests are usually blocked due to IP rate limiting
+    return octokitRequest('https://example.com/')
 
       .then(({ url }) => {
-        expect(url).to.equal('https://api.github.com/')
+        expect(url).to.equal('https://example.com/')
       })
   })
 })
