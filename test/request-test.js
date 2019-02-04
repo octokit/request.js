@@ -387,11 +387,17 @@ describe('octokitRequest()', () => {
       })
   })
 
-  it('Resolves with url', () => {
+  it('Resolves with url', function () {
     // this test cannot be mocked with `fetch-mock`. I don’t like to rely on
     // external websites to run tests, but in this case I’ll make an exception.
     // The alternative would be to start a local server we then send a request to,
     // this would only work in Node, so we would need to adapt the test setup, too.
+    // We also can’t test this on Travis because it’s an unauthenticated request
+    // and these are usually blocked due to IP rate limiting
+    if (process.env.TRAVIS) {
+      return this.skip()
+    }
+
     return octokitRequest('/')
 
       .then(({ url }) => {
