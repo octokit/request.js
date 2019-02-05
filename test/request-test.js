@@ -394,10 +394,10 @@ describe('octokitRequest()', () => {
     // this would only work in Node, so we would need to adapt the test setup, too.
     // We also can’t test the GitHub API, because on Travis unauthenticated
     // GitHub API requests are usually blocked due to IP rate limiting
-    return octokitRequest('https://example.com/')
+    return octokitRequest('https://www.githubstatus.com/api/v2/status.json')
 
       .then(({ url }) => {
-        expect(url).to.equal('https://example.com/')
+        expect(url).to.equal('https://www.githubstatus.com/api/v2/status.json')
       })
   })
 })
