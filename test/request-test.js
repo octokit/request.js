@@ -433,4 +433,20 @@ describe('octokitRequest()', () => {
         expect(url).to.equal('https://www.githubstatus.com/api/v2/status.json')
       })
   })
+
+  it.only('options.request.signal is passed as option to fetch', function () {
+    return octokitRequest('/', {
+      request: {
+        signal: 'funk'
+      }
+    })
+
+      .then(() => {
+        throw new Error('Should not resolve')
+      })
+
+      .catch((error) => {
+        expect(error.message).to.equal('Expected signal to be an instanceof AbortSignal')
+      })
+  })
 })
