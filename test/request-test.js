@@ -354,6 +354,39 @@ describe('octokitRequest()', () => {
       })
   })
 
+  it('redacts credentials from error.request.headers.authorization', () => {
+    mockable.fetch = fetchMock.sandbox()
+      .get('https://api.github.com/', {
+        status: 500
+      })
+
+    return octokitRequest('/', {
+      headers: {
+        authorization: 'token secret123'
+      }
+    })
+
+      .catch(error => {
+        expect(error.request.headers.authorization).to.equal('token [REDACTED]')
+      })
+  })
+
+  it('redacts credentials from error.request.url', () => {
+    mockable.fetch = fetchMock.sandbox()
+      .get('https://api.github.com/?client_id=123&client_secret=secret123', {
+        status: 500
+      })
+
+    return octokitRequest('/', {
+      client_id: '123',
+      client_secret: 'secret123'
+    })
+
+      .catch(error => {
+        expect(error.request.url).to.equal('https://api.github.com/?client_id=123&client_secret=[REDACTED]')
+      })
+  })
+
   it('error.code (deprecated)', () => {
     mockable.fetch = fetchMock.sandbox()
       .get('path:/orgs/nope', 404)
