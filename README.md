@@ -235,6 +235,17 @@ const result = await octokitRequest({
   </tr>
   <tr>
     <th align=left>
+      <code>options.request.fetch</code>
+    </th>
+    <td>
+      Function
+    </td>
+    <td>
+     Custom replacement for <a href="https://github.com/bitinn/node-fetch">built-in fetch method</a>. Useful for testing or request hooks.
+    </td>
+  </tr>
+  <tr>
+    <th align=left>
       <a name="options-request-signal"></a><code>options.request.signal</code>
     </th>
     <td>
@@ -249,7 +260,7 @@ const result = await octokitRequest({
       <code>options.request.timeout</code>
     </th>
     <td>
-      number
+      Number
     </td>
     <td>
      Node only. Request/response timeout in ms, it resets on redirect. 0 to disable (OS limit applies). <a href="#options-request-signal">options.request.signal</a> is recommended instead.
