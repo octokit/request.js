@@ -434,7 +434,7 @@ describe('octokitRequest()', () => {
       })
   })
 
-  it.only('options.request.signal is passed as option to fetch', function () {
+  it('options.request.signal is passed as option to fetch', function () {
     return octokitRequest('/', {
       request: {
         signal: 'funk'
