@@ -54,6 +54,8 @@ the passed options and sends the request using [fetch](https://developer.mozilla
 - `headers.accept`: `application/vnd.github.v3+json`
 - `headers.agent`: `octokit-request.js/<current version> <OS information>`, e.g. `octokit-request.js/1.2.3 Node.js/10.15.0 (macOS Mojave; x64)`
 
+👌 Simple to test: mock requests by passing a custom fetch method.
+
 🧐 Simple to debug: Sets `error.request` to request options causing the error (with redacted credentials).  
 
 👶 Small bundle size (\<5kb minified + gzipped)
@@ -222,18 +224,40 @@ const result = await octokitRequest({
   </tr>
   <tr>
     <th align=left>
-      <code>options.request</code>
+      <code>options.request.agent</code>
     </th>
     <td>
-      Object
+      <a href="https://nodejs.org/api/http.html#http_class_http_agent">http(s).Agent</a> instance
     </td>
     <td>
-     Pass <a href="https://github.com/bitinn/node-fetch#options">node-fetch extensions options</a>, such as <code>agent</code> or <code>timeout</code>. All other `options.request.*` keys will be ignored.
+     Node only. Useful for custom proxy, certificate, or dns lookup.
+    </td>
+  </tr>
+  <tr>
+    <th align=left>
+      <a name="options-request-signal"></a><code>options.request.signal</code>
+    </th>
+    <td>
+      <a href="https://github.com/bitinn/node-fetch/tree/e996bdab73baf996cf2dbf25643c8fe2698c3249#request-cancellation-with-abortsignal">new AbortController().signal</a>
+    </td>
+    <td>
+      Use an <code>AbortController</code> instance to cancel a request. In node you can only cancel streamed requests.
+    </td>
+  </tr>
+  <tr>
+    <th align=left>
+      <code>options.request.timeout</code>
+    </th>
+    <td>
+      number
+    </td>
+    <td>
+     Node only. Request/response timeout in ms, it resets on redirect. 0 to disable (OS limit applies). <a href="#options-request-signal">options.request.signal</a> is recommended instead.
     </td>
   </tr>
 </table>
 
-All other options will passed depending on the `method` and `url` options.
+All other options except `options.request.*` will be passed depending on the `method` and `url` options.
 
 1. If the option key is a placeholder in the `url`, it will be used as replacement. For example, if the passed options are `{url: '/orgs/:org/repos', org: 'foo'}` the returned `options.url` is `https://api.github.com/orgs/foo/repos`
 2. If the `method` is `GET` or `HEAD`, the option is passed as query parameter
