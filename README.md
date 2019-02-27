@@ -19,6 +19,7 @@ the passed options and sends the request using [fetch](https://developer.mozilla
 
 <!-- toc -->
 
+- [Features](#features)
 - [Usage](#usage)
   * [Node](#node)
   * [Browser](#browser)
@@ -34,6 +35,28 @@ the passed options and sends the request using [fetch](https://developer.mozilla
 - [LICENSE](#license)
 
 <!-- tocstop -->
+
+## Features
+
+🤩 1:1 mapping of REST API endpoint documentation, e.g. [Add labels to an issue](https://developer.github.com/v3/issues/labels/#add-labels-to-an-issue) becomes
+
+  ```js
+  request('POST /repos/:owner/:repo/issues/:number/labels', {
+    headers: {
+      accept: 'application/vnd.github.symmetra-preview+json'
+    },
+    labels: ['🐛 bug']
+  })
+  ```
+👍 Sensible defaults
+
+- `baseUrl`: `https://api.github.com`
+- `headers.accept`: `application/vnd.github.v3+json`
+- `headers.agent`: `octokit-request.js/<current version> <OS information>`, e.g. `octokit-request.js/1.2.3 Node.js/10.15.0 (macOS Mojave; x64)`
+
+🧐 Simple to debug: Sets `error.request` to request options causing the error (with redacted credentials).  
+
+👶 Small bundle size (\<5kb minified + gzipped)
 
 ## Usage
 
