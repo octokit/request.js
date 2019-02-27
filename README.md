@@ -424,8 +424,6 @@ octokitRequest('POST https://uploads.github.com/repos/octocat/Hello-World/releas
 })
 ```
 
-
-
 ## LICENSE
 
 [MIT](LICENSE)
