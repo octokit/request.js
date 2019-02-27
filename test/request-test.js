@@ -1,6 +1,7 @@
 const chai = require('chai')
 const getUserAgent = require('universal-user-agent')
 const fetchMock = require('fetch-mock/es5/server')
+const fetch = require('node-fetch')
 
 const octokitRequest = require('..')
 const mockable = require('../lib/fetch')
@@ -447,6 +448,27 @@ describe('octokitRequest()', () => {
 
       .catch((error) => {
         expect(error.message).to.equal('Expected signal to be an instanceof AbortSignal')
+      })
+  })
+
+  it('options.request.fetch', function () {
+    return octokitRequest('/', {
+      request: {
+        fetch: () => Promise.resolve({
+          status: 200,
+          headers: new fetch.Headers({
+            'Content-Type': 'application/json; charset=utf-8'
+          }),
+          url: 'http://api.github.com/',
+          json () {
+            return Promise.resolve('funk')
+          }
+        })
+      }
+    })
+
+      .then((result) => {
+        expect(result.data).to.equal('funk')
       })
   })
 })
