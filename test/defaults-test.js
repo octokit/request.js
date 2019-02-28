@@ -2,7 +2,6 @@ const chai = require('chai')
 const fetchMock = require('fetch-mock/es5/server')
 
 const octokitRequest = require('..')
-const mockable = require('../lib/fetch')
 
 const expect = chai.expect
 
@@ -12,7 +11,7 @@ describe('endpoint.defaults()', () => {
   })
 
   it('README example', () => {
-    mockable.fetch = fetchMock.sandbox()
+    const mock = fetchMock.sandbox()
       .mock('https://github-enterprise.acme-inc.com/api/v3/orgs/my-project/repos?per_page=100', [], {
         headers: {
           accept: 'application/vnd.github.v3+json',
@@ -28,7 +27,10 @@ describe('endpoint.defaults()', () => {
         authorization: `token 0000000000000000000000000000000000000001`
       },
       org: 'my-project',
-      per_page: 100
+      per_page: 100,
+      request: {
+        fetch: mock
+      }
     })
 
     return myRequest(`GET /orgs/:org/repos`)
@@ -39,7 +41,7 @@ describe('endpoint.defaults()', () => {
   })
 
   it('repeated defaults', () => {
-    mockable.fetch = fetchMock.sandbox()
+    const mock = fetchMock.sandbox()
       .get('https://github-enterprise.acme-inc.com/api/v3/orgs/my-project/repos', [], {
         headers: {
           accept: 'application/vnd.github.v3+json',
@@ -53,7 +55,10 @@ describe('endpoint.defaults()', () => {
       headers: {
         'user-agent': 'myApp/1.2.3'
       },
-      org: 'my-project'
+      org: 'my-project',
+      request: {
+        fetch: mock
+      }
     })
     const myProjectRequestWithAuth = myProjectRequest.defaults({
       headers: {
