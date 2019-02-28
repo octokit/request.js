@@ -484,7 +484,8 @@ describe('octokitRequest()', () => {
       })
 
       .catch((error) => {
-        expect(error.message).to.equal('Expected signal to be an instanceof AbortSignal')
+        expect(error.message).to.match(/\bsignal\b/i)
+        expect(error.message).to.match(/\bAbortSignal\b/i)
       })
   })
 
