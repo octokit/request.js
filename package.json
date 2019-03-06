@@ -37,8 +37,10 @@
   "homepage": "https://github.com/octokit/request.js#readme",
   "dependencies": {
     "@octokit/endpoint": "^3.1.1",
+    "deprecation": "^1.0.1",
     "is-plain-object": "^2.0.4",
     "node-fetch": "^2.3.0",
+    "once": "^1.4.0",
     "universal-user-agent": "^2.0.1"
   },
   "devDependencies": {
