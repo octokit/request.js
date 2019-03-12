@@ -45,6 +45,9 @@ the passed options and sends the request using [fetch](https://developer.mozilla
     headers: {
       accept: 'application/vnd.github.symmetra-preview+json'
     },
+    owner: 'ocotkit',
+    repo: 'request.js',
+    number: 1,
     labels: ['🐛 bug']
   })
   ```
