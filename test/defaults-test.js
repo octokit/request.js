@@ -44,7 +44,7 @@ describe('endpoint.defaults()', () => {
     const mock = fetchMock.sandbox()
       .get('https://github-enterprise.acme-inc.com/api/v3/orgs/my-project/repos', [], {
         headers: {
-          accept: 'application/vnd.github.v3+json',
+          accept: 'application/vnd.foo-preview.raw+json,application/vnd.bar-preview.raw+json',
           authorization: 'token 0000000000000000000000000000000000000001',
           'user-agent': 'myApp/1.2.3'
         }
@@ -54,6 +54,10 @@ describe('endpoint.defaults()', () => {
       baseUrl: 'https://github-enterprise.acme-inc.com/api/v3',
       headers: {
         'user-agent': 'myApp/1.2.3'
+      },
+      mediaType: {
+        format: 'raw+json',
+        previews: ['foo', 'bar']
       },
       org: 'my-project',
       request: {

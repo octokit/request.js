@@ -509,4 +509,64 @@ describe('octokitRequest()', () => {
         expect(result.data).to.equal('funk')
       })
   })
+
+  it('options.mediaType.format', function () {
+    const mock = fetchMock.sandbox()
+      .mock('https://api.github.com/repos/octokit/request.js/issues/1', 'ok', {
+        headers: {
+          accept: 'application/vnd.github.v3.raw+json',
+          authorization: 'token 0000000000000000000000000000000000000001',
+          'user-agent': userAgent
+        }
+      })
+
+    return octokitRequest('GET /repos/:owner/:repo/issues/:number', {
+      headers: {
+        authorization: 'token 0000000000000000000000000000000000000001'
+      },
+      mediaType: {
+        format: 'raw+json'
+      },
+      owner: 'octokit',
+      repo: 'request.js',
+      number: 1,
+      request: {
+        fetch: mock
+      }
+    })
+
+      .then(response => {
+        expect(response.data).to.equal('ok')
+      })
+  })
+
+  it('options.mediaType.previews', function () {
+    const mock = fetchMock.sandbox()
+      .mock('https://api.github.com/repos/octokit/request.js/issues/1', 'ok', {
+        headers: {
+          accept: 'application/vnd.foo-preview+json,application/vnd.bar-preview+json',
+          authorization: 'token 0000000000000000000000000000000000000001',
+          'user-agent': userAgent
+        }
+      })
+
+    return octokitRequest('GET /repos/:owner/:repo/issues/:number', {
+      headers: {
+        authorization: 'token 0000000000000000000000000000000000000001'
+      },
+      mediaType: {
+        previews: ['foo', 'bar']
+      },
+      owner: 'octokit',
+      repo: 'request.js',
+      number: 1,
+      request: {
+        fetch: mock
+      }
+    })
+
+      .then(response => {
+        expect(response.data).to.equal('ok')
+      })
+  })
 })
