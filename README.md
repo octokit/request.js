@@ -193,6 +193,28 @@ const result = await octokitRequest({
   </tr>
   <tr>
     <th align=left>
+      <code>options.mediaType.format</code>
+    </th>
+    <td>
+      String
+    </td>
+    <td>
+      Media type param, such as `raw`, `html`, or `full`. See <a href="https://developer.github.com/v3/media/">Media Types</a>.
+    </td>
+  </tr>
+  <tr>
+    <th align=left>
+      <code>options.mediaType.preview</code>
+    </th>
+    <td>
+      Array of strings
+    </td>
+    <td>
+      Name of previews, such as `mercy`, `symmetra`, or `scarlet-witch`. See <a href="https://developer.github.com/v3/previews/">API Previews</a>.
+    </td>
+  </tr>
+  <tr>
+    <th align=left>
       <code>options.method</code>
     </th>
     <td>
