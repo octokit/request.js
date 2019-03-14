@@ -544,7 +544,7 @@ describe('octokitRequest()', () => {
     const mock = fetchMock.sandbox()
       .mock('https://api.github.com/repos/octokit/request.js/issues/1', 'ok', {
         headers: {
-          accept: 'application/vnd.foo-preview+json,application/vnd.bar-preview+json',
+          accept: 'application/vnd.github.foo-preview+json,application/vnd.github.bar-preview+json',
           authorization: 'token 0000000000000000000000000000000000000001',
           'user-agent': userAgent
         }

@@ -44,7 +44,7 @@ describe('endpoint.defaults()', () => {
     const mock = fetchMock.sandbox()
       .get('https://github-enterprise.acme-inc.com/api/v3/orgs/my-project/repos', [], {
         headers: {
-          accept: 'application/vnd.foo-preview.raw+json,application/vnd.bar-preview.raw+json',
+          accept: 'application/vnd.github.foo-preview.raw+json,application/vnd.github.bar-preview.raw+json',
           authorization: 'token 0000000000000000000000000000000000000001',
           'user-agent': 'myApp/1.2.3'
         }
