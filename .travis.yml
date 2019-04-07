@@ -20,9 +20,7 @@ stages:
 jobs:
   include:
     - stage: test
-      node_js: 6
-      script: npm run test
-    - node_js: 8
+      node_js: 8
       script: npm run test
     - node_js: 10
       env: Node 10, coverage upload
