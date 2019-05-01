@@ -1,18 +1,15 @@
-const chai = require('chai')
 const getUserAgent = require('universal-user-agent')
 const fetchMock = require('fetch-mock/es5/server')
 const fetch = require('node-fetch')
 
-const octokitRequest = require('..')
-
-const expect = chai.expect
+const octokitRequest = require('../src')
 
 const pkg = require('../package.json')
 const userAgent = `octokit-request.js/${pkg.version} ${getUserAgent()}`
 
 describe('octokitRequest()', () => {
   it('is a function', () => {
-    expect(octokitRequest).to.be.a('function')
+    expect(octokitRequest).toBeInstanceOf(Function)
   })
 
   it('README example', () => {
@@ -37,7 +34,7 @@ describe('octokitRequest()', () => {
     })
 
       .then(response => {
-        expect(response.data).to.deep.equal([])
+        expect(response.data).toEqual([])
       })
   })
 
@@ -59,7 +56,7 @@ describe('octokitRequest()', () => {
     })
 
       .then(response => {
-        expect(response.data).to.deep.equal([])
+        expect(response.data).toEqual([])
       })
   })
 
@@ -92,7 +89,7 @@ describe('octokitRequest()', () => {
     })
 
       .then(response => {
-        expect(response.status).to.equal(201)
+        expect(response.status).toEqual(201)
       })
   })
 
@@ -116,7 +113,7 @@ describe('octokitRequest()', () => {
     })
 
       .then(response => {
-        expect(response.status).to.equal(204)
+        expect(response.status).toEqual(204)
       })
   })
 
@@ -149,7 +146,7 @@ describe('octokitRequest()', () => {
     octokitRequest(`HEAD /repos/:owner/:repo/pulls/:number`, options)
 
       .then(response => {
-        expect(response.status).to.equal(200)
+        expect(response.status).toEqual(200)
 
         return octokitRequest(`HEAD /repos/:owner/:repo/pulls/:number`, Object.assign(options, { number: 2 }))
       })
@@ -159,7 +156,7 @@ describe('octokitRequest()', () => {
       })
 
       .catch(error => {
-        expect(error.status).to.equal(404)
+        expect(error.status).toEqual(404)
       })
   })
 
@@ -185,7 +182,7 @@ describe('octokitRequest()', () => {
     })
 
       .then(response => {
-        expect(response.data.length).to.equal(172)
+        expect(response.data.length).toEqual(172)
       })
   })
 
@@ -196,7 +193,7 @@ describe('octokitRequest()', () => {
         .get('https://codeload.github.com/octokit-fixture-org/get-archive/legacy.tar.gz/master', {
           status: 200,
 
-          // expect(response.data.length).to.equal(172)
+          // expect(response.data.length).toEqual(172)
           // body: Buffer.from('1f8b0800000000000003cb4f2ec9cfce2cd14dcbac28292d4ad5cd2f4ad74d4f2dd14d2c4acec82c4bd53580007d060a0050bfb9b9a90203c428741ac2313436343307222320dbc010a8dc5c81c194124b8905a5c525894540a714e5e797e05347481edd734304e41319ff41ae8e2ebeae7ab92964d801d46f66668227fe0d4d51e3dfc8d0c8d808284f75df6201233cfe951590627ba01d330a46c1281805a3806e000024cb59d6000a0000', 'hex'),
           body: Buffer.from('1f8b0800000000000003cb4f2ec9cfce2cd14dcbac28292d4ad5cd2f4ad74d4f2dd14d2c4acec82c4bd53580007d060a0050bfb9b9a90203c428741ac2313436343307222320dbc010a8dc5c81c194124b8905a5c525894540a714e5e797e05347481edd734304e41319ff41ae8e2ebeae7ab92964d801d46f66668227fe0d4d51e3dfc8d0c8d808284f75df6201233cfe951590627ba01d330a46c1281805a3806e000024cb59d6000a0000', 'hex'),
           headers: {
@@ -233,7 +230,7 @@ describe('octokitRequest()', () => {
       })
 
       .catch(error => {
-        expect(error.status).to.equal(304)
+        expect(error.status).toEqual(304)
       })
   })
 
@@ -253,9 +250,9 @@ describe('octokitRequest()', () => {
       })
 
       .catch(error => {
-        expect(error.status).to.equal(404)
-        expect(error.request.method).to.equal('GET')
-        expect(error.request.url).to.equal('https://api.github.com/orgs/nope')
+        expect(error.status).toEqual(404)
+        expect(error.request.method).toEqual('GET')
+        expect(error.request.url).toEqual('https://api.github.com/orgs/nope')
       })
   })
 
@@ -283,7 +280,7 @@ describe('octokitRequest()', () => {
     })
 
       .then((response) => {
-        expect(response.data).to.equal('# hello-world')
+        expect(response.data).toEqual('# hello-world')
       })
   })
 
@@ -297,7 +294,7 @@ describe('octokitRequest()', () => {
         })
 
         .catch(error => {
-          expect(error.status).to.equal(500)
+          expect(error.status).toEqual(500)
         })
     })
   }
@@ -318,8 +315,8 @@ describe('octokitRequest()', () => {
 
   it('passes node-fetch options to fetch only', () => {
     const mock = (url, options) => {
-      expect(url).to.equal('https://api.github.com/')
-      expect(options.timeout).to.equal(100)
+      expect(url).toEqual('https://api.github.com/')
+      expect(options.timeout).toEqual(100)
       return Promise.reject(new Error('ok'))
     }
 
@@ -372,10 +369,10 @@ describe('octokitRequest()', () => {
     })
 
       .catch(error => {
-        expect(error.status).to.equal(422)
-        expect(error.headers['x-foo']).to.equal('bar')
-        expect(error.documentation_url).to.equal('https://developer.github.com/v3/issues/labels/#create-a-label')
-        expect(error.errors).to.deep.equal([{ resource: 'Label', code: 'invalid', field: 'color' }])
+        expect(error.status).toEqual(422)
+        expect(error.headers['x-foo']).toEqual('bar')
+        expect(error.documentation_url).toEqual('https://developer.github.com/v3/issues/labels/#create-a-label')
+        expect(error.errors).toEqual([{ resource: 'Label', code: 'invalid', field: 'color' }])
       })
   })
 
@@ -395,7 +392,7 @@ describe('octokitRequest()', () => {
     })
 
       .catch(error => {
-        expect(error.request.headers.authorization).to.equal('token [REDACTED]')
+        expect(error.request.headers.authorization).toEqual('token [REDACTED]')
       })
   })
 
@@ -414,7 +411,7 @@ describe('octokitRequest()', () => {
     })
 
       .catch(error => {
-        expect(error.request.url).to.equal('https://api.github.com/?client_id=123&client_secret=[REDACTED]')
+        expect(error.request.url).toEqual('https://api.github.com/?client_id=123&client_secret=[REDACTED]')
       })
   })
 
@@ -437,8 +434,8 @@ describe('octokitRequest()', () => {
       })
 
       .catch(error => {
-        expect(error.code).to.equal(404)
-        expect(warnCalled).to.equal(1)
+        expect(error.code).toEqual(404)
+        expect(warnCalled).toEqual(1)
         console.warn = consoleWarn
       })
   })
@@ -454,7 +451,7 @@ describe('octokitRequest()', () => {
     })
 
       .then(({ status }) => {
-        expect(status).to.equal(200)
+        expect(status).toEqual(200)
       })
   })
 
@@ -468,7 +465,7 @@ describe('octokitRequest()', () => {
     return octokitRequest('https://www.githubstatus.com/api/v2/status.json')
 
       .then(({ url }) => {
-        expect(url).to.equal('https://www.githubstatus.com/api/v2/status.json')
+        expect(url).toEqual('https://www.githubstatus.com/api/v2/status.json')
       })
   })
 
@@ -506,7 +503,7 @@ describe('octokitRequest()', () => {
     })
 
       .then((result) => {
-        expect(result.data).to.equal('funk')
+        expect(result.data).toEqual('funk')
       })
   })
 
@@ -536,7 +533,7 @@ describe('octokitRequest()', () => {
     })
 
       .then(response => {
-        expect(response.data).to.equal('ok')
+        expect(response.data).toEqual('ok')
       })
   })
 
@@ -566,7 +563,7 @@ describe('octokitRequest()', () => {
     })
 
       .then(response => {
-        expect(response.data).to.equal('ok')
+        expect(response.data).toEqual('ok')
       })
   })
 })

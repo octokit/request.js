@@ -1,9 +1,6 @@
-const chai = require('chai')
 const fetchMock = require('fetch-mock/es5/server')
 
-const octokitRequest = require('..')
-
-const expect = chai.expect
+const octokitRequest = require('../src')
 
 describe('endpoint.defaults()', () => {
   it('is a function', () => {
@@ -36,7 +33,7 @@ describe('endpoint.defaults()', () => {
     return myRequest(`GET /orgs/:org/repos`)
 
       .then(response => {
-        expect(response.status).to.equal(200)
+        expect(response.status).toEqual(200)
       })
   })
 
@@ -73,7 +70,7 @@ describe('endpoint.defaults()', () => {
     return myProjectRequestWithAuth(`GET /orgs/:org/repos`)
 
       .then(response => {
-        expect(response.status).to.equal(200)
+        expect(response.status).toEqual(200)
       })
   })
 })
