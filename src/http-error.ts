@@ -3,6 +3,7 @@ import once from 'once'
 const logOnce = once((deprecation: any) => console.warn(deprecation))
 
 export default class HttpError extends Error {
+  name: string
   status: number;
   headers: { [header: string]: string };
   request: { headers: { [header: string]: string }; url: string };

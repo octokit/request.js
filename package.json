@@ -86,15 +86,7 @@
     ]
   },
   "standard": {
-    "globals": [
-      "describe",
-      "before",
-      "beforeEach",
-      "afterEach",
-      "after",
-      "it",
-      "expect"
-    ]
+    "env": "mocha"
   },
   "files": [
     "lib"
