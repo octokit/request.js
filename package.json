@@ -46,6 +46,7 @@
   "devDependencies": {
     "@types/node": "^11.13.8",
     "@types/node-fetch": "^2.3.3",
+    "@types/once": "^1.4.0",
     "chai": "^4.2.0",
     "compression-webpack-plugin": "^2.0.0",
     "coveralls": "^3.0.2",

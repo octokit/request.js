@@ -58,7 +58,7 @@
     },
     "include": [
         "src/*",
-        "universal-user-agent.d.ts"
+        "src/@types/**/index.d.ts"
     ],
     "exclude": []
 }
