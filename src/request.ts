@@ -64,7 +64,7 @@ export default function request (requestOptions: { headers: { [key: string]: str
       }
 
       const contentType = response.headers.get('content-type')
-      if (/application\/json/.test(contentType)) {
+      if (/application\/json/.test(contentType!)) {
         return response.json()
       }
 
