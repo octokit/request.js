@@ -1,9 +1,13 @@
 import Deprecation from 'deprecation'
 import once from 'once'
-const logOnce = once(deprecation => console.warn(deprecation))
+const logOnce = once((deprecation: any) => console.warn(deprecation))
 
 export default class HttpError extends Error {
-  constructor (message, statusCode, headers, request) {
+  status: number;
+  headers: { [header: string]: string };
+  request: { headers: { [header: string]: string }; url: string };
+  code!: number
+  constructor (message: string, statusCode: number, headers: { [header: string]: string }, request: { headers: { [header: string]: string }; url: string }) {
     super(message)
 
     // Maintains proper stack trace (only available on V8)

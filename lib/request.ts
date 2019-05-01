@@ -4,14 +4,14 @@ import nodeFetch from 'node-fetch'
 import getBuffer from './get-buffer-response'
 import HttpError from './http-error'
 
-export default function request (requestOptions) {
+export default function request (requestOptions: { headers: any; url: any; body?: any; request?: { [key: string]: any | undefined; fetch?: typeof nodeFetch }; method?: any; redirect?: any; }) {
   if (isPlainObject(requestOptions.body) || Array.isArray(requestOptions.body)) {
     requestOptions.body = JSON.stringify(requestOptions.body)
   }
 
-  let headers = {}
-  let status;
-  let url;
+  let headers: { [header: string]: string } = {}
+  let status: number;
+  let url: string;
 
   const fetch = (requestOptions.request && requestOptions.request.fetch) || nodeFetch
 

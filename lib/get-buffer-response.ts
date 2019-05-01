@@ -1,4 +1,4 @@
 import { Response } from 'node-fetch';
-export default function getBufferResponse (response) {
+export default function getBufferResponse (response: Response) {
   return response.buffer()
 }
