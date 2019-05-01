@@ -1,10 +1,10 @@
-const getUserAgent = require('universal-user-agent')
-const fetchMock = require('fetch-mock/es5/server')
-const fetch = require('node-fetch')
+import getUserAgent from 'universal-user-agent';
+import fetchMock from 'fetch-mock';
+import { Headers, RequestInit } from 'node-fetch';
 
-const octokitRequest = require('../src')
+import octokitRequest from '../src';
 
-const pkg = require('../package.json')
+import pkg from '../package.json';
 const userAgent = `octokit-request.js/${pkg.version} ${getUserAgent()}`
 
 describe('octokitRequest()', () => {
@@ -97,7 +97,7 @@ describe('octokitRequest()', () => {
     const mock = fetchMock.sandbox()
       .mock('https://api.github.com/user/starred/octocat/hello-world', 204, {
         headers: {
-          'content-length': 0
+          'content-length': '0'
         }
       })
 
@@ -214,7 +214,7 @@ describe('octokitRequest()', () => {
     const mock = fetchMock.sandbox()
       .get((url, { headers }) => {
         return url === 'https://api.github.com/orgs/myorg' &&
-               headers['if-none-match'] === 'etag'
+               (headers! as unknown as Headers).get('if-none-match') === 'etag'
       }, 304)
 
     return octokitRequest('GET /orgs/:org', {
@@ -301,7 +301,7 @@ describe('octokitRequest()', () => {
 
   it('custom user-agent', () => {
     const mock = fetchMock.sandbox()
-      .get((url, { headers }) => headers['user-agent'] === 'funky boom boom pow', 200)
+      .get((url, { headers }) => (headers as unknown as Headers).get('user-agent') === 'funky boom boom pow', 200)
 
     return octokitRequest('GET /', {
       headers: {
@@ -314,7 +314,7 @@ describe('octokitRequest()', () => {
   })
 
   it('passes node-fetch options to fetch only', () => {
-    const mock = (url, options) => {
+    const mock = (url: string, options: RequestInit) => {
       expect(url).toEqual('https://api.github.com/')
       expect(options.timeout).toEqual(100)
       return Promise.reject(new Error('ok'))
@@ -481,8 +481,8 @@ describe('octokitRequest()', () => {
       })
 
       .catch((error) => {
-        expect(error.message).to.match(/\bsignal\b/i)
-        expect(error.message).to.match(/\bAbortSignal\b/i)
+        expect(error.message).toMatch(/\bsignal\b/i)
+        expect(error.message).toMatch(/\bAbortSignal\b/i)
       })
   })
 
@@ -491,7 +491,7 @@ describe('octokitRequest()', () => {
       request: {
         fetch: () => Promise.resolve({
           status: 200,
-          headers: new fetch.Headers({
+          headers: new Headers({
             'Content-Type': 'application/json; charset=utf-8'
           }),
           url: 'http://api.github.com/',

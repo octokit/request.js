@@ -1,10 +1,10 @@
-const fetchMock = require('fetch-mock/es5/server')
+import fetchMock from 'fetch-mock'
 
-const octokitRequest = require('../src')
+import octokitRequest from '../src'
 
 describe('endpoint.defaults()', () => {
   it('is a function', () => {
-    expect(octokitRequest.defaults).to.be.a('function')
+    expect(octokitRequest.defaults).toBeInstanceOf(Function)
   })
 
   it('README example', () => {
