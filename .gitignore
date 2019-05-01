@@ -3,3 +3,4 @@ coverage/
 cypress/
 dist/
 node_modules/
+tsconfig.tsbuildinfo

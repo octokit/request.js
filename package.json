@@ -44,6 +44,8 @@
     "universal-user-agent": "^2.0.1"
   },
   "devDependencies": {
+    "@types/node": "^11.13.8",
+    "@types/node-fetch": "^2.3.3",
     "chai": "^4.2.0",
     "compression-webpack-plugin": "^2.0.0",
     "coveralls": "^3.0.2",
@@ -56,6 +58,7 @@
     "semantic-release": "^15.10.5",
     "simple-mock": "^0.8.0",
     "standard": "^12.0.1",
+    "typescript": "^3.4.5",
     "webpack": "^4.22.0",
     "webpack-bundle-analyzer": "^3.0.3",
     "webpack-cli": "^3.1.2"
