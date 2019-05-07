@@ -1,4 +1,4 @@
-const endpoint = require('@octokit/endpoint')
+const { endpoint } = require('@octokit/endpoint')
 const getUserAgent = require('universal-user-agent')
 
 const version = require('./package.json').version
