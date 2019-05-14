@@ -1,20 +1,28 @@
-import request from "./request";
+import fetchWrapper from "./fetch-wrapper";
+
 import {
+  Endpoint,
+  request,
   endpoint,
-  Parameters,
-  RequestOptions
-} from "@octokit/endpoint/dist-types/types";
+  AnyResponse,
+  Route,
+  Parameters
+} from "./types";
 
 export default function withDefaults(
   oldEndpoint: endpoint,
   newDefaults: Parameters
-) {
+): request {
   const endpoint = oldEndpoint.defaults(newDefaults);
-  const newApi = function(route: string, options: RequestOptions) {
-    return request(endpoint(route, options));
+  const newApi = function(
+    route: Route | Endpoint,
+    parameters?: Parameters
+  ): Promise<AnyResponse> {
+    return fetchWrapper(endpoint(<Route>route, parameters));
   };
 
-  newApi.endpoint = endpoint;
-  newApi.defaults = withDefaults.bind(null, endpoint);
-  return newApi;
+  return Object.assign(newApi, {
+    endpoint,
+    defaults: withDefaults.bind(null, endpoint)
+  });
 }

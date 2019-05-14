@@ -3,10 +3,10 @@ import nodeFetch from "node-fetch";
 
 import getBuffer from "./get-buffer-response";
 import HttpError from "./http-error";
-import { RequestOptions } from "@octokit/endpoint/dist-types/types";
+import { endpoint } from "./types";
 
-export default function request(
-  requestOptions: RequestOptions & { redirect?: string }
+export default function fetchWrapper(
+  requestOptions: ReturnType<endpoint> & { redirect?: string }
 ) {
   if (
     isPlainObject(requestOptions.body) ||
