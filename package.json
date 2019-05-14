@@ -10,7 +10,7 @@
     "build": "pack build",
     "lint": "prettier --check '{src,test}/**/*' README.md package.json",
     "lint:fix": "prettier --write '{src,test}/**/*' README.md package.json",
-    "pretest": "npm run -s lint && npm run -s build:ts",
+    "pretest": "npm run -s lint",
     "test": "jest --coverage",
     "semantic-release": "semantic-release"
   },
