@@ -5,7 +5,9 @@ import getBuffer from "./get-buffer-response";
 import HttpError from "./http-error";
 import { RequestOptions } from "@octokit/endpoint/dist-types/types";
 
-export default function request(requestOptions: RequestOptions & { redirect?: string }) {
+export default function request(
+  requestOptions: RequestOptions & { redirect?: string }
+) {
   if (
     isPlainObject(requestOptions.body) ||
     Array.isArray(requestOptions.body)

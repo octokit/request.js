@@ -1,5 +1,9 @@
 import request from "./request";
-import { endpoint, Parameters, RequestOptions } from "@octokit/endpoint/dist-types/types";
+import {
+  endpoint,
+  Parameters,
+  RequestOptions
+} from "@octokit/endpoint/dist-types/types";
 
 export default function withDefaults(
   oldEndpoint: endpoint,
