@@ -1,4 +1,4 @@
-import Deprecation from "deprecation";
+import { Deprecation } from "deprecation";
 import once from "once";
 const logOnce = once((deprecation: any) => console.warn(deprecation));
 
