@@ -3,15 +3,9 @@ import nodeFetch from "node-fetch";
 
 import getBuffer from "./get-buffer-response";
 import HttpError from "./http-error";
+import { RequestOptions } from "@octokit/endpoint/dist-types/types";
 
-export default function request(requestOptions: {
-  headers: { [key: string]: string };
-  url: string;
-  body?: string | string[] | [];
-  request?: { [key: string]: any | undefined; fetch?: typeof nodeFetch };
-  method?: any;
-  redirect?: any;
-}) {
+export default function request(requestOptions: RequestOptions & { redirect?: string }) {
   if (
     isPlainObject(requestOptions.body) ||
     Array.isArray(requestOptions.body)

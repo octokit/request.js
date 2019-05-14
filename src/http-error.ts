@@ -2,17 +2,18 @@ import Deprecation from "deprecation";
 import once from "once";
 const logOnce = once((deprecation: any) => console.warn(deprecation));
 
+import { Headers } from "@octokit/endpoint/dist-types/types"
 export default class HttpError extends Error {
   name: string;
   status: number;
-  headers: { [header: string]: string };
-  request: { headers: { [header: string]: string }; url: string };
+  headers: Headers;
+  request: { headers: Headers; url: string };
   code!: number;
   constructor(
     message: string,
     statusCode: number,
-    headers: { [header: string]: string },
-    request: { headers: { [header: string]: string }; url: string }
+    headers: Headers,
+    request: { headers: Headers; url: string }
   ) {
     super(message);
 
