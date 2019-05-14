@@ -21,14 +21,12 @@ the passed options and sends the request using [fetch](https://developer.mozilla
 
 - [Features](#features)
 - [Usage](#usage)
-  - [Node](#node)
-  - [Browser](#browser)
   - [REST API example](#rest-api-example)
   - [GraphQL example](#graphql-example)
   - [Alternative: pass `method` & `url` as part of options](#alternative-pass-method--url-as-part-of-options)
-- [octokitRequest()](#octokitrequest)
-- [`octokitRequest.defaults()`](#octokitrequestdefaults)
-- [`octokitRequest.endpoint`](#octokitrequestendpoint)
+- [request()](#request)
+- [`request.defaults()`](#requestdefaults)
+- [`request.endpoint`](#requestendpoint)
 - [Special cases](#special-cases)
   - [The `data` parameter – set request body directly](#the-data-parameter-%E2%80%93-set-request-body-directly)
   - [Set parameters for both the URL/query and the request body](#set-parameters-for-both-the-urlquery-and-the-request-body)
@@ -66,32 +64,41 @@ request("POST /repos/:owner/:repo/issues/:number/labels", {
 
 ## Usage
 
-### Node
-
-Install with `npm install @octokit/request`.
-
-```js
-const octokitRequest = require("@octokit/request");
+<table>
+<tbody valign=top align=left>
+<tr><th>
+Browsers
+</th><td width=100%>
+Load <code>@octokit/request</code> directly from <a href="https://unpkg.com">unpkg.com</a>
+        
+```html
+<script type="module">
+import { request } from "https://unpkg.com/@octokit/request";
+</script>
 ```
 
-### Browser
+</td></tr>
+<tr><th>
+Node
+</th><td>
 
-1. Download `octokit-request.min.js` from the latest release: https://github.com/octokit/request.js/releases
+Install with <code>npm install @octokit/request</code>
 
-2. Load it as script into your web application:
+```js
+const { request } = require("@octokit/request");
+// or: import { request } from "@octokit/request";
+```
 
-   ```html
-   <script src="request-rest.min.js"></script>
-   ```
-
-3. The `octokitRequest` is now available
+</td></tr>
+</tbody>
+</table>
 
 ### REST API example
 
 ```js
 // Following GitHub docs formatting:
 // https://developer.github.com/v3/repos/#list-organization-repositories
-const result = await octokitRequest("GET /orgs/:org/repos", {
+const result = await request("GET /orgs/:org/repos", {
   headers: {
     authorization: "token 0000000000000000000000000000000000000001"
   },
@@ -105,7 +112,7 @@ console.log(`${result.data.length} repos found.`);
 ### GraphQL example
 
 ```js
-const result = await octokitRequest("POST /graphql", {
+const result = await request("POST /graphql", {
   headers: {
     authorization: "token 0000000000000000000000000000000000000001"
   },
@@ -127,7 +134,7 @@ const result = await octokitRequest("POST /graphql", {
 Alternatively, pass in a method and a url
 
 ```js
-const result = await octokitRequest({
+const result = await request({
   method: "GET",
   url: "/orgs/:org/repos",
   headers: {
@@ -138,9 +145,9 @@ const result = await octokitRequest({
 });
 ```
 
-## octokitRequest()
+## request()
 
-`octokitRequest(route, options)` or `octokitRequest(options)`.
+`request(route, options)` or `request(options)`.
 
 **Options**
 
@@ -302,7 +309,7 @@ All other options except `options.request.*` will be passed depending on the `me
 
 **Result**
 
-`octokitRequest` returns a promise and resolves with 4 keys
+`request` returns a promise and resolves with 4 keys
 
 <table>
   <thead>
@@ -346,12 +353,12 @@ If an error occurs, the `error` instance has additional properties to help with 
 - `error.headers` The http response headers as an object
 - `error.request` The request options such as `method`, `url` and `data`
 
-## `octokitRequest.defaults()`
+## `request.defaults()`
 
 Override or set default options. Example:
 
 ```js
-const myOctokitRequest = require("@octokit/request").defaults({
+const myrequest = require("@octokit/request").defaults({
   baseUrl: "https://github-enterprise.acme-inc.com/api/v3",
   headers: {
     "user-agent": "myApp/1.2.3",
@@ -361,13 +368,13 @@ const myOctokitRequest = require("@octokit/request").defaults({
   per_page: 100
 });
 
-myOctokitRequest(`GET /orgs/:org/repos`);
+myrequest(`GET /orgs/:org/repos`);
 ```
 
 You can call `.defaults()` again on the returned method, the defaults will cascade.
 
 ```js
-const myProjectRequest = octokitRequest.defaults({
+const myProjectRequest = request.defaults({
   baseUrl: "https://github-enterprise.acme-inc.com/api/v3",
   headers: {
     "user-agent": "myApp/1.2.3"
@@ -385,12 +392,12 @@ const myProjectRequestWithAuth = myProjectRequest.defaults({
 `org` and `headers['authorization']` on top of `headers['accept']` that is set
 by the global default.
 
-## `octokitRequest.endpoint`
+## `request.endpoint`
 
 See https://github.com/octokit/endpoint.js. Example
 
 ```js
-const options = octokitRequest.endpoint("GET /orgs/:org/repos", {
+const options = request.endpoint("GET /orgs/:org/repos", {
   org: "my-project",
   type: "private"
 });
@@ -450,7 +457,7 @@ There are API endpoints that accept both query parameters as well as a body. In 
 Example
 
 ```js
-octokitRequest(
+request(
   "POST https://uploads.github.com/repos/octocat/Hello-World/releases/1/assets{?name,label}",
   {
     name: "example.zip",
