@@ -35,13 +35,11 @@ jobs:
       script:
         - npm run test:browser
     - node_js: lts/*
-      sudo: required
-      addons:
-        chrome: stable
       env: bundle size
       script:
         - npm run build
-        - npx bundlesize
+        - npx terser pkg/dist-web/index.bundled.js --output pkg/dist-web/index.bundled.min.js --compress --mangle
+        - npx bundlesize --files pkg/dist-web/index.bundled.min.js --max-size 5KB
 
     # release stage: run semantic release & update the docs
     - stage: release

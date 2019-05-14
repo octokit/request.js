@@ -62,12 +62,6 @@
   "browser": {
     "./lib/request/get-buffer-response.js": "./lib/request/get-buffer-response-browser.js"
   },
-  "bundlesize": [
-    {
-      "path": "./dist/octokit-request.min.js.gz",
-      "maxSize": "5KB"
-    }
-  ],
   "jest": {
     "preset": "ts-jest",
     "coverageThreshold": {
