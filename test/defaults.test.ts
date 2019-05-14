@@ -1,10 +1,10 @@
 import fetchMock from "fetch-mock";
 
-import octokitRequest from "../src";
+import { request } from "../src";
 
 describe("endpoint.defaults()", () => {
   it("is a function", () => {
-    expect(octokitRequest.defaults).toBeInstanceOf(Function);
+    expect(request.defaults).toBeInstanceOf(Function);
   });
 
   it("README example", () => {
@@ -22,7 +22,7 @@ describe("endpoint.defaults()", () => {
         }
       );
 
-    const myRequest = octokitRequest.defaults({
+    const myRequest = request.defaults({
       baseUrl: "https://github-enterprise.acme-inc.com/api/v3",
       headers: {
         "user-agent": "myApp/1.2.3",
@@ -56,7 +56,7 @@ describe("endpoint.defaults()", () => {
         }
       );
 
-    const myProjectRequest = octokitRequest.defaults({
+    const myProjectRequest = request.defaults({
       baseUrl: "https://github-enterprise.acme-inc.com/api/v3",
       headers: {
         "user-agent": "myApp/1.2.3"

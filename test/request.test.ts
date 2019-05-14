@@ -2,14 +2,13 @@ import getUserAgent from "universal-user-agent";
 import fetchMock from "fetch-mock";
 import { Headers, RequestInit } from "node-fetch";
 
-import octokitRequest from "../src";
+import { request } from "../src";
 
-import pkg from "../package.json";
-const userAgent = `octokit-request.js/${pkg.version} ${getUserAgent()}`;
+const userAgent = `octokit-request.js/0.0.0-development ${getUserAgent()}`;
 
-describe("octokitRequest()", () => {
+describe("request()", () => {
   it("is a function", () => {
-    expect(octokitRequest).toBeInstanceOf(Function);
+    expect(request).toBeInstanceOf(Function);
   });
 
   it("README example", () => {
@@ -23,7 +22,7 @@ describe("octokitRequest()", () => {
         }
       });
 
-    return octokitRequest("GET /orgs/:org/repos", {
+    return request("GET /orgs/:org/repos", {
       headers: {
         authorization: "token 0000000000000000000000000000000000000001"
       },
@@ -42,7 +41,7 @@ describe("octokitRequest()", () => {
       .sandbox()
       .mock("https://api.github.com/orgs/octokit/repos?type=private", []);
 
-    return octokitRequest({
+    return request({
       method: "GET",
       url: "/orgs/:org/repos",
       headers: {
@@ -67,7 +66,7 @@ describe("octokitRequest()", () => {
         }
       });
 
-    octokitRequest("POST /repos/:owner/:repo/issues", {
+    request("POST /repos/:owner/:repo/issues", {
       owner: "octocat",
       repo: "hello-world",
       headers: {
@@ -95,7 +94,7 @@ describe("octokitRequest()", () => {
         }
       });
 
-    octokitRequest("PUT /user/starred/:owner/:repo", {
+    request("PUT /user/starred/:owner/:repo", {
       headers: {
         authorization: `token 0000000000000000000000000000000000000001`
       },
@@ -136,11 +135,11 @@ describe("octokitRequest()", () => {
       }
     };
 
-    octokitRequest(`HEAD /repos/:owner/:repo/pulls/:number`, options)
+    request(`HEAD /repos/:owner/:repo/pulls/:number`, options)
       .then(response => {
         expect(response.status).toEqual(200);
 
-        return octokitRequest(
+        return request(
           `HEAD /repos/:owner/:repo/pulls/:number`,
           Object.assign(options, { number: 2 })
         );
@@ -173,7 +172,7 @@ describe("octokitRequest()", () => {
         }
       );
 
-    return octokitRequest("GET /repos/:owner/:repo/:archive_format/:ref", {
+    return request("GET /repos/:owner/:repo/:archive_format/:ref", {
       owner: "octokit-fixture-org",
       repo: "get-archive",
       archive_format: "tarball",
@@ -209,7 +208,7 @@ describe("octokitRequest()", () => {
           }
         );
 
-      return octokitRequest(
+      return request(
         "GET https://codeload.github.com/octokit-fixture-org/get-archive/legacy.tar.gz/master",
         {
           request: {
@@ -228,7 +227,7 @@ describe("octokitRequest()", () => {
       );
     }, 304);
 
-    return octokitRequest("GET /orgs/:org", {
+    return request("GET /orgs/:org", {
       org: "myorg",
       headers: { "If-None-Match": "etag" },
       request: {
@@ -247,7 +246,7 @@ describe("octokitRequest()", () => {
   it("Not found", () => {
     const mock = fetchMock.sandbox().get("path:/orgs/nope", 404);
 
-    return octokitRequest("GET /orgs/:org", {
+    return request("GET /orgs/:org", {
       org: "nope",
       request: {
         fetch: mock
@@ -276,7 +275,7 @@ describe("octokitRequest()", () => {
         }
       });
 
-    return octokitRequest("GET /repos/:owner/:repo/contents/:path", {
+    return request("GET /repos/:owner/:repo/contents/:path", {
       headers: {
         accept: "application/vnd.github.v3.raw"
       },
@@ -294,7 +293,7 @@ describe("octokitRequest()", () => {
   if (!process.browser) {
     it("Request error", () => {
       // port: 8 // officially unassigned port. See https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
-      return octokitRequest("GET https://127.0.0.1:8/")
+      return request("GET https://127.0.0.1:8/")
         .then(() => {
           throw new Error("should not resolve");
         })
@@ -315,7 +314,7 @@ describe("octokitRequest()", () => {
         200
       );
 
-    return octokitRequest("GET /", {
+    return request("GET /", {
       headers: {
         "user-agent": "funky boom boom pow"
       },
@@ -332,7 +331,7 @@ describe("octokitRequest()", () => {
       return Promise.reject(new Error("ok"));
     };
 
-    return octokitRequest("GET /", {
+    return request("GET /", {
       headers: {
         "user-agent": "funky boom boom pow"
       },
@@ -372,7 +371,7 @@ describe("octokitRequest()", () => {
         }
       });
 
-    return octokitRequest("POST /repos/octocat/hello-world/labels", {
+    return request("POST /repos/octocat/hello-world/labels", {
       name: "foo",
       color: "invalid",
       request: {
@@ -395,7 +394,7 @@ describe("octokitRequest()", () => {
       status: 500
     });
 
-    return octokitRequest("/", {
+    return request("/", {
       headers: {
         authorization: "token secret123"
       },
@@ -414,7 +413,7 @@ describe("octokitRequest()", () => {
         status: 500
       });
 
-    return octokitRequest("/", {
+    return request("/", {
       client_id: "123",
       client_secret: "secret123",
       request: {
@@ -433,7 +432,7 @@ describe("octokitRequest()", () => {
     const consoleWarn = console.warn;
     let warnCalled = 0;
     console.warn = () => warnCalled++;
-    return octokitRequest("GET /orgs/:org", {
+    return request("GET /orgs/:org", {
       org: "nope",
       request: {
         fetch: mock
@@ -453,7 +452,7 @@ describe("octokitRequest()", () => {
   it("Just URL", () => {
     const mock = fetchMock.sandbox().get("path:/", 200);
 
-    return octokitRequest("/", {
+    return request("/", {
       request: {
         fetch: mock
       }
@@ -469,15 +468,15 @@ describe("octokitRequest()", () => {
     // this would only work in Node, so we would need to adapt the test setup, too.
     // We also can’t test the GitHub API, because on Travis unauthenticated
     // GitHub API requests are usually blocked due to IP rate limiting
-    return octokitRequest(
-      "https://www.githubstatus.com/api/v2/status.json"
-    ).then(({ url }) => {
-      expect(url).toEqual("https://www.githubstatus.com/api/v2/status.json");
-    });
+    return request("https://www.githubstatus.com/api/v2/status.json").then(
+      ({ url }) => {
+        expect(url).toEqual("https://www.githubstatus.com/api/v2/status.json");
+      }
+    );
   });
 
   it("options.request.signal is passed as option to fetch", function() {
-    return octokitRequest("/", {
+    return request("/", {
       request: {
         signal: "funk"
       }
@@ -493,7 +492,7 @@ describe("octokitRequest()", () => {
   });
 
   it("options.request.fetch", function() {
-    return octokitRequest("/", {
+    return request("/", {
       request: {
         fetch: () =>
           Promise.resolve({
@@ -523,7 +522,7 @@ describe("octokitRequest()", () => {
         }
       });
 
-    return octokitRequest("GET /repos/:owner/:repo/issues/:number", {
+    return request("GET /repos/:owner/:repo/issues/:number", {
       headers: {
         authorization: "token 0000000000000000000000000000000000000001"
       },
@@ -553,7 +552,7 @@ describe("octokitRequest()", () => {
         }
       });
 
-    return octokitRequest("GET /repos/:owner/:repo/issues/:number", {
+    return request("GET /repos/:owner/:repo/issues/:number", {
       headers: {
         authorization: "token 0000000000000000000000000000000000000001"
       },
