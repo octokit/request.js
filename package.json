@@ -8,7 +8,6 @@
   "main": "index.js",
   "scripts": {
     "build": "pack build",
-    "coverage:upload": "cat ./coverage/lcov.info | coveralls",
     "lint": "prettier --check '{src,test}/**/*' README.md package.json",
     "lint:fix": "prettier --write '{src,test}/**/*' README.md package.json",
     "pretest": "npm run -s lint && npm run -s build:ts",
@@ -50,7 +49,6 @@
     "@types/node": "^11.13.8",
     "@types/node-fetch": "^2.3.3",
     "@types/once": "^1.4.0",
-    "coveralls": "^3.0.2",
     "fetch-mock": "^7.2.0",
     "jest": "^24.7.1",
     "npm-run-all": "^4.1.3",
@@ -71,7 +69,15 @@
     }
   ],
   "jest": {
-    "preset": "ts-jest"
+    "preset": "ts-jest",
+    "coverageThreshold": {
+      "global": {
+        "statements": 100,
+        "branches": 100,
+        "functions": 100,
+        "lines": 100
+      }
+    }
   },
   "files": [
     "lib"
