@@ -1,8 +1,9 @@
 import { endpoint } from "@octokit/endpoint";
 import getUserAgent from "universal-user-agent";
 
-const version = "0.0.0-development";
-const userAgent = `octokit-request.js/${version} ${getUserAgent()}`;
+import { VERSION } from "./version";
+
+const userAgent = `octokit-request.js/${VERSION} ${getUserAgent()}`;
 import withDefaults from "./with-defaults";
 
 export const request = withDefaults(endpoint, {
