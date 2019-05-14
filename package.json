@@ -66,7 +66,6 @@
     "webpack-cli": "^3.1.2"
   },
   "browser": {
-    "./lib/get-request-agent.js": false,
     "./lib/request/get-buffer-response.js": "./lib/request/get-buffer-response-browser.js"
   },
   "bundlesize": [
