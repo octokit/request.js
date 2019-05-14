@@ -42,7 +42,7 @@
     "is-plain-object": "^3.0.0",
     "node-fetch": "^2.3.0",
     "once": "^1.4.0",
-    "universal-user-agent": "^2.0.1"
+    "universal-user-agent": "^2.1.0"
   },
   "devDependencies": {
     "@types/fetch-mock": "^7.2.3",
