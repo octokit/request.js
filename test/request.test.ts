@@ -3,6 +3,7 @@ import fetchMock from "fetch-mock";
 import { Headers, RequestInit } from "node-fetch";
 
 import { request } from "../src";
+import { ResponseHeaders } from "../src/types";
 
 const userAgent = `octokit-request.js/0.0.0-development ${getUserAgent()}`;
 
@@ -88,11 +89,12 @@ describe("request()", () => {
   it("Put without request body", () => {
     const mock = fetchMock
       .sandbox()
-      .mock("https://api.github.com/user/starred/octocat/hello-world", 204, {
-        headers: {
-          "content-length": "0"
-        }
-      });
+      // .mock("https://api.github.com/user/starred/octocat/hello-world", 204, {
+      //   headers: {
+      //     "content-length": 0
+      //   }
+      // });
+      .mock("https://api.github.com/user/starred/octocat/hello-world", 204);
 
     request("PUT /user/starred/:owner/:repo", {
       headers: {
@@ -221,7 +223,7 @@ describe("request()", () => {
     const mock = fetchMock.sandbox().get((url, { headers }) => {
       return (
         url === "https://api.github.com/orgs/myorg" &&
-        ((headers! as unknown) as Headers).get("if-none-match") === "etag"
+        (headers as ResponseHeaders)["if-none-match"] === "etag"
       );
     }, 304);
 
@@ -305,8 +307,7 @@ describe("request()", () => {
       .sandbox()
       .get(
         (url, { headers }) =>
-          ((headers as unknown) as Headers).get("user-agent") ===
-          "funky boom boom pow",
+          (headers as ResponseHeaders)["user-agent"] === "funky boom boom pow",
         200
       );
 
