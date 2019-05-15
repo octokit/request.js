@@ -4,7 +4,6 @@
 
 [![@latest](https://img.shields.io/npm/v/@octokit/request.svg)](https://www.npmjs.com/package/@octokit/request)
 [![Build Status](https://travis-ci.org/octokit/request.js.svg?branch=master)](https://travis-ci.org/octokit/request.js)
-[![Coverage Status](https://coveralls.io/repos/github/octokit/request.js/badge.svg)](https://coveralls.io/github/octokit/request.js)
 [![Greenkeeper](https://badges.greenkeeper.io/octokit/request.js.svg)](https://greenkeeper.io/)
 
 `@octokit/request` is a request library for browsers & node that makes it easier
@@ -13,7 +12,7 @@ to interact with [GitHub’s REST API](https://developer.github.com/v3/) and
 
 It uses [`@octokit/endpoint`](https://github.com/octokit/endpoint.js) to parse
 the passed options and sends the request using [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
- ([node-fetch](https://github.com/bitinn/node-fetch) in Node).
+([node-fetch](https://github.com/bitinn/node-fetch) in Node).
 
 <!-- update table of contents by running `npx markdown-toc README.md -i` -->
 
@@ -21,17 +20,15 @@ the passed options and sends the request using [fetch](https://developer.mozilla
 
 - [Features](#features)
 - [Usage](#usage)
-  * [Node](#node)
-  * [Browser](#browser)
-  * [REST API example](#rest-api-example)
-  * [GraphQL example](#graphql-example)
-  * [Alternative: pass `method` & `url` as part of options](#alternative-pass-method--url-as-part-of-options)
-- [octokitRequest()](#octokitrequest)
-- [`octokitRequest.defaults()`](#octokitrequestdefaults)
-- [`octokitRequest.endpoint`](#octokitrequestendpoint)
+  - [REST API example](#rest-api-example)
+  - [GraphQL example](#graphql-example)
+  - [Alternative: pass `method` & `url` as part of options](#alternative-pass-method--url-as-part-of-options)
+- [request()](#request)
+- [`request.defaults()`](#requestdefaults)
+- [`request.endpoint`](#requestendpoint)
 - [Special cases](#special-cases)
-  * [The `data` parameter – set request body directly](#the-data-parameter-%E2%80%93-set-request-body-directly)
-  * [Set parameters for both the URL/query and the request body](#set-parameters-for-both-the-urlquery-and-the-request-body)
+  - [The `data` parameter – set request body directly](#the-data-parameter-%E2%80%93-set-request-body-directly)
+  - [Set parameters for both the URL/query and the request body](#set-parameters-for-both-the-urlquery-and-the-request-body)
 - [LICENSE](#license)
 
 <!-- tocstop -->
@@ -40,17 +37,18 @@ the passed options and sends the request using [fetch](https://developer.mozilla
 
 🤩 1:1 mapping of REST API endpoint documentation, e.g. [Add labels to an issue](https://developer.github.com/v3/issues/labels/#add-labels-to-an-issue) becomes
 
-  ```js
-  request('POST /repos/:owner/:repo/issues/:number/labels', {
-    headers: {
-      accept: 'application/vnd.github.symmetra-preview+json'
-    },
-    owner: 'ocotkit',
-    repo: 'request.js',
-    number: 1,
-    labels: ['🐛 bug']
-  })
-  ```
+```js
+request("POST /repos/:owner/:repo/issues/:number/labels", {
+  headers: {
+    accept: "application/vnd.github.symmetra-preview+json"
+  },
+  owner: "ocotkit",
+  repo: "request.js",
+  number: 1,
+  labels: ["🐛 bug"]
+});
+```
+
 👍 Sensible defaults
 
 - `baseUrl`: `https://api.github.com`
@@ -59,54 +57,63 @@ the passed options and sends the request using [fetch](https://developer.mozilla
 
 👌 Simple to test: mock requests by passing a custom fetch method.
 
-🧐 Simple to debug: Sets `error.request` to request options causing the error (with redacted credentials).  
+🧐 Simple to debug: Sets `error.request` to request options causing the error (with redacted credentials).
 
 👶 Small bundle size (\<5kb minified + gzipped)
 
 ## Usage
 
-### Node
-
-Install with `npm install @octokit/request`.
-
-```js
-const octokitRequest = require('@octokit/request')
+<table>
+<tbody valign=top align=left>
+<tr><th>
+Browsers
+</th><td width=100%>
+Load <code>@octokit/request</code> directly from <a href="https://unpkg.com">unpkg.com</a>
+        
+```html
+<script type="module">
+import { request } from "https://unpkg.com/@octokit/request";
+</script>
 ```
 
-### Browser
+</td></tr>
+<tr><th>
+Node
+</th><td>
 
-1. Download `octokit-request.min.js` from the latest release: https://github.com/octokit/request.js/releases
+Install with <code>npm install @octokit/request</code>
 
-2. Load it as script into your web application:
+```js
+const { request } = require("@octokit/request");
+// or: import { request } from "@octokit/request";
+```
 
-   ```html
-   <script src="request-rest.min.js"></script>
-   ```
-
-3. The `octokitRequest` is now available
+</td></tr>
+</tbody>
+</table>
 
 ### REST API example
 
 ```js
 // Following GitHub docs formatting:
 // https://developer.github.com/v3/repos/#list-organization-repositories
-const result = await octokitRequest('GET /orgs/:org/repos', {
+const result = await request("GET /orgs/:org/repos", {
   headers: {
-    authorization: 'token 0000000000000000000000000000000000000001'
+    authorization: "token 0000000000000000000000000000000000000001"
   },
-  org: 'octokit',
-  type: 'private'
-})
+  org: "octokit",
+  type: "private"
+});
 
-console.log(`${result.data.length} repos found.`)
+console.log(`${result.data.length} repos found.`);
 ```
 
 ### GraphQL example
 
 ```js
-const result = await octokitRequest('POST /graphql', {
+const result = await request("POST /graphql", {
   headers: {
-    authorization: 'token 0000000000000000000000000000000000000001'
+    authorization: "token 0000000000000000000000000000000000000001"
   },
   query: `query ($login: String!) {
     organization(login: $login) {
@@ -116,9 +123,9 @@ const result = await octokitRequest('POST /graphql', {
     }
   }`,
   variables: {
-    login: 'octokit'
+    login: "octokit"
   }
-})
+});
 ```
 
 ### Alternative: pass `method` & `url` as part of options
@@ -126,20 +133,20 @@ const result = await octokitRequest('POST /graphql', {
 Alternatively, pass in a method and a url
 
 ```js
-const result = await octokitRequest({
-  method: 'GET',
-  url: '/orgs/:org/repos',
+const result = await request({
+  method: "GET",
+  url: "/orgs/:org/repos",
   headers: {
-    authorization: 'token 0000000000000000000000000000000000000001'
+    authorization: "token 0000000000000000000000000000000000000001"
   },
-  org: 'octokit',
-  type: 'private'
-})
+  org: "octokit",
+  type: "private"
+});
 ```
 
-## octokitRequest()
+## request()
 
-`octokitRequest(route, options)` or `octokitRequest(options)`.
+`request(route, options)` or `request(options)`.
 
 **Options**
 
@@ -271,6 +278,17 @@ const result = await octokitRequest({
   </tr>
   <tr>
     <th align=left>
+      <code>options.request.hook</code>
+    </th>
+    <td>
+      Function
+    </td>
+    <td>
+     Function with the signature <code>hook(endpointOptions, request)</code>, where <code>endpointOptions</code> are the parsed options as returned by <a href="https://github.com/octokit/endpoint.js#endpointmergeroute-options-or-endpointmergeoptions"><code>endpoint.merge()</code></a>, and <code>request</code> is <a href="https://github.com/octokit/request.js#request"><code>request()</code></a>. This option works great in conjuction with <a href="https://github.com/gr2m/before-after-hook">before-after-hook</a>.
+    </td>
+  </tr>
+  <tr>
+    <th align=left>
       <a name="options-request-signal"></a><code>options.request.signal</code>
     </th>
     <td>
@@ -301,7 +319,7 @@ All other options except `options.request.*` will be passed depending on the `me
 
 **Result**
 
-`octokitRequest` returns a promise and resolves with 4 keys
+`request` returns a promise and resolves with 4 keys
 
 <table>
   <thead>
@@ -345,54 +363,54 @@ If an error occurs, the `error` instance has additional properties to help with 
 - `error.headers` The http response headers as an object
 - `error.request` The request options such as `method`, `url` and `data`
 
-## `octokitRequest.defaults()`
+## `request.defaults()`
 
 Override or set default options. Example:
 
 ```js
-const myOctokitRequest = require('@octokit/request').defaults({
-  baseUrl: 'https://github-enterprise.acme-inc.com/api/v3',
+const myrequest = require("@octokit/request").defaults({
+  baseUrl: "https://github-enterprise.acme-inc.com/api/v3",
   headers: {
-    'user-agent': 'myApp/1.2.3',
+    "user-agent": "myApp/1.2.3",
     authorization: `token 0000000000000000000000000000000000000001`
   },
-  org: 'my-project',
+  org: "my-project",
   per_page: 100
-})
+});
 
-myOctokitRequest(`GET /orgs/:org/repos`)
+myrequest(`GET /orgs/:org/repos`);
 ```
 
 You can call `.defaults()` again on the returned method, the defaults will cascade.
 
 ```js
-const myProjectRequest = octokitRequest.defaults({
-  baseUrl: 'https://github-enterprise.acme-inc.com/api/v3',
+const myProjectRequest = request.defaults({
+  baseUrl: "https://github-enterprise.acme-inc.com/api/v3",
   headers: {
-    'user-agent': 'myApp/1.2.3'
+    "user-agent": "myApp/1.2.3"
   },
-  org: 'my-project'
-})
+  org: "my-project"
+});
 const myProjectRequestWithAuth = myProjectRequest.defaults({
   headers: {
     authorization: `token 0000000000000000000000000000000000000001`
   }
-})
+});
 ```
 
 `myProjectRequest` now defaults the `baseUrl`, `headers['user-agent']`,
 `org` and `headers['authorization']` on top of `headers['accept']` that is set
 by the global default.
 
-## `octokitRequest.endpoint`
+## `request.endpoint`
 
 See https://github.com/octokit/endpoint.js. Example
 
 ```js
-const options = octokitRequest.endpoint('GET /orgs/:org/repos', {
-  org: 'my-project',
-  type: 'private'
-})
+const options = request.endpoint("GET /orgs/:org/repos", {
+  org: "my-project",
+  type: "private"
+});
 
 // {
 //   method: 'GET',
@@ -415,18 +433,19 @@ All of the [`@octokit/endpoint`](https://github.com/octokit/endpoint.js) API can
 ## Special cases
 
 <a name="data-parameter"></a>
+
 ### The `data` parameter – set request body directly
 
 Some endpoints such as [Render a Markdown document in raw mode](https://developer.github.com/v3/markdown/#render-a-markdown-document-in-raw-mode) don’t have parameters that are sent as request body keys, instead the request body needs to be set directly. In these cases, set the `data` parameter.
 
 ```js
-const options = endpoint('POST /markdown/raw', {
-  data: 'Hello world github/linguist#1 **cool**, and #1!',
+const options = endpoint("POST /markdown/raw", {
+  data: "Hello world github/linguist#1 **cool**, and #1!",
   headers: {
-    accept: 'text/html;charset=utf-8',
-    'content-type': 'text/plain'
+    accept: "text/html;charset=utf-8",
+    "content-type": "text/plain"
   }
-})
+});
 
 // options is
 // {
@@ -448,16 +467,19 @@ There are API endpoints that accept both query parameters as well as a body. In 
 Example
 
 ```js
-octokitRequest('POST https://uploads.github.com/repos/octocat/Hello-World/releases/1/assets{?name,label}', {
-  name: 'example.zip',
-  label: 'short description',
-  headers: {
-    'content-type': 'text/plain',
-    'content-length': 14,
-    authorization: `token 0000000000000000000000000000000000000001`
-  },
-  data: 'Hello, world!'
-})
+request(
+  "POST https://uploads.github.com/repos/octocat/Hello-World/releases/1/assets{?name,label}",
+  {
+    name: "example.zip",
+    label: "short description",
+    headers: {
+      "content-type": "text/plain",
+      "content-length": 14,
+      authorization: `token 0000000000000000000000000000000000000001`
+    },
+    data: "Hello, world!"
+  }
+);
 ```
 
 ## LICENSE

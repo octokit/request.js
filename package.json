@@ -7,16 +7,11 @@
   "description": "Send parameterized requests to GitHub’s APIs with sensible defaults in browsers and Node",
   "main": "index.js",
   "scripts": {
-    "prebuild": "mkdirp dist/",
-    "build": "npm-run-all build:*",
-    "build:development": "webpack --mode development --entry . --output-library=Octokit --output=./dist/octokit-request.js --profile --json > dist/bundle-stats.json",
-    "build:production": "webpack --mode production --entry . --plugin=compression-webpack-plugin --output-library=Octokit --output-path=./dist --output-filename=octokit-request.min.js --devtool source-map",
-    "bundle-report": "webpack-bundle-analyzer dist/bundle-stats.json --mode=static --no-open --report dist/bundle-report.html",
-    "coverage": "nyc report --reporter=html && open coverage/index.html",
-    "coverage:upload": "nyc report --reporter=text-lcov | coveralls",
-    "pretest": "standard",
-    "test": "nyc mocha test/*-test.js",
-    "test:browser": "cypress run --browser chrome",
+    "build": "pack build",
+    "lint": "prettier --check '{src,test}/**/*' README.md package.json",
+    "lint:fix": "prettier --write '{src,test}/**/*' README.md package.json",
+    "pretest": "npm run -s lint",
+    "test": "jest --coverage",
     "semantic-release": "semantic-release"
   },
   "repository": {
@@ -37,63 +32,89 @@
   "homepage": "https://github.com/octokit/request.js#readme",
   "dependencies": {
     "@octokit/endpoint": "^5.1.0",
-    "deprecation": "^1.0.1",
+    "deprecation": "^2.0.0",
     "is-plain-object": "^3.0.0",
     "node-fetch": "^2.3.0",
     "once": "^1.4.0",
-    "universal-user-agent": "^2.0.1"
+    "universal-user-agent": "^2.1.0"
   },
   "devDependencies": {
-    "chai": "^4.2.0",
-    "compression-webpack-plugin": "^2.0.0",
-    "coveralls": "^3.0.2",
-    "cypress": "^3.1.0",
+    "@gr2m/pika-plugin-bundle-web": "^0.3.16-patch-issue-46-6",
+    "@pika/pack": "^0.3.7",
+    "@pika/plugin-build-node": "^0.3.16",
+    "@pika/plugin-build-web": "^0.3.16",
+    "@pika/plugin-ts-standard-pkg": "^0.3.16",
+    "@types/fetch-mock": "^7.2.4",
+    "@types/jest": "^24.0.12",
+    "@types/node": "^11.13.8",
+    "@types/node-fetch": "^2.3.3",
+    "@types/once": "^1.4.0",
     "fetch-mock": "^7.2.0",
-    "mkdirp": "^0.5.1",
-    "mocha": "^6.1.1",
+    "jest": "^24.7.1",
     "npm-run-all": "^4.1.3",
-    "nyc": "^14.0.0",
+    "pika-plugin-unpkg-field": "^1.1.0",
+    "prettier": "^1.17.0",
+    "rollup-plugin-commonjs": "^9.3.4",
+    "rollup-plugin-json": "^4.0.0",
+    "rollup-plugin-node-resolve": "^4.2.4",
     "semantic-release": "^15.10.5",
+    "semantic-release-plugin-update-version-in-files": "^1.0.0",
     "simple-mock": "^0.8.0",
-    "standard": "^12.0.1",
-    "webpack": "^4.22.0",
-    "webpack-bundle-analyzer": "^3.0.3",
-    "webpack-cli": "^3.1.2"
+    "ts-jest": "^24.0.2",
+    "typescript": "^3.4.5"
   },
-  "browser": {
-    "./lib/get-request-agent.js": false,
-    "./lib/request/get-buffer-response.js": "./lib/request/get-buffer-response-browser.js"
-  },
-  "bundlesize": [
-    {
-      "path": "./dist/octokit-request.min.js.gz",
-      "maxSize": "5KB"
-    }
-  ],
-  "release": {
-    "publish": [
-      "@semantic-release/npm",
-      {
-        "path": "@semantic-release/github",
-        "assets": [
-          "dist/*",
-          "!dist/*.map.gz"
-        ]
+  "jest": {
+    "preset": "ts-jest",
+    "coverageThreshold": {
+      "global": {
+        "statements": 100,
+        "branches": 100,
+        "functions": 100,
+        "lines": 100
       }
-    ]
-  },
-  "standard": {
-    "globals": [
-      "describe",
-      "before",
-      "beforeEach",
-      "afterEach",
-      "after",
-      "it",
-      "expect"
-    ]
+    }
   },
   "files": [
     "lib"
-  ]
+  ],
+  "@pika/pack": {
+    "pipeline": [
+      [
+        "@pika/plugin-ts-standard-pkg"
+      ],
+      [
+        "@pika/plugin-build-node"
+      ],
+      [
+        "@pika/plugin-build-web"
+      ],
+      [
+        "@gr2m/pika-plugin-bundle-web",
+        {
+          "browser": true
+        }
+      ],
+      [
+        "pika-plugin-unpkg-field"
+      ]
+    ]
+  },
+  "release": {
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/github",
+      "@semantic-release/npm",
+      [
+        "semantic-release-plugin-update-version-in-files",
+        {
+          "files": [
+            "dist-web/*",
+            "dist-node/*",
+            "*/version.*"
+          ]
+        }
+      ]
+    ]
+  }
 }
