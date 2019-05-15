@@ -20,10 +20,7 @@ jobs:
       node_js: 8
       script: npm run test
     - node_js: 10
-      env: Node 10, coverage upload
-      script:
-        - npm run test
-        - npm run coverage:upload
+      script: npm run test
     - node_js: lts/*
       env: bundle size
       script:
