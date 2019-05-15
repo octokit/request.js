@@ -278,6 +278,17 @@ const result = await request({
   </tr>
   <tr>
     <th align=left>
+      <code>options.request.hook</code>
+    </th>
+    <td>
+      Function
+    </td>
+    <td>
+     Function with the signature <code>hook(endpointOptions, request)</code>, where <code>endpointOptions</code> are the parsed options as returned by <a href="https://github.com/octokit/endpoint.js#endpointmergeroute-options-or-endpointmergeoptions"><code>endpoint.merge()</code></a>, and <code>request</code> is <a href="https://github.com/octokit/request.js#request"><code>request()</code></a>. This option works great in conjuction with <a href="https://github.com/gr2m/before-after-hook">before-after-hook</a>.
+    </td>
+  </tr>
+  <tr>
+    <th align=left>
       <a name="options-request-signal"></a><code>options.request.signal</code>
     </th>
     <td>
