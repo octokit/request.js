@@ -34,5 +34,4 @@ jobs:
       env: semantic-release
       script:
         - npm run build
-        - npm run bundle-report
-        - npm run semantic-release
+        - cd pkg && ../node_modules/.bin/semantic-release
