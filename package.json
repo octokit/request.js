@@ -44,7 +44,7 @@
     "@pika/plugin-build-web": "^0.3.16",
     "@pika/plugin-bundle-web": "file:./patches/@pika/plugin-bundle-web",
     "@pika/plugin-ts-standard-pkg": "^0.3.16",
-    "@types/fetch-mock": "^7.2.3",
+    "@types/fetch-mock": "^7.2.4",
     "@types/jest": "^24.0.12",
     "@types/node": "^11.13.8",
     "@types/node-fetch": "^2.3.3",
