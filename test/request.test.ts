@@ -3,7 +3,11 @@ import fetchMock from "fetch-mock";
 import { Headers, RequestInit } from "node-fetch";
 
 import { request } from "../src";
-import { ResponseHeaders } from "../src/types";
+import {
+  request as requestInterface,
+  ResponseHeaders,
+  Endpoint
+} from "../src/types";
 
 const userAgent = `octokit-request.js/0.0.0-development ${getUserAgent()}`;
 
@@ -505,6 +509,42 @@ describe("request()", () => {
       }
     }).then(result => {
       expect(result.data).toEqual("funk");
+    });
+  });
+
+  it("options.request.hook", function() {
+    const mock = fetchMock
+      .sandbox()
+      .mock("https://api.github.com/", { ok: true });
+
+    const hook = (options: Endpoint, request: requestInterface) => {
+      expect(options).toEqual({
+        baseUrl: "https://api.github.com",
+        headers: {
+          accept: "application/vnd.github.v3+json",
+          "user-agent": userAgent
+        },
+        mediaType: {
+          format: "",
+          previews: []
+        },
+        method: "GET",
+        request: {
+          fetch: mock,
+          hook: hook
+        },
+        url: "/"
+      });
+      return request(options);
+    };
+
+    return request("/", {
+      request: {
+        fetch: mock,
+        hook
+      }
+    }).then(result => {
+      expect(result.data).toEqual({ ok: true });
     });
   });
 
