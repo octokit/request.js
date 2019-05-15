@@ -93,12 +93,11 @@ describe("request()", () => {
   it("Put without request body", () => {
     const mock = fetchMock
       .sandbox()
-      // .mock("https://api.github.com/user/starred/octocat/hello-world", 204, {
-      //   headers: {
-      //     "content-length": 0
-      //   }
-      // });
-      .mock("https://api.github.com/user/starred/octocat/hello-world", 204);
+      .mock("https://api.github.com/user/starred/octocat/hello-world", 204, {
+        headers: {
+          "content-length": 0
+        }
+      });
 
     request("PUT /user/starred/:owner/:repo", {
       headers: {
