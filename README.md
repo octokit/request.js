@@ -204,7 +204,7 @@ const result = await octokitRequest({
   </tr>
   <tr>
     <th align=left>
-      <code>options.mediaType.preview</code>
+      <code>options.mediaType.previews</code>
     </th>
     <td>
       Array of strings
