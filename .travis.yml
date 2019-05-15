@@ -1,8 +1,5 @@
 language: node_js
-cache:
-  directories:
-    - ~/.npm
-    - node_modules/cypress/dist
+cache: npm
 
 # Trigger a push build on master and greenkeeper branches + PRs build on every branches
 # Avoid double build on PRs (See https://github.com/travis-ci/travis-ci/issues/1147)
@@ -27,13 +24,6 @@ jobs:
       script:
         - npm run test
         - npm run coverage:upload
-    - node_js: lts/*
-      sudo: required
-      addons:
-        chrome: stable
-      env: browser tests
-      script:
-        - npm run test:browser
     - node_js: lts/*
       env: bundle size
       script:

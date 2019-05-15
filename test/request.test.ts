@@ -186,38 +186,36 @@ describe("request()", () => {
   });
 
   // TODO: fails with "response.buffer is not a function" in browser
-  if (!process.browser) {
-    it("Binary response", () => {
-      const mock = fetchMock
-        .sandbox()
-        .get(
-          "https://codeload.github.com/octokit-fixture-org/get-archive/legacy.tar.gz/master",
-          {
-            status: 200,
-
-            // expect(response.data.length).toEqual(172)
-            // body: Buffer.from('1f8b0800000000000003cb4f2ec9cfce2cd14dcbac28292d4ad5cd2f4ad74d4f2dd14d2c4acec82c4bd53580007d060a0050bfb9b9a90203c428741ac2313436343307222320dbc010a8dc5c81c194124b8905a5c525894540a714e5e797e05347481edd734304e41319ff41ae8e2ebeae7ab92964d801d46f66668227fe0d4d51e3dfc8d0c8d808284f75df6201233cfe951590627ba01d330a46c1281805a3806e000024cb59d6000a0000', 'hex'),
-            body: Buffer.from(
-              "1f8b0800000000000003cb4f2ec9cfce2cd14dcbac28292d4ad5cd2f4ad74d4f2dd14d2c4acec82c4bd53580007d060a0050bfb9b9a90203c428741ac2313436343307222320dbc010a8dc5c81c194124b8905a5c525894540a714e5e797e05347481edd734304e41319ff41ae8e2ebeae7ab92964d801d46f66668227fe0d4d51e3dfc8d0c8d808284f75df6201233cfe951590627ba01d330a46c1281805a3806e000024cb59d6000a0000",
-              "hex"
-            ),
-            headers: {
-              "content-type": "application/x-gzip",
-              "content-length": 172
-            }
-          }
-        );
-
-      return request(
-        "GET https://codeload.github.com/octokit-fixture-org/get-archive/legacy.tar.gz/master",
+  it("Binary response", () => {
+    const mock = fetchMock
+      .sandbox()
+      .get(
+        "https://codeload.github.com/octokit-fixture-org/get-archive/legacy.tar.gz/master",
         {
-          request: {
-            fetch: mock
+          status: 200,
+
+          // expect(response.data.length).toEqual(172)
+          // body: Buffer.from('1f8b0800000000000003cb4f2ec9cfce2cd14dcbac28292d4ad5cd2f4ad74d4f2dd14d2c4acec82c4bd53580007d060a0050bfb9b9a90203c428741ac2313436343307222320dbc010a8dc5c81c194124b8905a5c525894540a714e5e797e05347481edd734304e41319ff41ae8e2ebeae7ab92964d801d46f66668227fe0d4d51e3dfc8d0c8d808284f75df6201233cfe951590627ba01d330a46c1281805a3806e000024cb59d6000a0000', 'hex'),
+          body: Buffer.from(
+            "1f8b0800000000000003cb4f2ec9cfce2cd14dcbac28292d4ad5cd2f4ad74d4f2dd14d2c4acec82c4bd53580007d060a0050bfb9b9a90203c428741ac2313436343307222320dbc010a8dc5c81c194124b8905a5c525894540a714e5e797e05347481edd734304e41319ff41ae8e2ebeae7ab92964d801d46f66668227fe0d4d51e3dfc8d0c8d808284f75df6201233cfe951590627ba01d330a46c1281805a3806e000024cb59d6000a0000",
+            "hex"
+          ),
+          headers: {
+            "content-type": "application/x-gzip",
+            "content-length": 172
           }
         }
       );
-    });
-  }
+
+    return request(
+      "GET https://codeload.github.com/octokit-fixture-org/get-archive/legacy.tar.gz/master",
+      {
+        request: {
+          fetch: mock
+        }
+      }
+    );
+  });
 
   it("304 etag", () => {
     const mock = fetchMock.sandbox().get((url, { headers }) => {
@@ -290,19 +288,17 @@ describe("request()", () => {
     });
   });
 
-  if (!process.browser) {
-    it("Request error", () => {
-      // port: 8 // officially unassigned port. See https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
-      return request("GET https://127.0.0.1:8/")
-        .then(() => {
-          throw new Error("should not resolve");
-        })
+  it("Request error", () => {
+    // port: 8 // officially unassigned port. See https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
+    return request("GET https://127.0.0.1:8/")
+      .then(() => {
+        throw new Error("should not resolve");
+      })
 
-        .catch(error => {
-          expect(error.status).toEqual(500);
-        });
-    });
-  }
+      .catch(error => {
+        expect(error.status).toEqual(500);
+      });
+  });
 
   it("custom user-agent", () => {
     const mock = fetchMock
