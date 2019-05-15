@@ -6,7 +6,8 @@ import {
   endpoint,
   AnyResponse,
   Route,
-  Parameters
+  Parameters,
+  Defaults
 } from "./types";
 
 export default function withDefaults(
@@ -18,7 +19,15 @@ export default function withDefaults(
     route: Route | Endpoint,
     parameters?: Parameters
   ): Promise<AnyResponse> {
-    return fetchWrapper(endpoint(<Route>route, parameters));
+    const endpointOptions = endpoint.merge(<Route>route, parameters);
+
+    if (!endpointOptions.request || !endpointOptions.request.hook) {
+      return fetchWrapper(endpoint.parse(endpointOptions));
+    }
+
+    return endpointOptions.request.hook(endpointOptions, (options: Defaults) =>
+      fetchWrapper(endpoint.parse(options))
+    );
   };
 
   return Object.assign(newApi, {
