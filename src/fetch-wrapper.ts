@@ -1,8 +1,8 @@
 import isPlainObject from "is-plain-object";
 import nodeFetch from "node-fetch";
+import { RequestError } from "@octokit/request-error";
 
 import getBuffer from "./get-buffer-response";
-import HttpError from "./http-error";
 import { endpoint } from "./types";
 
 export default function fetchWrapper(
@@ -52,16 +52,17 @@ export default function fetchWrapper(
           return;
         }
 
-        throw new HttpError(
-          response.statusText,
-          status,
+        throw new RequestError(response.statusText, status, {
           headers,
-          requestOptions
-        );
+          request: requestOptions
+        });
       }
 
       if (status === 304) {
-        throw new HttpError("Not modified", status, headers, requestOptions);
+        throw new RequestError("Not modified", status, {
+          headers,
+          request: requestOptions
+        });
       }
 
       if (status >= 400) {
@@ -69,12 +70,10 @@ export default function fetchWrapper(
           .text()
 
           .then(message => {
-            const error = new HttpError(
-              message,
-              status,
+            const error = new RequestError(message, status, {
               headers,
-              requestOptions
-            );
+              request: requestOptions
+            });
 
             try {
               Object.assign(error, JSON.parse(error.message));
@@ -108,10 +107,13 @@ export default function fetchWrapper(
     })
 
     .catch(error => {
-      if (error instanceof HttpError) {
+      if (error instanceof RequestError) {
         throw error;
       }
 
-      throw new HttpError(error.message, 500, headers, requestOptions);
+      throw new RequestError(error.message, 500, {
+        headers,
+        request: requestOptions
+      });
     });
 }

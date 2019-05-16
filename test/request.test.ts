@@ -425,30 +425,6 @@ describe("request()", () => {
       );
     });
   });
-
-  it("error.code (deprecated)", () => {
-    const mock = fetchMock.sandbox().get("path:/orgs/nope", 404);
-
-    const consoleWarn = console.warn;
-    let warnCalled = 0;
-    console.warn = () => warnCalled++;
-    return request("GET /orgs/:org", {
-      org: "nope",
-      request: {
-        fetch: mock
-      }
-    })
-      .then(() => {
-        throw new Error("should not resolve");
-      })
-
-      .catch(error => {
-        expect(error.code).toEqual(404);
-        expect(warnCalled).toEqual(1);
-        console.warn = consoleWarn;
-      });
-  });
-
   it("Just URL", () => {
     const mock = fetchMock.sandbox().get("path:/", 200);
 
