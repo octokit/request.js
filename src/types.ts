@@ -9,7 +9,7 @@ export interface request {
    *
    * @param {object} endpoint Must set `method` and `url`. Plus URL, query or body parameters, as well as `headers`, `mediaType.{format|previews}`, `request`, or `baseUrl`.
    */
-  (options: Endpoint): Promise<AnyResponse>;
+  <T = any>(options: Endpoint): Promise<OctokitResponse<T>>;
 
   /**
    * Sends a request based on endpoint options
@@ -17,7 +17,7 @@ export interface request {
    * @param {string} route Request method + URL. Example: `'GET /orgs/:org'`
    * @param {object} [parameters] URL, query or body parameters, as well as `headers`, `mediaType.{format|previews}`, `request`, or `baseUrl`.
    */
-  (route: Route, parameters?: Parameters): Promise<AnyResponse>;
+  <T = any>(route: Route, parameters?: Parameters): Promise<OctokitResponse<T>>;
 
   /**
    * Returns a new `endpoint` with updated route and parameters
