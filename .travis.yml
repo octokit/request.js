@@ -21,6 +21,11 @@ jobs:
       script: npm run test
     - node_js: 10
       script: npm run test
+    - node_js: 12
+      script: npm run test
+    - node_js: lts/*
+      env: build
+      script: npm run build
     - node_js: lts/*
       env: bundle size
       script:
