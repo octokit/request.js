@@ -40,11 +40,11 @@
     "universal-user-agent": "^2.1.0"
   },
   "devDependencies": {
-    "@gr2m/pika-plugin-bundle-web": "^0.3.16-patch-issue-46-6",
     "@pika/pack": "^0.3.7",
-    "@pika/plugin-build-node": "^0.3.16",
-    "@pika/plugin-build-web": "^0.3.16",
-    "@pika/plugin-ts-standard-pkg": "^0.3.16",
+    "@pika/plugin-build-node": "^0.4.0",
+    "@pika/plugin-build-web": "^0.4.0",
+    "@pika/plugin-bundle-web": "^0.4.0",
+    "@pika/plugin-ts-standard-pkg": "^0.4.0",
     "@types/fetch-mock": "^7.2.4",
     "@types/jest": "^24.0.12",
     "@types/node": "^11.13.8",
@@ -85,7 +85,7 @@
         "@pika/plugin-build-web"
       ],
       [
-        "@gr2m/pika-plugin-bundle-web",
+        "@pika/plugin-bundle-web",
         {
           "browser": true
         }
