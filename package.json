@@ -83,15 +83,6 @@
       ],
       [
         "@pika/plugin-build-web"
-      ],
-      [
-        "@pika/plugin-bundle-web",
-        {
-          "browser": true
-        }
-      ],
-      [
-        "pika-plugin-unpkg-field"
       ]
     ]
   },
@@ -100,7 +91,12 @@
       "@semantic-release/commit-analyzer",
       "@semantic-release/release-notes-generator",
       "@semantic-release/github",
-      "@semantic-release/npm",
+      [
+        "@semantic-release/npm",
+        {
+          "pkgRoot": "./pkg"
+        }
+      ],
       [
         "semantic-release-plugin-update-version-in-files",
         {
