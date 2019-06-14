@@ -2,7 +2,8 @@
   "name": "@octokit/request",
   "version": "0.0.0-development",
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "tag": "next"
   },
   "description": "Send parameterized requests to GitHub’s APIs with sensible defaults in browsers and Node",
   "main": "index.js",
