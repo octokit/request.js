@@ -26,12 +26,6 @@ jobs:
     - node_js: lts/*
       env: build
       script: npm run build
-    - node_js: lts/*
-      env: bundle size
-      script:
-        - npm run build
-        - npx terser pkg/dist-web/index.bundled.js --output pkg/dist-web/index.bundled.min.js --compress --mangle
-        - npx bundlesize --files pkg/dist-web/index.bundled.min.js --max-size 5KB
 
     # release stage: run semantic release & update the docs
     - stage: release
@@ -39,4 +33,4 @@ jobs:
       env: semantic-release
       script:
         - npm run build
-        - cd pkg && ../node_modules/.bin/semantic-release
+        - npx semantic-release
