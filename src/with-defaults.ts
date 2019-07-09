@@ -25,9 +25,9 @@ export default function withDefaults(
       return fetchWrapper(endpoint.parse(endpointOptions));
     }
 
-    return endpointOptions.request.hook(endpointOptions, (options: Defaults) =>
-      fetchWrapper(endpoint.parse(options))
-    );
+    return endpointOptions.request.hook((options: Defaults) => {
+      return fetchWrapper(endpoint.parse(options));
+    }, endpointOptions);
   };
 
   return Object.assign(newApi, {
