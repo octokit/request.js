@@ -39,8 +39,8 @@ the passed options and sends the request using [fetch](https://developer.mozilla
 
 ```js
 request("POST /repos/:owner/:repo/issues/:number/labels", {
-  headers: {
-    accept: "application/vnd.github.symmetra-preview+json"
+  mediaType: {
+    previews: ["symmetra"]
   },
   owner: "ocotkit",
   repo: "request.js",
@@ -195,7 +195,7 @@ const result = await request({
     <td>
       Custom headers. Passed headers are merged with defaults:<br>
       <em><code>headers['user-agent']</code> defaults to <code>octokit-rest.js/1.2.3</code> (where <code>1.2.3</code> is the released version)</em>.<br>
-      <em><code>headers['accept']</code> defaults to <code>application/vnd.github.v3+json</code>.<br>
+      <em><code>headers['accept']</code> defaults to <code>application/vnd.github.v3+json</code>.<br> Use <code>options.mediaType.{format,previews}</code> to request API previews and custom media types.
     </td>
   </tr>
   <tr>
@@ -439,7 +439,7 @@ All of the [`@octokit/endpoint`](https://github.com/octokit/endpoint.js) API can
 Some endpoints such as [Render a Markdown document in raw mode](https://developer.github.com/v3/markdown/#render-a-markdown-document-in-raw-mode) don’t have parameters that are sent as request body keys, instead the request body needs to be set directly. In these cases, set the `data` parameter.
 
 ```js
-const options = endpoint("POST /markdown/raw", {
+const response = await request("POST /markdown/raw", {
   data: "Hello world github/linguist#1 **cool**, and #1!",
   headers: {
     accept: "text/html;charset=utf-8",
@@ -447,17 +447,25 @@ const options = endpoint("POST /markdown/raw", {
   }
 });
 
-// options is
-// {
-//   method: 'post',
-//   url: 'https://api.github.com/markdown/raw',
-//   headers: {
-//     accept: 'text/html;charset=utf-8',
-//     'content-type': 'text/plain',
-//     'user-agent': userAgent
-//   },
-//   body: 'Hello world github/linguist#1 **cool**, and #1!'
-// }
+// Request is sent as
+//
+//     {
+//       method: 'post',
+//       url: 'https://api.github.com/markdown/raw',
+//       headers: {
+//         accept: 'text/html;charset=utf-8',
+//         'content-type': 'text/plain',
+//         'user-agent': userAgent
+//       },
+//       body: 'Hello world github/linguist#1 **cool**, and #1!'
+//     }
+//
+// not as
+//
+//     {
+//       ...
+//       body: '{"data": "Hello world github/linguist#1 **cool**, and #1!"}'
+//     }
 ```
 
 ### Set parameters for both the URL/query and the request body
