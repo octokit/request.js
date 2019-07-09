@@ -492,7 +492,7 @@ describe("request()", () => {
       .sandbox()
       .mock("https://api.github.com/", { ok: true });
 
-    const hook = (options: Endpoint, request: requestInterface) => {
+    const hook = (request: requestInterface, options: Endpoint) => {
       expect(options).toEqual({
         baseUrl: "https://api.github.com",
         headers: {
