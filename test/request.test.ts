@@ -488,11 +488,19 @@ describe("request()", () => {
   });
 
   it("options.request.hook", function() {
-    const mock = fetchMock
-      .sandbox()
-      .mock("https://api.github.com/", { ok: true });
+    const mock = fetchMock.sandbox().mock(
+      "https://api.github.com/foo",
+      { ok: true },
+      {
+        headers: {
+          "x-foo": "bar"
+        }
+      }
+    );
 
     const hook = (request: requestInterface, options: Endpoint) => {
+      expect(request.endpoint).toBeInstanceOf(Function);
+      expect(request.defaults).toBeInstanceOf(Function);
       expect(options).toEqual({
         baseUrl: "https://api.github.com",
         headers: {
@@ -510,7 +518,15 @@ describe("request()", () => {
         },
         url: "/"
       });
-      return request(options);
+
+      return request("/foo", {
+        headers: {
+          "x-foo": "bar"
+        },
+        request: {
+          fetch: mock
+        }
+      });
     };
 
     return request("/", {
