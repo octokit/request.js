@@ -25,9 +25,18 @@ export default function withDefaults(
       return fetchWrapper(endpoint.parse(endpointOptions));
     }
 
-    return endpointOptions.request.hook((options: Defaults) => {
-      return fetchWrapper(endpoint.parse(options));
-    }, endpointOptions);
+    const request = (route: Route | Endpoint, parameters?: Parameters) => {
+      return fetchWrapper(
+        endpoint.parse(endpoint.merge(<Route>route, parameters))
+      );
+    };
+
+    Object.assign(request, {
+      endpoint,
+      defaults: withDefaults.bind(null, endpoint)
+    });
+
+    return endpointOptions.request.hook(request, endpointOptions);
   };
 
   return Object.assign(newApi, {
