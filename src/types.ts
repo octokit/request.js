@@ -1,7 +1,6 @@
 import { Agent } from "http";
 
 import { endpoint } from "@octokit/endpoint";
-import nodeFetch from "node-fetch";
 
 export interface request {
   /**
