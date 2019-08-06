@@ -42,7 +42,7 @@ request("POST /repos/:owner/:repo/issues/:number/labels", {
   mediaType: {
     previews: ["symmetra"]
   },
-  owner: "ocotkit",
+  owner: "octokit",
   repo: "request.js",
   number: 1,
   labels: ["🐛 bug"]
@@ -425,10 +425,10 @@ const options = request.endpoint("GET /orgs/:org/repos", {
 
 All of the [`@octokit/endpoint`](https://github.com/octokit/endpoint.js) API can be used:
 
-- [`ocotkitRequest.endpoint()`](#endpoint)
-- [`ocotkitRequest.endpoint.defaults()`](#endpointdefaults)
-- [`ocotkitRequest.endpoint.merge()`](#endpointdefaults)
-- [`ocotkitRequest.endpoint.parse()`](#endpointmerge)
+- [`octokitRequest.endpoint()`](#endpoint)
+- [`octokitRequest.endpoint.defaults()`](#endpointdefaults)
+- [`octokitRequest.endpoint.merge()`](#endpointdefaults)
+- [`octokitRequest.endpoint.parse()`](#endpointmerge)
 
 ## Special cases
 
