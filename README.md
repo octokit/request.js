@@ -49,6 +49,10 @@ request("POST /repos/:owner/:repo/issues/:number/labels", {
 });
 ```
 
+👶 [Small bundle size](https://bundlephobia.com/result?p=@octokit/request@5.0.3) (\<4kb minified + gzipped)
+
+😎 [Authenticate](#authentication) with any of [GitHubs Authentication Strategies](https://github.com/octokit/auth.js).
+
 👍 Sensible defaults
 
 - `baseUrl`: `https://api.github.com`
@@ -58,8 +62,6 @@ request("POST /repos/:owner/:repo/issues/:number/labels", {
 👌 Simple to test: mock requests by passing a custom fetch method.
 
 🧐 Simple to debug: Sets `error.request` to request options causing the error (with redacted credentials).
-
-👶 Small bundle size (\<5kb minified + gzipped)
 
 ## Usage
 
@@ -110,6 +112,8 @@ console.log(`${result.data.length} repos found.`);
 
 ### GraphQL example
 
+For GraphQL request we recommend using [`@octokit/graphql`](https://github.com/octokit/graphql.js#readme)
+
 ```js
 const result = await request("POST /graphql", {
   headers: {
@@ -141,6 +145,45 @@ const result = await request({
   },
   org: "octokit",
   type: "private"
+});
+```
+
+## Authentication
+
+The simplest way to authenticate a request is to set the `Authorization` header directly, e.g. to a [personal access token](https://github.com/settings/tokens/).
+
+```js
+const requestWithAuth = request.defaults({
+  headers: {
+    authorization: "token 0000000000000000000000000000000000000001"
+  }
+});
+const result = await request("GET /user");
+```
+
+For more complex authentication strategies such as GitHub Apps or Basic, we recommend the according authentication library exported by [`@octokit/auth`](https://github.com/octokit/auth.js).
+
+```js
+const { createAppAuth } = require("@octokit/auth-app");
+const auth = createAppAuth({
+  id: process.env.APP_ID,
+  privateKey: process.env.PRIVATE_KEY,
+  installationId: 123
+});
+const requestWithAuth = request.defaults({
+  request: {
+    hook: auth.hook
+  },
+  mediaType: {
+    previews: ["machine-man"]
+  }
+});
+
+const { data: app } = await requestWithAuth("GET /app");
+const { data: app } = await requestWithAuth("POST /repos/:owner/:repo/issues", {
+  owner: "octocat",
+  repo: "hello-world",
+  title: "Hello from the engine room"
 });
 ```
 
