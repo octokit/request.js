@@ -5,14 +5,12 @@
     "access": "public"
   },
   "description": "Send parameterized requests to GitHub’s APIs with sensible defaults in browsers and Node",
-  "main": "index.js",
   "scripts": {
     "build": "pika build",
     "lint": "prettier --check '{src,test}/**/*' README.md package.json",
     "lint:fix": "prettier --write '{src,test}/**/*' README.md package.json",
     "pretest": "npm run -s lint",
-    "test": "jest --coverage",
-    "semantic-release": "semantic-release"
+    "test": "jest --coverage"
   },
   "repository": {
     "type": "git",
@@ -68,9 +66,6 @@
       }
     }
   },
-  "files": [
-    "lib"
-  ],
   "@pika/pack": {
     "pipeline": [
       [
