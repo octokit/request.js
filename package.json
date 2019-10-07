@@ -51,7 +51,7 @@
     "@types/once": "^1.4.0",
     "fetch-mock": "^7.2.0",
     "jest": "^24.7.1",
-    "lolex": "^4.2.0",
+    "lolex": "^5.0.0",
     "prettier": "^1.17.0",
     "semantic-release": "^15.10.5",
     "semantic-release-plugin-update-version-in-files": "^1.0.0",
