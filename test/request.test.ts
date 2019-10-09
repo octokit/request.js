@@ -691,4 +691,61 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       expect(response.data).toEqual("ok");
     });
   });
+
+  it("@octokit/rest.js/issues/1497/error-messages-on-validation-error", function() {
+    const mock = fetchMock.sandbox().mock(
+      "https://request-errors-test.com/repos/gr2m/sandbox/branches/gr2m-patch-1/protection",
+      {
+        status: 403,
+        body: {
+          message: "Validation Failed",
+          errors: [
+            "Only organization repositories can have users and team restrictions"
+          ],
+          documentation_url:
+            "https://developer.github.com/v3/repos/branches/#update-branch-protection"
+        }
+      },
+      {
+        method: "PUT",
+        headers: {
+          accept:
+            "application/vnd.github.hellcat-preview+json,application/vnd.github.luke-cage-preview+json,application/vnd.github.zzzax-preview+json",
+          authorization: "Bearer dXNlcm5hbWU6cGFzc3dvcmQ="
+        }
+      }
+    );
+
+    return request("PUT /repos/:owner/:repo/branches/:branch/protection", {
+      baseUrl: "https://request-errors-test.com",
+      mediaType: { previews: ["hellcat", "luke-cage", "zzzax"] },
+      headers: {
+        authorization: "Bearer dXNlcm5hbWU6cGFzc3dvcmQ="
+      },
+      owner: "gr2m",
+      repo: "sandbox",
+      branch: "gr2m-patch-1",
+      required_status_checks: { strict: true, contexts: ["wip"] },
+      enforce_admins: true,
+      required_pull_request_reviews: {
+        required_approving_review_count: 1,
+        dismiss_stale_reviews: true,
+        require_code_owner_reviews: true,
+        dismissal_restrictions: { users: [], teams: [] }
+      },
+      restrictions: { users: [], teams: [] },
+      request: {
+        fetch: mock
+      }
+    })
+      .then(() => {
+        fail("This should return error.");
+      })
+      .catch(error => {
+        expect(error).toHaveProperty(
+          "message",
+          "Validation failed: Only organization repositories can have users and team restrictions"
+        );
+      });
+  });
 });
