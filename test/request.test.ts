@@ -696,7 +696,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     const mock = fetchMock.sandbox().mock(
       "https://request-errors-test.com/repos/gr2m/sandbox/branches/gr2m-patch-1/protection",
       {
-        status: 403,
+        status: 400,
         body: {
           message: "Validation Failed",
           errors: [
@@ -709,18 +709,17 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       {
         method: "PUT",
         headers: {
-          accept:
-            "application/vnd.github.hellcat-preview+json,application/vnd.github.luke-cage-preview+json,application/vnd.github.zzzax-preview+json",
-          authorization: "Bearer dXNlcm5hbWU6cGFzc3dvcmQ="
+          accept: "application/vnd.github.luke-cage-preview+json",
+          authorization: "token secret123"
         }
       }
     );
 
     return request("PUT /repos/:owner/:repo/branches/:branch/protection", {
       baseUrl: "https://request-errors-test.com",
-      mediaType: { previews: ["hellcat", "luke-cage", "zzzax"] },
+      mediaType: { previews: ["luke-cage"] },
       headers: {
-        authorization: "Bearer dXNlcm5hbWU6cGFzc3dvcmQ="
+        authorization: "token secret123"
       },
       owner: "gr2m",
       repo: "sandbox",
