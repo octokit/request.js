@@ -5,17 +5,6 @@ import { RequestError } from "@octokit/request-error";
 import getBuffer from "./get-buffer-response";
 import { endpoint } from "./types";
 
-function mapErrorToString(error: any): string {
-  if (typeof error !== "object") {
-    return String(error);
-  }
-  let errorObj: Array<string> = [];
-  Object.keys(error).forEach((value: string) =>
-    errorObj.push(value + ": " + error[value])
-  );
-  return "{ " + errorObj.join(", ") + " }";
-}
-
 export default function fetchWrapper(
   requestOptions: ReturnType<endpoint> & { redirect?: string }
 ) {
@@ -94,7 +83,7 @@ export default function fetchWrapper(
 
               // Assumption `errors` would always be in Array Fotmat
               error.message =
-                error.message + ": " + errors.map(mapErrorToString).join(", ");
+                error.message + ": " + errors.map(JSON.stringify).join(", ");
             } catch (e) {
               // ignore, see octokit/rest.js#684
             }

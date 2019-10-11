@@ -744,7 +744,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       .catch(error => {
         expect(error).toHaveProperty(
           "message",
-          "Validation failed: Only organization repositories can have users and team restrictions, { resource: Search, field: q, code: invalid }"
+          `Validation failed: "Only organization repositories can have users and team restrictions", {"resource":"Search","field":"q","code":"invalid"}`
         );
       });
   });
