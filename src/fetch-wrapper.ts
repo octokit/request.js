@@ -76,7 +76,14 @@ export default function fetchWrapper(
             });
 
             try {
-              Object.assign(error, JSON.parse(error.message));
+              let responseBody = JSON.parse(error.message);
+              Object.assign(error, responseBody);
+
+              let errors = responseBody.errors;
+
+              // Assumption `errors` would always be in Array Fotmat
+              error.message =
+                error.message + ": " + errors.map(JSON.stringify).join(", ");
             } catch (e) {
               // ignore, see octokit/rest.js#684
             }
