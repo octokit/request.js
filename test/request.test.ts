@@ -698,9 +698,10 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       {
         status: 400,
         body: {
-          message: "Validation Failed",
+          message: "Validation failed",
           errors: [
-            "Only organization repositories can have users and team restrictions"
+            "Only organization repositories can have users and team restrictions",
+            { resource: "Search", field: "q", code: "invalid" }
           ],
           documentation_url:
             "https://developer.github.com/v3/repos/branches/#update-branch-protection"
@@ -743,7 +744,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       .catch(error => {
         expect(error).toHaveProperty(
           "message",
-          "Validation failed: Only organization repositories can have users and team restrictions"
+          "Validation failed: Only organization repositories can have users and team restrictions, { resource: Search, field: q, code: invalid }"
         );
       });
   });
