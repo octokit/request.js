@@ -1,12 +1,12 @@
 import isPlainObject from "is-plain-object";
 import nodeFetch from "node-fetch";
 import { RequestError } from "@octokit/request-error";
+import { EndpointInterface } from "@octokit/types";
 
 import getBuffer from "./get-buffer-response";
-import { endpoint } from "./types";
 
 export default function fetchWrapper(
-  requestOptions: ReturnType<endpoint> & { redirect?: string }
+  requestOptions: ReturnType<EndpointInterface> & { redirect?: string }
 ) {
   if (
     isPlainObject(requestOptions.body) ||

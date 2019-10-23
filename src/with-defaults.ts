@@ -1,31 +1,32 @@
 import fetchWrapper from "./fetch-wrapper";
-
 import {
-  Endpoint,
-  request,
-  endpoint,
-  AnyResponse,
+  EndpointOptions,
+  EndpointInterface,
+  OctokitResponse,
   Route,
-  Parameters,
-  Defaults
-} from "./types";
+  RequestInterface,
+  RequestParameters
+} from "@octokit/types";
 
 export default function withDefaults(
-  oldEndpoint: endpoint,
-  newDefaults: Parameters
-): request {
+  oldEndpoint: EndpointInterface,
+  newDefaults: RequestParameters
+): RequestInterface {
   const endpoint = oldEndpoint.defaults(newDefaults);
   const newApi = function(
-    route: Route | Endpoint,
-    parameters?: Parameters
-  ): Promise<AnyResponse> {
+    route: Route | EndpointOptions,
+    parameters?: RequestParameters
+  ): Promise<OctokitResponse<any>> {
     const endpointOptions = endpoint.merge(<Route>route, parameters);
 
     if (!endpointOptions.request || !endpointOptions.request.hook) {
       return fetchWrapper(endpoint.parse(endpointOptions));
     }
 
-    const request = (route: Route | Endpoint, parameters?: Parameters) => {
+    const request = (
+      route: Route | EndpointOptions,
+      parameters?: RequestParameters
+    ) => {
       return fetchWrapper(
         endpoint.parse(endpoint.merge(<Route>route, parameters))
       );
