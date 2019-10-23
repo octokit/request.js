@@ -3,13 +3,13 @@ import fetchMock from "fetch-mock";
 import { Headers, RequestInit } from "node-fetch";
 import { createAppAuth } from "@octokit/auth-app";
 import lolex from "lolex";
+import {
+  EndpointOptions,
+  RequestInterface,
+  ResponseHeaders
+} from "@octokit/types";
 
 import { request } from "../src";
-import {
-  request as requestInterface,
-  ResponseHeaders,
-  Endpoint
-} from "../src/types";
 
 const userAgent = `octokit-request.js/0.0.0-development ${getUserAgent()}`;
 
@@ -592,7 +592,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       }
     );
 
-    const hook = (request: requestInterface, options: Endpoint) => {
+    const hook = (request: RequestInterface, options: EndpointOptions) => {
       expect(request.endpoint).toBeInstanceOf(Function);
       expect(request.defaults).toBeInstanceOf(Function);
       expect(options).toEqual({
