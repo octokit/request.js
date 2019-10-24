@@ -214,14 +214,14 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         status: 200,
         headers: {
           "Content-Type": "application/json; charset=utf-8",
-          "Content-Length": 19137
+          "Content-Length": "19137"
         }
       })
       .head("https://api.github.com/repos/whatwg/html/pulls/2", {
         status: 404,
         headers: {
           "Content-Type": "application/json; charset=utf-8",
-          "Content-Length": 120
+          "Content-Length": "120"
         }
       });
 
@@ -266,7 +266,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
           ),
           headers: {
             "content-type": "application/x-gzip",
-            "content-length": 172
+            "content-length": "172"
           }
         }
       );
@@ -301,7 +301,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
           ),
           headers: {
             "content-type": "application/x-gzip",
-            "content-length": 172
+            "content-length": "172"
           }
         }
       );
@@ -367,7 +367,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         status: 200,
         body: "# hello-world",
         headers: {
-          "content-length": 13,
+          "content-length": "13",
           "content-type": "application/vnd.github.v3.raw; charset=utf-8"
         }
       });
