@@ -748,4 +748,37 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         );
       });
   });
+
+  it("Error in /login/oauth/access_token", function() {
+    const errorDescription =
+      "The client_id and/or client_secret passed are incorrect.";
+
+    const mock = fetchMock
+      .sandbox()
+      .mock("https://github.com/login/oauth/access_token", {
+        status: 200,
+        body: JSON.stringify({
+          error: "incorrect_client_credentials",
+          error_description: errorDescription
+        }),
+        headers: {
+          "Content-Type": "application/json; charset=utf-8"
+        }
+      });
+
+    return request("POST https://github.com/login/oauth/access_token", {
+      headers: {
+        accept: "application/json",
+      },
+      request: {
+        fetch: mock
+      }
+    })
+      .then(() => {
+        fail("should not resolve");
+      })
+      .catch(error => {
+        expect(error).toHaveProperty("message", errorDescription);
+      });
+  });
 });
