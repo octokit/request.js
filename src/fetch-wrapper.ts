@@ -81,7 +81,7 @@ export default function fetchWrapper(
 
               let errors = responseBody.errors;
 
-              // Assumption `errors` would always be in Array Fotmat
+              // Assumption `errors` would always be in Array format
               error.message =
                 error.message + ": " + errors.map(JSON.stringify).join(", ");
             } catch (e) {
