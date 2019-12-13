@@ -46,7 +46,7 @@ export default function fetchWrapper(
         return;
       }
 
-      // GitHub API returns 200 for HEAD requsets
+      // GitHub API returns 200 for HEAD requests
       if (requestOptions.method === "HEAD") {
         if (status < 400) {
           return;
