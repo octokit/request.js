@@ -340,6 +340,32 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       });
   });
 
+  it("304 last-modified", () => {
+    const mock = fetchMock.sandbox().get((url, { headers }) => {
+      return (
+        url === "https://api.github.com/orgs/myorg" &&
+        (headers as ResponseHeaders)["if-modified-since"] ===
+          "Sun Dec 24 2017 22:00:00 GMT-0600 (CST)"
+      );
+    }, 304);
+
+    return request("GET /orgs/:org", {
+      org: "myorg",
+      headers: {
+        "If-Modified-Since": "Sun Dec 24 2017 22:00:00 GMT-0600 (CST)"
+      },
+      request: {
+        fetch: mock
+      }
+    })
+      .then(response => {
+        throw new Error("should not resolve");
+      })
+      .catch(error => {
+        expect(error.status).toEqual(304);
+      });
+  });
+
   it("Not found", () => {
     const mock = fetchMock.sandbox().get("path:/orgs/nope", 404);
 
