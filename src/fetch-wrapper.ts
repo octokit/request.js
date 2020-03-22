@@ -29,12 +29,12 @@ export default function fetchWrapper(
         method: requestOptions.method,
         body: requestOptions.body,
         headers: requestOptions.headers,
-        redirect: requestOptions.redirect
+        redirect: requestOptions.redirect,
       },
       requestOptions.request
     )
   )
-    .then(response => {
+    .then((response) => {
       url = response.url;
       status = response.status;
 
@@ -54,14 +54,14 @@ export default function fetchWrapper(
 
         throw new RequestError(response.statusText, status, {
           headers,
-          request: requestOptions
+          request: requestOptions,
         });
       }
 
       if (status === 304) {
         throw new RequestError("Not modified", status, {
           headers,
-          request: requestOptions
+          request: requestOptions,
         });
       }
 
@@ -69,10 +69,10 @@ export default function fetchWrapper(
         return response
           .text()
 
-          .then(message => {
+          .then((message) => {
             const error = new RequestError(message, status, {
               headers,
-              request: requestOptions
+              request: requestOptions,
             });
 
             try {
@@ -104,23 +104,23 @@ export default function fetchWrapper(
       return getBuffer(response);
     })
 
-    .then(data => {
+    .then((data) => {
       return {
         status,
         url,
         headers,
-        data
+        data,
       };
     })
 
-    .catch(error => {
+    .catch((error) => {
       if (error instanceof RequestError) {
         throw error;
       }
 
       throw new RequestError(error.message, 500, {
         headers,
-        request: requestOptions
+        request: requestOptions,
       });
     });
 }

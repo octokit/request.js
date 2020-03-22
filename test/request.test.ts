@@ -6,7 +6,7 @@ import lolex from "lolex";
 import {
   EndpointOptions,
   RequestInterface,
-  ResponseHeaders
+  ResponseHeaders,
 } from "@octokit/types";
 
 import { request } from "../src";
@@ -25,20 +25,20 @@ describe("request()", () => {
         headers: {
           accept: "application/vnd.github.v3+json",
           authorization: "token 0000000000000000000000000000000000000001",
-          "user-agent": userAgent
-        }
+          "user-agent": userAgent,
+        },
       });
 
     return request("GET /orgs/:org/repos", {
       headers: {
-        authorization: "token 0000000000000000000000000000000000000001"
+        authorization: "token 0000000000000000000000000000000000000001",
       },
       org: "octokit",
       type: "private",
       request: {
-        fetch: mock
-      }
-    }).then(response => {
+        fetch: mock,
+      },
+    }).then((response) => {
       expect(response.data).toEqual([]);
     });
   });
@@ -52,14 +52,14 @@ describe("request()", () => {
       method: "GET",
       url: "/orgs/:org/repos",
       headers: {
-        authorization: "token 0000000000000000000000000000000000000001"
+        authorization: "token 0000000000000000000000000000000000000001",
       },
       org: "octokit",
       type: "private",
       request: {
-        fetch: mock
-      }
-    }).then(response => {
+        fetch: mock,
+      },
+    }).then((response) => {
       expect(response.data).toEqual([]);
     });
   });
@@ -67,7 +67,7 @@ describe("request()", () => {
   it("README authentication example", async () => {
     const clock = lolex.install({
       now: 0,
-      toFake: ["Date"]
+      toFake: ["Date"],
     });
     const APP_ID = 1;
     const PRIVATE_KEY = `-----BEGIN RSA PRIVATE KEY-----
@@ -106,9 +106,9 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         token: "secret123",
         expires_at: "1970-01-01T01:00:00.000Z",
         permissions: {
-          metadata: "read"
+          metadata: "read",
         },
-        repository_selection: "all"
+        repository_selection: "all",
       })
       .getOnce(
         "https://api.github.com/app",
@@ -117,8 +117,8 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
           headers: {
             accept: "application/vnd.github.machine-man-preview+json",
             "user-agent": userAgent,
-            authorization: `bearer ${BEARER}`
-          }
+            authorization: `bearer ${BEARER}`,
+          },
         }
       )
       .postOnce(
@@ -128,29 +128,29 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
           headers: {
             accept: "application/vnd.github.machine-man-preview+json",
             "user-agent": userAgent,
-            authorization: `token secret123`
-          }
+            authorization: `token secret123`,
+          },
         }
       );
     const auth = createAppAuth({
       id: APP_ID,
       privateKey: PRIVATE_KEY,
-      installationId: 123
+      installationId: 123,
     });
     const requestWithAuth = request.defaults({
       mediaType: {
-        previews: ["machine-man"]
+        previews: ["machine-man"],
       },
       request: {
         fetch: mock,
-        hook: auth.hook
-      }
+        hook: auth.hook,
+      },
     });
     await requestWithAuth("GET /app");
     await requestWithAuth("POST /repos/:owner/:repo/issues", {
       owner: "octocat",
       repo: "hello-world",
-      title: "Hello from the engine room"
+      title: "Hello from the engine room",
     });
     expect(mock.done()).toBe(true);
     clock.reset();
@@ -161,15 +161,15 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       .sandbox()
       .mock("https://api.github.com/repos/octocat/hello-world/issues", 201, {
         headers: {
-          "content-type": "application/json; charset=utf-8"
-        }
+          "content-type": "application/json; charset=utf-8",
+        },
       });
 
     request("POST /repos/:owner/:repo/issues", {
       owner: "octocat",
       repo: "hello-world",
       headers: {
-        accept: "text/html;charset=utf-8"
+        accept: "text/html;charset=utf-8",
       },
       title: "Found a bug",
       body: "I'm having a problem with this.",
@@ -177,9 +177,9 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       milestone: 1,
       labels: ["bug"],
       request: {
-        fetch: mock
-      }
-    }).then(response => {
+        fetch: mock,
+      },
+    }).then((response) => {
       expect(response.status).toEqual(201);
     });
   });
@@ -189,20 +189,20 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       .sandbox()
       .mock("https://api.github.com/user/starred/octocat/hello-world", 204, {
         headers: {
-          "content-length": 0
-        }
+          "content-length": 0,
+        },
       });
 
     request("PUT /user/starred/:owner/:repo", {
       headers: {
-        authorization: `token 0000000000000000000000000000000000000001`
+        authorization: `token 0000000000000000000000000000000000000001`,
       },
       owner: "octocat",
       repo: "hello-world",
       request: {
-        fetch: mock
-      }
-    }).then(response => {
+        fetch: mock,
+      },
+    }).then((response) => {
       expect(response.status).toEqual(204);
     });
   });
@@ -214,15 +214,15 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         status: 200,
         headers: {
           "Content-Type": "application/json; charset=utf-8",
-          "Content-Length": "19137"
-        }
+          "Content-Length": "19137",
+        },
       })
       .head("https://api.github.com/repos/whatwg/html/pulls/2", {
         status: 404,
         headers: {
           "Content-Type": "application/json; charset=utf-8",
-          "Content-Length": "120"
-        }
+          "Content-Length": "120",
+        },
       });
 
     const options = {
@@ -230,12 +230,12 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       repo: "html",
       number: 1,
       request: {
-        fetch: mock
-      }
+        fetch: mock,
+      },
     };
 
     request(`HEAD /repos/:owner/:repo/pulls/:number`, options)
-      .then(response => {
+      .then((response) => {
         expect(response.status).toEqual(200);
 
         return request(
@@ -248,7 +248,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         throw new Error("should not resolve");
       })
 
-      .catch(error => {
+      .catch((error) => {
         expect(error.status).toEqual(404);
       });
   });
@@ -266,8 +266,8 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
           ),
           headers: {
             "content-type": "application/x-gzip",
-            "content-length": "172"
-          }
+            "content-length": "172",
+          },
         }
       );
 
@@ -277,9 +277,9 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       archive_format: "tarball",
       ref: "master",
       request: {
-        fetch: mock
-      }
-    }).then(response => {
+        fetch: mock,
+      },
+    }).then((response) => {
       expect(response.data.length).toEqual(172);
     });
   });
@@ -301,8 +301,8 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
           ),
           headers: {
             "content-type": "application/x-gzip",
-            "content-length": "172"
-          }
+            "content-length": "172",
+          },
         }
       );
 
@@ -310,8 +310,8 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       "GET https://codeload.github.com/octokit-fixture-org/get-archive/legacy.tar.gz/master",
       {
         request: {
-          fetch: mock
-        }
+          fetch: mock,
+        },
       }
     );
   });
@@ -328,14 +328,14 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       org: "myorg",
       headers: { "If-None-Match": "etag" },
       request: {
-        fetch: mock
-      }
+        fetch: mock,
+      },
     })
       .then(() => {
         throw new Error("should not resolve");
       })
 
-      .catch(error => {
+      .catch((error) => {
         expect(error.status).toEqual(304);
       });
   });
@@ -352,16 +352,16 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     return request("GET /orgs/:org", {
       org: "myorg",
       headers: {
-        "If-Modified-Since": "Sun Dec 24 2017 22:00:00 GMT-0600 (CST)"
+        "If-Modified-Since": "Sun Dec 24 2017 22:00:00 GMT-0600 (CST)",
       },
       request: {
-        fetch: mock
-      }
+        fetch: mock,
+      },
     })
-      .then(response => {
+      .then((response) => {
         throw new Error("should not resolve");
       })
-      .catch(error => {
+      .catch((error) => {
         expect(error.status).toEqual(304);
       });
   });
@@ -372,14 +372,14 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     return request("GET /orgs/:org", {
       org: "nope",
       request: {
-        fetch: mock
-      }
+        fetch: mock,
+      },
     })
       .then(() => {
         throw new Error("should not resolve");
       })
 
-      .catch(error => {
+      .catch((error) => {
         expect(error.status).toEqual(404);
         expect(error.request.method).toEqual("GET");
         expect(error.request.url).toEqual("https://api.github.com/orgs/nope");
@@ -394,21 +394,21 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         body: "# hello-world",
         headers: {
           "content-length": "13",
-          "content-type": "application/vnd.github.v3.raw; charset=utf-8"
-        }
+          "content-type": "application/vnd.github.v3.raw; charset=utf-8",
+        },
       });
 
     return request("GET /repos/:owner/:repo/contents/:path", {
       headers: {
-        accept: "application/vnd.github.v3.raw"
+        accept: "application/vnd.github.v3.raw",
       },
       owner: "octokit-fixture-org",
       repo: "hello-world",
       path: "README.md",
       request: {
-        fetch: mock
-      }
-    }).then(response => {
+        fetch: mock,
+      },
+    }).then((response) => {
       expect(response.data).toEqual("# hello-world");
     });
   });
@@ -420,7 +420,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         throw new Error("should not resolve");
       })
 
-      .catch(error => {
+      .catch((error) => {
         expect(error.status).toEqual(500);
       });
   });
@@ -436,11 +436,11 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
 
     return request("GET /", {
       headers: {
-        "user-agent": "funky boom boom pow"
+        "user-agent": "funky boom boom pow",
       },
       request: {
-        fetch: mock
-      }
+        fetch: mock,
+      },
     });
   });
 
@@ -453,13 +453,13 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
 
     return request("GET /", {
       headers: {
-        "user-agent": "funky boom boom pow"
+        "user-agent": "funky boom boom pow",
       },
       request: {
         timeout: 100,
-        fetch: mock
-      }
-    }).catch(error => {
+        fetch: mock,
+      },
+    }).catch((error) => {
       if (error.message === "ok") {
         return;
       }
@@ -475,7 +475,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         status: 422,
         headers: {
           "Content-Type": "application/json; charset=utf-8",
-          "X-Foo": "bar"
+          "X-Foo": "bar",
         },
         body: {
           message: "Validation Failed",
@@ -483,45 +483,45 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
             {
               resource: "Label",
               code: "invalid",
-              field: "color"
-            }
+              field: "color",
+            },
           ],
           documentation_url:
-            "https://developer.github.com/v3/issues/labels/#create-a-label"
-        }
+            "https://developer.github.com/v3/issues/labels/#create-a-label",
+        },
       });
 
     return request("POST /repos/octocat/hello-world/labels", {
       name: "foo",
       color: "invalid",
       request: {
-        fetch: mock
-      }
-    }).catch(error => {
+        fetch: mock,
+      },
+    }).catch((error) => {
       expect(error.status).toEqual(422);
       expect(error.headers["x-foo"]).toEqual("bar");
       expect(error.documentation_url).toEqual(
         "https://developer.github.com/v3/issues/labels/#create-a-label"
       );
       expect(error.errors).toEqual([
-        { resource: "Label", code: "invalid", field: "color" }
+        { resource: "Label", code: "invalid", field: "color" },
       ]);
     });
   });
 
   it("redacts credentials from error.request.headers.authorization", () => {
     const mock = fetchMock.sandbox().get("https://api.github.com/", {
-      status: 500
+      status: 500,
     });
 
     return request("/", {
       headers: {
-        authorization: "token secret123"
+        authorization: "token secret123",
       },
       request: {
-        fetch: mock
-      }
-    }).catch(error => {
+        fetch: mock,
+      },
+    }).catch((error) => {
       expect(error.request.headers.authorization).toEqual("token [REDACTED]");
     });
   });
@@ -530,16 +530,16 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     const mock = fetchMock
       .sandbox()
       .get("https://api.github.com/?client_id=123&client_secret=secret123", {
-        status: 500
+        status: 500,
       });
 
     return request("/", {
       client_id: "123",
       client_secret: "secret123",
       request: {
-        fetch: mock
-      }
-    }).catch(error => {
+        fetch: mock,
+      },
+    }).catch((error) => {
       expect(error.request.url).toEqual(
         "https://api.github.com/?client_id=123&client_secret=[REDACTED]"
       );
@@ -550,14 +550,14 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
 
     return request("/", {
       request: {
-        fetch: mock
-      }
+        fetch: mock,
+      },
     }).then(({ status }) => {
       expect(status).toEqual(200);
     });
   });
 
-  it("Resolves with url", function() {
+  it("Resolves with url", function () {
     // this test cannot be mocked with `fetch-mock`. I don’t like to rely on
     // external websites to run tests, but in this case I’ll make an exception.
     // The alternative would be to start a local server we then send a request to,
@@ -571,50 +571,50 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     );
   });
 
-  it("options.request.signal is passed as option to fetch", function() {
+  it("options.request.signal is passed as option to fetch", function () {
     return request("/", {
       request: {
-        signal: "funk"
-      }
+        signal: "funk",
+      },
     })
       .then(() => {
         throw new Error("Should not resolve");
       })
 
-      .catch(error => {
+      .catch((error) => {
         expect(error.message).toMatch(/\bsignal\b/i);
         expect(error.message).toMatch(/\bAbortSignal\b/i);
       });
   });
 
-  it("options.request.fetch", function() {
+  it("options.request.fetch", function () {
     return request("/", {
       request: {
         fetch: () =>
           Promise.resolve({
             status: 200,
             headers: new Headers({
-              "Content-Type": "application/json; charset=utf-8"
+              "Content-Type": "application/json; charset=utf-8",
             }),
             url: "http://api.github.com/",
             json() {
               return Promise.resolve("funk");
-            }
-          })
-      }
-    }).then(result => {
+            },
+          }),
+      },
+    }).then((result) => {
       expect(result.data).toEqual("funk");
     });
   });
 
-  it("options.request.hook", function() {
+  it("options.request.hook", function () {
     const mock = fetchMock.sandbox().mock(
       "https://api.github.com/foo",
       { ok: true },
       {
         headers: {
-          "x-foo": "bar"
-        }
+          "x-foo": "bar",
+        },
       }
     );
 
@@ -625,70 +625,70 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         baseUrl: "https://api.github.com",
         headers: {
           accept: "application/vnd.github.v3+json",
-          "user-agent": userAgent
+          "user-agent": userAgent,
         },
         mediaType: {
           format: "",
-          previews: []
+          previews: [],
         },
         method: "GET",
         request: {
           fetch: mock,
-          hook: hook
+          hook: hook,
         },
-        url: "/"
+        url: "/",
       });
 
       return request("/foo", {
         headers: {
-          "x-foo": "bar"
+          "x-foo": "bar",
         },
         request: {
-          fetch: mock
-        }
+          fetch: mock,
+        },
       });
     };
 
     return request("/", {
       request: {
         fetch: mock,
-        hook
-      }
-    }).then(result => {
+        hook,
+      },
+    }).then((result) => {
       expect(result.data).toEqual({ ok: true });
     });
   });
 
-  it("options.mediaType.format", function() {
+  it("options.mediaType.format", function () {
     const mock = fetchMock
       .sandbox()
       .mock("https://api.github.com/repos/octokit/request.js/issues/1", "ok", {
         headers: {
           accept: "application/vnd.github.v3.raw+json",
           authorization: "token 0000000000000000000000000000000000000001",
-          "user-agent": userAgent
-        }
+          "user-agent": userAgent,
+        },
       });
 
     return request("GET /repos/:owner/:repo/issues/:number", {
       headers: {
-        authorization: "token 0000000000000000000000000000000000000001"
+        authorization: "token 0000000000000000000000000000000000000001",
       },
       mediaType: {
-        format: "raw+json"
+        format: "raw+json",
       },
       owner: "octokit",
       repo: "request.js",
       number: 1,
       request: {
-        fetch: mock
-      }
-    }).then(response => {
+        fetch: mock,
+      },
+    }).then((response) => {
       expect(response.data).toEqual("ok");
     });
   });
 
-  it("options.mediaType.previews", function() {
+  it("options.mediaType.previews", function () {
     const mock = fetchMock
       .sandbox()
       .mock("https://api.github.com/repos/octokit/request.js/issues/1", "ok", {
@@ -696,29 +696,29 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
           accept:
             "application/vnd.github.foo-preview+json,application/vnd.github.bar-preview+json",
           authorization: "token 0000000000000000000000000000000000000001",
-          "user-agent": userAgent
-        }
+          "user-agent": userAgent,
+        },
       });
 
     return request("GET /repos/:owner/:repo/issues/:number", {
       headers: {
-        authorization: "token 0000000000000000000000000000000000000001"
+        authorization: "token 0000000000000000000000000000000000000001",
       },
       mediaType: {
-        previews: ["foo", "bar"]
+        previews: ["foo", "bar"],
       },
       owner: "octokit",
       repo: "request.js",
       number: 1,
       request: {
-        fetch: mock
-      }
-    }).then(response => {
+        fetch: mock,
+      },
+    }).then((response) => {
       expect(response.data).toEqual("ok");
     });
   });
 
-  it("@octokit/rest.js/issues/1497/error-messages-on-validation-error", function() {
+  it("@octokit/rest.js/issues/1497/error-messages-on-validation-error", function () {
     const mock = fetchMock.sandbox().mock(
       "https://request-errors-test.com/repos/gr2m/sandbox/branches/gr2m-patch-1/protection",
       {
@@ -727,18 +727,18 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
           message: "Validation failed",
           errors: [
             "Only organization repositories can have users and team restrictions",
-            { resource: "Search", field: "q", code: "invalid" }
+            { resource: "Search", field: "q", code: "invalid" },
           ],
           documentation_url:
-            "https://developer.github.com/v3/repos/branches/#update-branch-protection"
-        }
+            "https://developer.github.com/v3/repos/branches/#update-branch-protection",
+        },
       },
       {
         method: "PUT",
         headers: {
           accept: "application/vnd.github.luke-cage-preview+json",
-          authorization: "token secret123"
-        }
+          authorization: "token secret123",
+        },
       }
     );
 
@@ -746,7 +746,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       baseUrl: "https://request-errors-test.com",
       mediaType: { previews: ["luke-cage"] },
       headers: {
-        authorization: "token secret123"
+        authorization: "token secret123",
       },
       owner: "gr2m",
       repo: "sandbox",
@@ -757,17 +757,17 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         required_approving_review_count: 1,
         dismiss_stale_reviews: true,
         require_code_owner_reviews: true,
-        dismissal_restrictions: { users: [], teams: [] }
+        dismissal_restrictions: { users: [], teams: [] },
       },
       restrictions: { users: [], teams: [] },
       request: {
-        fetch: mock
-      }
+        fetch: mock,
+      },
     })
       .then(() => {
         fail("This should return error.");
       })
-      .catch(error => {
+      .catch((error) => {
         expect(error).toHaveProperty(
           "message",
           `Validation failed: "Only organization repositories can have users and team restrictions", {"resource":"Search","field":"q","code":"invalid"}`

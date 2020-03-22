@@ -5,7 +5,7 @@ import {
   OctokitResponse,
   Route,
   RequestInterface,
-  RequestParameters
+  RequestParameters,
 } from "@octokit/types";
 
 export default function withDefaults(
@@ -13,7 +13,7 @@ export default function withDefaults(
   newDefaults: RequestParameters
 ): RequestInterface {
   const endpoint = oldEndpoint.defaults(newDefaults);
-  const newApi = function(
+  const newApi = function (
     route: Route | EndpointOptions,
     parameters?: RequestParameters
   ): Promise<OctokitResponse<any>> {
@@ -34,7 +34,7 @@ export default function withDefaults(
 
     Object.assign(request, {
       endpoint,
-      defaults: withDefaults.bind(null, endpoint)
+      defaults: withDefaults.bind(null, endpoint),
     });
 
     return endpointOptions.request.hook(request, endpointOptions);
@@ -42,6 +42,6 @@ export default function withDefaults(
 
   return Object.assign(newApi, {
     endpoint,
-    defaults: withDefaults.bind(null, endpoint)
+    defaults: withDefaults.bind(null, endpoint),
   });
 }
