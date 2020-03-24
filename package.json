@@ -29,7 +29,7 @@
   },
   "homepage": "https://github.com/octokit/request.js#readme",
   "dependencies": {
-    "@octokit/endpoint": "^5.5.0",
+    "@octokit/endpoint": "^6.0.0",
     "@octokit/request-error": "^1.0.1",
     "@octokit/types": "^2.0.0",
     "deprecation": "^2.0.0",
