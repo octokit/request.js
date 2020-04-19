@@ -43,5 +43,5 @@ export default function withDefaults(
   return Object.assign(newApi, {
     endpoint,
     defaults: withDefaults.bind(null, endpoint),
-  });
+  }) as RequestInterface<typeof endpoint.DEFAULTS & typeof newDefaults>;
 }
