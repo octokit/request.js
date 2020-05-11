@@ -159,7 +159,7 @@ const requestWithAuth = request.defaults({
     authorization: "token 0000000000000000000000000000000000000001",
   },
 });
-const result = await request("GET /user");
+const result = await requestWithAuth("GET /user");
 ```
 
 For more complex authentication strategies such as GitHub Apps or Basic, we recommend the according authentication library exported by [`@octokit/auth`](https://github.com/octokit/auth.js).
