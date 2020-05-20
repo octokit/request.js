@@ -4,7 +4,6 @@
 
 [![@latest](https://img.shields.io/npm/v/@octokit/request.svg)](https://www.npmjs.com/package/@octokit/request)
 [![Build Status](https://github.com/octokit/request.js/workflows/Test/badge.svg)](https://github.com/octokit/request.js/actions?query=workflow%3ATest+branch%3Amaster)
-[![Greenkeeper](https://badges.greenkeeper.io/octokit/request.js.svg)](https://greenkeeper.io/)
 
 `@octokit/request` is a request library for browsers & node that makes it easier
 to interact with [GitHub’s REST API](https://developer.github.com/v3/) and
