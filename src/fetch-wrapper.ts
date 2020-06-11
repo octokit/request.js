@@ -1,12 +1,14 @@
 import isPlainObject from "is-plain-object";
-import nodeFetch from "node-fetch";
+import nodeFetch, { HeadersInit } from "node-fetch";
 import { RequestError } from "@octokit/request-error";
 import { EndpointInterface } from "@octokit/types";
 
 import getBuffer from "./get-buffer-response";
 
 export default function fetchWrapper(
-  requestOptions: ReturnType<EndpointInterface> & { redirect?: string }
+  requestOptions: ReturnType<EndpointInterface> & {
+    redirect?: "error" | "follow" | "manual";
+  }
 ) {
   if (
     isPlainObject(requestOptions.body) ||
@@ -28,7 +30,7 @@ export default function fetchWrapper(
       {
         method: requestOptions.method,
         body: requestOptions.body,
-        headers: requestOptions.headers,
+        headers: requestOptions.headers as HeadersInit,
         redirect: requestOptions.redirect,
       },
       requestOptions.request
