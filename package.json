@@ -36,7 +36,7 @@
     "is-plain-object": "^3.0.0",
     "node-fetch": "^2.3.0",
     "once": "^1.4.0",
-    "universal-user-agent": "^5.0.0"
+    "universal-user-agent": "^6.0.0"
   },
   "devDependencies": {
     "@octokit/auth-app": "^2.1.2",
