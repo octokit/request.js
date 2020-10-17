@@ -70,11 +70,11 @@ request("POST /repos/:owner/:repo/issues/:number/labels", {
 <tr><th>
 Browsers
 </th><td width=100%>
-Load <code>@octokit/request</code> directly from <a href="https://cdn.pika.dev">cdn.pika.dev</a>
+Load <code>@octokit/request</code> directly from <a href="https://cdn.skypack.dev">cdn.skypack.dev</a>
         
 ```html
 <script type="module">
-import { request } from "https://cdn.pika.dev/@octokit/request";
+import { request } from "https://cdn.skypack.dev/@octokit/request";
 </script>
 ```
 
