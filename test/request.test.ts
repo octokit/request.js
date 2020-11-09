@@ -133,7 +133,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         }
       );
     const auth = createAppAuth({
-      id: APP_ID,
+      appId: APP_ID,
       privateKey: PRIVATE_KEY,
       installationId: 123,
     });
