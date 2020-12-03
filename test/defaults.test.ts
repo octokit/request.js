@@ -35,7 +35,7 @@ describe("endpoint.defaults()", () => {
       },
     });
 
-    return myRequest(`GET /orgs/:org/repos`).then((response) => {
+    return myRequest(`GET /orgs/{org}/repos`).then((response) => {
       expect(response.status).toEqual(200);
     });
   });
@@ -76,8 +76,10 @@ describe("endpoint.defaults()", () => {
       },
     });
 
-    return myProjectRequestWithAuth(`GET /orgs/:org/repos`).then((response) => {
-      expect(response.status).toEqual(200);
-    });
+    return myProjectRequestWithAuth(`GET /orgs/{org}/repos`).then(
+      (response) => {
+        expect(response.status).toEqual(200);
+      }
+    );
   });
 });
