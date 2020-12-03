@@ -29,7 +29,7 @@ describe("request()", () => {
         },
       });
 
-    return request("GET /orgs/:org/repos", {
+    return request("GET /orgs/{org}/repos", {
       headers: {
         authorization: "token 0000000000000000000000000000000000000001",
       },
@@ -50,7 +50,7 @@ describe("request()", () => {
 
     return request({
       method: "GET",
-      url: "/orgs/:org/repos",
+      url: "/orgs/{org}/repos",
       headers: {
         authorization: "token 0000000000000000000000000000000000000001",
       },
@@ -147,7 +147,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       },
     });
     await requestWithAuth("GET /app");
-    await requestWithAuth("POST /repos/:owner/:repo/issues", {
+    await requestWithAuth("POST /repos/{owner}/{repo}/issues", {
       owner: "octocat",
       repo: "hello-world",
       title: "Hello from the engine room",
@@ -165,7 +165,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         },
       });
 
-    request("POST /repos/:owner/:repo/issues", {
+    request("POST /repos/{owner}/{repo}/issues", {
       owner: "octocat",
       repo: "hello-world",
       headers: {
@@ -193,7 +193,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         },
       });
 
-    request("PUT /user/starred/:owner/:repo", {
+    request("PUT /user/starred/{owner}/{repo}", {
       headers: {
         authorization: `token 0000000000000000000000000000000000000001`,
       },
@@ -234,12 +234,12 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       },
     };
 
-    request(`HEAD /repos/:owner/:repo/pulls/:number`, options)
+    request(`HEAD /repos/{owner}/{repo}/pulls/{number}`, options)
       .then((response) => {
         expect(response.status).toEqual(200);
 
         return request(
-          `HEAD /repos/:owner/:repo/pulls/:number`,
+          `HEAD /repos/{owner}/{repo}/pulls/{number}`,
           Object.assign(options, { number: 2 })
         );
       })
@@ -271,7 +271,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         }
       );
 
-    return request("GET /repos/:owner/:repo/:archive_format/:ref", {
+    return request("GET /repos/{owner}/{repo}/{archive_format}/{ref}", {
       owner: "octokit-fixture-org",
       repo: "get-archive",
       archive_format: "tarball",
@@ -324,7 +324,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       );
     }, 304);
 
-    return request("GET /orgs/:org", {
+    return request("GET /orgs/{org}", {
       org: "myorg",
       headers: { "If-None-Match": "etag" },
       request: {
@@ -349,7 +349,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       );
     }, 304);
 
-    return request("GET /orgs/:org", {
+    return request("GET /orgs/{org}", {
       org: "myorg",
       headers: {
         "If-Modified-Since": "Sun Dec 24 2017 22:00:00 GMT-0600 (CST)",
@@ -369,7 +369,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
   it("Not found", () => {
     const mock = fetchMock.sandbox().get("path:/orgs/nope", 404);
 
-    return request("GET /orgs/:org", {
+    return request("GET /orgs/{org}", {
       org: "nope",
       request: {
         fetch: mock,
@@ -398,7 +398,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         },
       });
 
-    return request("GET /repos/:owner/:repo/contents/:path", {
+    return request("GET /repos/{owner}/{repo}/contents/{path}", {
       headers: {
         accept: "application/vnd.github.v3.raw",
       },
@@ -670,7 +670,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         },
       });
 
-    return request("GET /repos/:owner/:repo/issues/:number", {
+    return request("GET /repos/{owner}/{repo}/issues/{number}", {
       headers: {
         authorization: "token 0000000000000000000000000000000000000001",
       },
@@ -700,7 +700,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         },
       });
 
-    return request("GET /repos/:owner/:repo/issues/:number", {
+    return request("GET /repos/{owner}/{repo}/issues/{number}", {
       headers: {
         authorization: "token 0000000000000000000000000000000000000001",
       },
@@ -742,7 +742,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       }
     );
 
-    return request("PUT /repos/:owner/:repo/branches/:branch/protection", {
+    return request("PUT /repos/{owner}/{repo}/branches/{branch}/protection", {
       baseUrl: "https://request-errors-test.com",
       mediaType: { previews: ["luke-cage"] },
       headers: {
