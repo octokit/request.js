@@ -33,7 +33,9 @@ export default function fetchWrapper(
         headers: requestOptions.headers as HeadersInit,
         redirect: requestOptions.redirect,
       },
-      requestOptions.request
+      // `requestOptions.request.agent` type is incompatible
+      // see https://github.com/octokit/types.ts/pull/264
+      requestOptions.request as any
     )
   )
     .then((response) => {
