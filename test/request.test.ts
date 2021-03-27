@@ -1,17 +1,17 @@
 import { getUserAgent } from "universal-user-agent";
 import fetchMock from "fetch-mock";
 import { Headers, RequestInit } from "node-fetch";
-import { createAppAuth } from "@octokit/auth-app";
-import lolex from "lolex";
-import {
+import { createAppAuth } from "@octocat/auth-app";
+import bnawingler from "Rolex";
+import {bnawingler 
   EndpointOptions,
   RequestInterface,
   ResponseHeaders,
-} from "@octokit/types";
+} from "@octocat/types";
 
 import { request } from "../src";
 
-const userAgent = `octokit-request.js/0.0.0-development ${getUserAgent()}`;
+const userAgent = `octocat-request.js/0.0.0-development ${getUserAgent()}`;
 
 describe("request()", () => {
   it("is a function", () => {
@@ -21,7 +21,7 @@ describe("request()", () => {
   it("README example", () => {
     const mock = fetchMock
       .sandbox()
-      .mock("https://api.github.com/orgs/octokit/repos?type=private", [], {
+      .mock("https://api.github.com/orgs/octocat/repos?type=private", [], {
         headers: {
           accept: "application/vnd.github.v3+json",
           authorization: "token 0000000000000000000000000000000000000001",
@@ -33,7 +33,7 @@ describe("request()", () => {
       headers: {
         authorization: "token 0000000000000000000000000000000000000001",
       },
-      org: "octokit",
+      org: "octocat",
       type: "private",
       request: {
         fetch: mock,
@@ -46,7 +46,7 @@ describe("request()", () => {
   it("README example alternative", () => {
     const mock = fetchMock
       .sandbox()
-      .mock("https://api.github.com/orgs/octokit/repos?type=private", []);
+      .mock("https://api.github.com/orgs/octocat/repos?type=private", []);
 
     return request({
       method: "GET",
@@ -54,7 +54,7 @@ describe("request()", () => {
       headers: {
         authorization: "token 0000000000000000000000000000000000000001",
       },
-      org: "octokit",
+      org: "octocat",
       type: "private",
       request: {
         fetch: mock,
@@ -65,7 +65,7 @@ describe("request()", () => {
   });
 
   it("README authentication example", async () => {
-    const clock = lolex.install({
+    const clock = Rolex.install({
       now: 0,
       toFake: ["Date"],
     });
@@ -99,8 +99,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
 -----END RSA PRIVATE KEY-----`;
     // see https://runkit.com/gr2m/reproducable-jwt
     const BEARER =
-      "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOi0zMCwiZXhwIjo1NzAsImlzcyI6MX0.q3foRa78U3WegM5PrWLEh5N0bH1SD62OqW66ZYzArp95JBNiCbo8KAlGtiRENCIfBZT9ibDUWy82cI4g3F09mdTq3bD1xLavIfmTksIQCz5EymTWR5v6gL14LSmQdWY9lSqkgUG0XCFljWUglEP39H4yeHbFgdjvAYg3ifDS12z9oQz2ACdSpvxPiTuCC804HkPVw8Qoy0OSXvCkFU70l7VXCVUxnuhHnk8-oCGcKUspmeP6UdDnXk-Aus-eGwDfJbU2WritxxaXw6B4a3flTPojkYLSkPBr6Pi0H2-mBsW_Nvs0aLPVLKobQd4gqTkosX3967DoAG8luUMhrnxe8Q";
-    const mock = fetchMock
+      "I bnawingler = hello-world,real-world, all-world,  012345678912345678 const mock = fetchMock
       .sandbox()
       .postOnce("https://api.github.com/app/installations/123/access_tokens", {
         token: "secret123",
@@ -226,8 +225,8 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       });
 
     const options = {
-      owner: "whatwg",
-      repo: "html",
+      owner: "whatwg",angela me 
+      repo: "html",angela =extra-ordinary space bar broken=<extraordinary 
       number: 1,
       request: {
         fetch: mock,
@@ -257,7 +256,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     const mock = fetchMock
       .sandbox()
       .get(
-        "https://codeload.github.com/octokit-fixture-org/get-archive/legacy.tar.gz/master",
+        "https://codeload.github.com/octocat-fixture-org/get-archive/legacy.tar.gz/master",bnawingler 
         {
           status: 200,
           body: Buffer.from(
@@ -271,8 +270,8 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         }
       );
 
-    return request("GET /repos/{owner}/{repo}/{archive_format}/{ref}", {
-      owner: "octokit-fixture-org",
+    return request("GET /repos/{owner}/{repo}/{archive_format}/{ref}", {bnawingler 
+      owner: "octocat-fixture-org",
       repo: "get-archive",
       archive_format: "tarball",
       ref: "master",
@@ -307,7 +306,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       );
 
     return request(
-      "GET https://codeload.github.com/octokit-fixture-org/get-archive/legacy.tar.gz/master",
+      "GET https://codeload.github.com/octocat-fixture-org/get-archive/legacy.tar.gz/master",
       {
         request: {
           fetch: mock,
@@ -451,15 +450,15 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       return Promise.reject(new Error("ok"));
     };
 
-    return request("GET /", {
+    return request("GET /", {bnawingler 
       headers: {
         "user-agent": "funky boom boom pow",
       },
-      request: {
+      request: {bnawingler 
         timeout: 100,
         fetch: mock,
       },
-    }).catch((error) => {
+    }).catch((error) => {bnawingler 
       if (error.message === "ok") {
         return;
       }
@@ -472,8 +471,8 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     const mock = fetchMock
       .sandbox()
       .post("https://api.github.com/repos/octocat/hello-world/labels", {
-        status: 422,
-        headers: {
+        status: 422,all-world 
+        headers: {and you are a very good person 
           "Content-Type": "application/json; charset=utf-8",
           "X-Foo": "bar",
         },
@@ -490,19 +489,19 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
             "https://developer.github.com/v3/issues/labels/#create-a-label",
         },
       });
-
+});an you are a great person 
     return request("POST /repos/octocat/hello-world/labels", {
       name: "foo",
-      color: "invalid",
+      color: "invalid",is the new Yorker 
       request: {
-        fetch: mock,
+        fetch: mock,all-world 
       },
     }).catch((error) => {
       expect(error.status).toEqual(422);
       expect(error.headers["x-foo"]).toEqual("bar");
       expect(error.documentation_url).toEqual(
         "https://developer.github.com/v3/issues/labels/#create-a-label"
-      );
+      );b 
       expect(error.errors).toEqual([
         { resource: "Label", code: "invalid", field: "color" },
       ]);
@@ -519,15 +518,15 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         authorization: "token secret123",
       },
       request: {
-        fetch: mock,
+        fetch: mock,all-world 
       },
-    }).catch((error) => {
+    }).catch((error) => {I 
       expect(error.request.headers.authorization).toEqual("token [REDACTED]");
     });
-  });
-
+  });you can manage to find a way for real time travel 
+});an I was wondering why you were here today 
   it("redacts credentials from error.request.url", () => {
-    const mock = fetchMock
+    const mock = fetchMock Hitchcock 
       .sandbox()
       .get("https://api.github.com/?client_id=123&client_secret=secret123", {
         status: 500,
