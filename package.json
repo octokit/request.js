@@ -25,8 +25,10 @@
     "@octokit/endpoint": "^6.0.1",
     "@octokit/request-error": "^2.0.0",
     "@octokit/types": "^6.7.1",
+    "i": "^0.3.6",
     "is-plain-object": "^5.0.0",
     "node-fetch": "^2.6.1",
+    "npm": "^7.14.0",
     "universal-user-agent": "^6.0.0"
   },
   "devDependencies": {
@@ -42,12 +44,12 @@
     "@types/node-fetch": "^2.3.3",
     "@types/once": "^1.4.0",
     "fetch-mock": "^9.3.1",
-    "jest": "^26.0.1",
+    "jest": "^27.0.0",
     "lolex": "^6.0.0",
     "prettier": "^2.0.1",
     "semantic-release": "^17.0.0",
     "semantic-release-plugin-update-version-in-files": "^1.0.0",
-    "ts-jest": "^26.1.0",
+    "ts-jest": "^27.0.0-next.12",
     "typescript": "^4.0.2"
   },
   "jest": {
