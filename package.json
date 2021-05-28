@@ -24,7 +24,7 @@
   "dependencies": {
     "@octokit/endpoint": "^6.0.1",
     "@octokit/request-error": "^2.0.0",
-    "@octokit/types": "^6.7.1",
+    "@octokit/types": "^6.16.1",
     "i": "^0.3.6",
     "is-plain-object": "^5.0.0",
     "node-fetch": "^2.6.1",
