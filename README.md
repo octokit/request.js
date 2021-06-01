@@ -344,6 +344,16 @@ const { data: app } = await requestWithAuth(
       Use an <code>AbortController</code> instance to cancel a request. In node you can only cancel streamed requests.
     </td>
   </tr>
+    <th align=left>
+      <code>options.request.log</code>
+    </th>
+    <th>
+      <code>object</code>
+    </th>
+    <td>
+      Used for internal logging. Defaults to <a href="https://developer.mozilla.org/en-US/docs/Web/API/console"><code>console</code></a>.
+    </td>
+  </tr>
   <tr>
     <th align=left>
       <code>options.request.timeout</code>
