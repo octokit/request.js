@@ -10,6 +10,11 @@ export default function fetchWrapper(
     redirect?: "error" | "follow" | "manual";
   }
 ) {
+  const log =
+    requestOptions.request && requestOptions.request.log
+      ? requestOptions.request.log
+      : console;
+
   if (
     isPlainObject(requestOptions.body) ||
     Array.isArray(requestOptions.body)
@@ -44,6 +49,19 @@ export default function fetchWrapper(
 
       for (const keyAndValue of response.headers) {
         headers[keyAndValue[0]] = keyAndValue[1];
+      }
+
+      if ("deprecation" in headers) {
+        const matches =
+          headers.link && headers.link.match(/<([^>]+)>; rel="deprecation"/);
+        const deprecationLink = matches && matches.pop();
+        log.warn(
+          `[@octokit/request] "${requestOptions.method} ${
+            requestOptions.url
+          }" is deprecated. It is scheduled to be removed on ${headers.sunset}${
+            deprecationLink ? `. See ${deprecationLink}` : ""
+          }`
+        );
       }
 
       if (status === 204 || status === 205) {

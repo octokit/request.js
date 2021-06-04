@@ -774,4 +774,81 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         );
       });
   });
+
+  it("logs deprecation warning if `deprecation` header is present", function () {
+    const mock = fetchMock.sandbox().mock(
+      "https://api.github.com/teams/123",
+      {
+        body: {
+          id: 123,
+        },
+        headers: {
+          deprecation: "Sat, 01 Feb 2020 00:00:00 GMT",
+          sunset: "Mon, 01 Feb 2021 00:00:00 GMT",
+          link: '<https://developer.github.com/changes/2020-01-21-moving-the-team-api-endpoints/>; rel="deprecation"; type="text/html", <https://api.github.com/organizations/3430433/team/4177875>; rel="alternate"',
+        },
+      },
+      {
+        headers: {
+          accept: "application/vnd.github.v3+json",
+          authorization: "token 0000000000000000000000000000000000000001",
+          "user-agent": userAgent,
+        },
+      }
+    );
+
+    const warn = jest.fn();
+
+    return request("GET /teams/{team_id}", {
+      headers: {
+        authorization: "token 0000000000000000000000000000000000000001",
+      },
+      team_id: 123,
+      request: { fetch: mock, log: { warn } },
+    }).then((response) => {
+      expect(response.data).toEqual({ id: 123 });
+      expect(warn).toHaveBeenCalledTimes(1);
+      expect(warn).toHaveBeenCalledWith(
+        '[@octokit/request] "GET https://api.github.com/teams/123" is deprecated. It is scheduled to be removed on Mon, 01 Feb 2021 00:00:00 GMT. See https://developer.github.com/changes/2020-01-21-moving-the-team-api-endpoints/'
+      );
+    });
+  });
+
+  it("deprecation header without deprecation link", function () {
+    const mock = fetchMock.sandbox().mock(
+      "https://api.github.com/teams/123",
+      {
+        body: {
+          id: 123,
+        },
+        headers: {
+          deprecation: "Sat, 01 Feb 2020 00:00:00 GMT",
+          sunset: "Mon, 01 Feb 2021 00:00:00 GMT",
+        },
+      },
+      {
+        headers: {
+          accept: "application/vnd.github.v3+json",
+          authorization: "token 0000000000000000000000000000000000000001",
+          "user-agent": userAgent,
+        },
+      }
+    );
+
+    const warn = jest.fn();
+
+    return request("GET /teams/{team_id}", {
+      headers: {
+        authorization: "token 0000000000000000000000000000000000000001",
+      },
+      team_id: 123,
+      request: { fetch: mock, log: { warn } },
+    }).then((response) => {
+      expect(response.data).toEqual({ id: 123 });
+      expect(warn).toHaveBeenCalledTimes(1);
+      expect(warn).toHaveBeenCalledWith(
+        '[@octokit/request] "GET https://api.github.com/teams/123" is deprecated. It is scheduled to be removed on Mon, 01 Feb 2021 00:00:00 GMT'
+      );
+    });
+  });
 });
