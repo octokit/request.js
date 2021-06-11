@@ -1,5 +1,5 @@
 import { isPlainObject } from "is-plain-object";
-import nodeFetch, { HeadersInit } from "node-fetch";
+import nodeFetch, { HeadersInit, Response } from "node-fetch";
 import { RequestError } from "@octokit/request-error";
 import { EndpointInterface } from "@octokit/types";
 
@@ -43,7 +43,7 @@ export default function fetchWrapper(
       requestOptions.request as any
     )
   )
-    .then((response) => {
+    .then(async (response) => {
       url = response.url;
       status = response.status;
 
@@ -75,55 +75,45 @@ export default function fetchWrapper(
         }
 
         throw new RequestError(response.statusText, status, {
-          headers,
+          response: {
+            url,
+            status,
+            headers,
+            data: undefined,
+          },
           request: requestOptions,
         });
       }
 
       if (status === 304) {
         throw new RequestError("Not modified", status, {
-          headers,
+          response: {
+            url,
+            status,
+            headers,
+            data: await getResponseData(response),
+          },
           request: requestOptions,
         });
       }
 
       if (status >= 400) {
-        return response
-          .text()
+        const data = await getResponseData(response);
 
-          .then((message) => {
-            const error = new RequestError(message, status, {
-              headers,
-              request: requestOptions,
-            });
+        const error = new RequestError(toErrorMessage(data), status, {
+          response: {
+            url,
+            status,
+            headers,
+            data,
+          },
+          request: requestOptions,
+        });
 
-            try {
-              let responseBody = JSON.parse(error.message);
-              Object.assign(error, responseBody);
-
-              let errors = responseBody.errors;
-
-              // Assumption `errors` would always be in Array format
-              error.message =
-                error.message + ": " + errors.map(JSON.stringify).join(", ");
-            } catch (e) {
-              // ignore, see octokit/rest.js#684
-            }
-
-            throw error;
-          });
+        throw error;
       }
 
-      const contentType = response.headers.get("content-type");
-      if (/application\/json/.test(contentType!)) {
-        return response.json();
-      }
-
-      if (!contentType || /^text\/|charset=utf-8$/.test(contentType)) {
-        return response.text();
-      }
-
-      return getBuffer(response);
+      return getResponseData(response);
     })
 
     .then((data) => {
@@ -136,13 +126,39 @@ export default function fetchWrapper(
     })
 
     .catch((error) => {
-      if (error instanceof RequestError) {
-        throw error;
-      }
+      if (error instanceof RequestError) throw error;
 
       throw new RequestError(error.message, 500, {
-        headers,
         request: requestOptions,
       });
     });
+}
+
+async function getResponseData(response: Response) {
+  const contentType = response.headers.get("content-type");
+  if (/application\/json/.test(contentType!)) {
+    return response.json();
+  }
+
+  if (!contentType || /^text\/|charset=utf-8$/.test(contentType)) {
+    return response.text();
+  }
+
+  return getBuffer(response);
+}
+
+function toErrorMessage(data: any) {
+  if (typeof data === "string") return data;
+
+  // istanbul ignore else - just in case
+  if ("message" in data) {
+    if (Array.isArray(data.errors)) {
+      return `${data.message}: ${data.errors.map(JSON.stringify).join(", ")}`;
+    }
+
+    return data.message;
+  }
+
+  // istanbul ignore next - just in case
+  return `Unknown error: ${JSON.stringify(data)}`;
 }
