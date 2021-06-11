@@ -416,8 +416,8 @@ All other options except `options.request.*` will be passed depending on the `me
 If an error occurs, the `error` instance has additional properties to help with debugging
 
 - `error.status` The http response status code
-- `error.headers` The http response headers as an object
 - `error.request` The request options such as `method`, `url` and `data`
+- `error.response` The http response object with `url`, `headers`, and `data`
 
 ## `request.defaults()`
 
