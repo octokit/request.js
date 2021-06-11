@@ -10,6 +10,7 @@ import {
 } from "@octokit/types";
 
 import { request } from "../src";
+import { isPlainObject } from "is-plain-object";
 
 const userAgent = `octokit-request.js/0.0.0-development ${getUserAgent()}`;
 
@@ -499,11 +500,11 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       },
     }).catch((error) => {
       expect(error.status).toEqual(422);
-      expect(error.headers["x-foo"]).toEqual("bar");
-      expect(error.documentation_url).toEqual(
+      expect(error.response.headers["x-foo"]).toEqual("bar");
+      expect(error.response.data.documentation_url).toEqual(
         "https://developer.github.com/v3/issues/labels/#create-a-label"
       );
-      expect(error.errors).toEqual([
+      expect(error.response.data.errors).toEqual([
         { resource: "Label", code: "invalid", field: "color" },
       ]);
     });
@@ -718,7 +719,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     });
   });
 
-  it("@octokit/rest.js/issues/1497/error-messages-on-validation-error", function () {
+  it("octokit/octokit.js#1497", function () {
     const mock = fetchMock.sandbox().mock(
       "https://request-errors-test.com/repos/gr2m/sandbox/branches/gr2m-patch-1/protection",
       {
@@ -848,6 +849,32 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       expect(warn).toHaveBeenCalledTimes(1);
       expect(warn).toHaveBeenCalledWith(
         '[@octokit/request] "GET https://api.github.com/teams/123" is deprecated. It is scheduled to be removed on Mon, 01 Feb 2021 00:00:00 GMT'
+      );
+    });
+  });
+
+  it("404 not found", () => {
+    const mock = fetchMock
+      .sandbox()
+      .get("https://api.github.com/repos/octocat/unknown", {
+        status: 404,
+        headers: {},
+        body: {
+          message: "Not Found",
+          documentation_url:
+            "https://docs.github.com/en/rest/reference/repos#get-a-repository",
+        },
+      });
+
+    return request("GET /repos/octocat/unknown", {
+      request: {
+        fetch: mock,
+      },
+    }).catch((error) => {
+      expect(error.status).toEqual(404);
+      expect(error.response.data.message).toEqual("Not Found");
+      expect(error.response.data.documentation_url).toEqual(
+        "https://docs.github.com/en/rest/reference/repos#get-a-repository"
       );
     });
   });
