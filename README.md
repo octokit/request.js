@@ -347,9 +347,9 @@ const { data: app } = await requestWithAuth(
     <th align=left>
       <code>options.request.log</code>
     </th>
-    <th>
+    <td>
       <code>object</code>
-    </th>
+    </td>
     <td>
       Used for internal logging. Defaults to <a href="https://developer.mozilla.org/en-US/docs/Web/API/console"><code>console</code></a>.
     </td>
