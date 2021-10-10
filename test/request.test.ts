@@ -11,6 +11,8 @@ import {
 
 import { request } from "../src";
 import { isPlainObject } from "is-plain-object";
+import fs from "fs";
+import stream from "stream";
 
 const userAgent = `octokit-request.js/0.0.0-development ${getUserAgent()}`;
 
@@ -913,5 +915,37 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         expect(error.name).toEqual("HttpError");
         expect(error.status).toEqual(500);
       });
+  });
+
+  it("validate request with readstream data", () => {
+    const size = fs.statSync(__filename).size;
+    const mock = fetchMock
+      .sandbox()
+      .post(
+        "https://api.github.com/repos/octokit-fixture-org/release-assets/releases/v1.0.0/assets",
+        {
+          status: 200,
+        }
+      );
+
+    return request("POST /repos/{owner}/{repo}/releases/{release_id}/assets", {
+      owner: "octokit-fixture-org",
+      repo: "release-assets",
+      release_id: "v1.0.0",
+      request: {
+        fetch: mock,
+      },
+      headers: {
+        "content-type": "text/json",
+        "content-length": size,
+      },
+      data: fs.createReadStream(__filename),
+      name: "test-upload.txt",
+      label: "test",
+    }).then((response) => {
+      expect(response.status).toEqual(200);
+      expect(mock.lastOptions()?.body instanceof stream.Readable).toBe(true);
+      expect(mock.done()).toBe(true);
+    });
   });
 });
