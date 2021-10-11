@@ -1,3 +1,6 @@
+import fs from "fs";
+import stream from "stream";
+
 import { getUserAgent } from "universal-user-agent";
 import fetchMock from "fetch-mock";
 import { Headers, RequestInit } from "node-fetch";
@@ -10,11 +13,9 @@ import {
 } from "@octokit/types";
 
 import { request } from "../src";
-import { isPlainObject } from "is-plain-object";
-import fs from "fs";
-import stream from "stream";
 
 const userAgent = `octokit-request.js/0.0.0-development ${getUserAgent()}`;
+const stringToArrayBuffer = require("string-to-arraybuffer");
 
 describe("request()", () => {
   it("is a function", () => {
@@ -945,6 +946,68 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     }).then((response) => {
       expect(response.status).toEqual(200);
       expect(mock.lastOptions()?.body).toBeInstanceOf(stream.Readable);
+      expect(mock.done()).toBe(true);
+    });
+  });
+
+  it("validate request with data set to Buffer type", () => {
+    const mock = fetchMock
+      .sandbox()
+      .post(
+        "https://api.github.com/repos/octokit-fixture-org/release-assets/releases/tags/v1.0.0",
+        {
+          status: 200,
+        }
+      );
+
+    return request("POST /repos/{owner}/{repo}/releases/tags/{tag}", {
+      owner: "octokit-fixture-org",
+      repo: "release-assets",
+      tag: "v1.0.0",
+      request: {
+        fetch: mock,
+      },
+      headers: {
+        "content-type": "text/plain",
+      },
+      data: Buffer.from("Hello, world!\n"),
+      name: "test-upload.txt",
+      label: "test",
+    }).then((response) => {
+      expect(response.status).toEqual(200);
+      expect(mock.lastOptions()?.body).toEqual(Buffer.from("Hello, world!\n"));
+      expect(mock.done()).toBe(true);
+    });
+  });
+
+  it("validate request with data set to ArrayBuffer type", () => {
+    const mock = fetchMock
+      .sandbox()
+      .post(
+        "https://api.github.com/repos/octokit-fixture-org/release-assets/releases/tags/v1.0.0",
+        {
+          status: 200,
+        }
+      );
+
+    return request("POST /repos/{owner}/{repo}/releases/tags/{tag}", {
+      owner: "octokit-fixture-org",
+      repo: "release-assets",
+      tag: "v1.0.0",
+      request: {
+        fetch: mock,
+      },
+      headers: {
+        "content-type": "text/plain",
+      },
+      data: stringToArrayBuffer("Hello, world!\n"),
+      name: "test-upload.txt",
+      label: "test",
+    }).then((response) => {
+      expect(response.status).toEqual(200);
+      expect(mock.lastOptions()?.body).toEqual(
+        stringToArrayBuffer("Hello, world!\n")
+      );
       expect(mock.done()).toBe(true);
     });
   });
