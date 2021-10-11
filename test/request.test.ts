@@ -944,7 +944,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       label: "test",
     }).then((response) => {
       expect(response.status).toEqual(200);
-      expect(mock.lastOptions()?.body instanceof stream.Readable).toBe(true);
+      expect(mock.lastOptions()?.body).toBeInstanceOf(stream.Readable);
       expect(mock.done()).toBe(true);
     });
   });
