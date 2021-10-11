@@ -878,4 +878,40 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       );
     });
   });
+
+  it("Request timeout", () => {
+    const delay = (millis = 3000) => {
+      return new Promise((resolve) => {
+        setTimeout(resolve, millis);
+      });
+    };
+
+    const mock = (url: string, options: RequestInit) => {
+      expect(url).toEqual("https://api.github.com/");
+      expect(options.timeout).toEqual(100);
+      return delay().then(() => {
+        return {
+          status: 200,
+          headers: {},
+          body: {
+            message: "OK",
+          },
+        };
+      });
+    };
+
+    return request("GET /", {
+      request: {
+        timeout: 100,
+        fetch: mock,
+      },
+    })
+      .then((response) => {
+        throw new Error("should not resolve");
+      })
+      .catch((error) => {
+        expect(error.name).toEqual("HttpError");
+        expect(error.status).toEqual(500);
+      });
+  });
 });
