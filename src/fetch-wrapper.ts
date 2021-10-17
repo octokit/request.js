@@ -127,6 +127,7 @@ export default function fetchWrapper(
     })
     .catch((error) => {
       if (error instanceof RequestError) throw error;
+      else if (error.name === "AbortError") throw error;
 
       throw new RequestError(error.message, 500, {
         request: requestOptions,
