@@ -375,7 +375,7 @@ All other options except `options.request.*` will be passed depending on the `me
 
 **Result**
 
-`request` returns a promise and resolves with 4 keys
+`request` returns a promise. If the request was successful, the promise resolves with an object containing 4 keys:
 
 <table>
   <thead>
@@ -413,7 +413,7 @@ All other options except `options.request.*` will be passed depending on the `me
   </tr>
 </table>
 
-If an error occurs, the `error` instance has additional properties to help with debugging
+If an error occurs, the promise is rejected with an `error` object containing 3 keys to help with debugging:
 
 - `error.status` The http response status code
 - `error.request` The request options such as `method`, `url` and `data`
