@@ -1,5 +1,6 @@
 import { isPlainObject } from "is-plain-object";
-import nodeFetch, { HeadersInit, Response } from "node-fetch";
+import isomorphicFetch, { Response } from "cross-fetch";
+import { HeadersInit } from "node-fetch";
 import { RequestError } from "@octokit/request-error";
 import { EndpointInterface } from "@octokit/types";
 
@@ -26,8 +27,8 @@ export default function fetchWrapper(
   let status: number;
   let url: string;
 
-  const fetch: typeof nodeFetch =
-    (requestOptions.request && requestOptions.request.fetch) || nodeFetch;
+  const fetch: typeof isomorphicFetch =
+    (requestOptions.request && requestOptions.request.fetch) || isomorphicFetch;
 
   return fetch(
     requestOptions.url,
