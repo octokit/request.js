@@ -11,7 +11,7 @@ to interact with [GitHub’s REST API](https://developer.github.com/v3/) and
 
 It uses [`@octokit/endpoint`](https://github.com/octokit/endpoint.js) to parse
 the passed options and sends the request using [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
-([node-fetch](https://github.com/bitinn/node-fetch) in Node).
+([node-fetch](https://github.com/bitinn/node-fetch) when the runtime has no native `fetch` API).
 
 <!-- update table of contents by running `npx markdown-toc README.md -i` -->
 
