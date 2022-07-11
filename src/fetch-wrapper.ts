@@ -27,7 +27,9 @@ export default function fetchWrapper(
   let url: string;
 
   const fetch: typeof nodeFetch =
-    (requestOptions.request && requestOptions.request.fetch) || nodeFetch;
+    (requestOptions.request && requestOptions.request.fetch) ||
+    globalThis.fetch ||
+    /* istanbul ignore next */ nodeFetch;
 
   return fetch(
     requestOptions.url,
@@ -115,7 +117,6 @@ export default function fetchWrapper(
 
       return getResponseData(response);
     })
-
     .then((data) => {
       return {
         status,
@@ -124,7 +125,6 @@ export default function fetchWrapper(
         data,
       };
     })
-
     .catch((error) => {
       if (error instanceof RequestError) throw error;
 
