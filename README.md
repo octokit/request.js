@@ -419,6 +419,8 @@ If an error occurs, the promise is rejected with an `error` object containing 3 
 - `error.request` The request options such as `method`, `url` and `data`
 - `error.response` The http response object with `url`, `headers`, and `data`
 
+If the error is due to an `AbortSignal` being used, the resulting `AbortError` is bubbled up to the caller.
+
 ## `request.defaults()`
 
 Override or set default options. Example:
