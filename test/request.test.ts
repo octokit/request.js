@@ -578,6 +578,8 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
   it("options.request.signal is passed as option to fetch", function () {
     return request("/", {
       request: {
+        // We pass a value that is not an `AbortSignal`, and expect `fetch` to
+        // throw an exception complaining about the value
         signal: "funk",
       },
     })
@@ -586,8 +588,13 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       })
 
       .catch((error) => {
-        expect(error.message).toMatch(/\bsignal\b/i);
-        expect(error.message).toMatch(/\bAbortSignal\b/i);
+        // We can't match on the entire string because the message differs between
+        // Node versions.
+        //
+        // In v14 and v16, the message just mentions "signal" and has `instanceof`
+        // as one word, whereas in v18 it contains the stringified signal and uses
+        // proper English ("instance of").
+        expect(error.message).toMatch(/to be an instance ?of AbortSignal/);
       });
   });
 
