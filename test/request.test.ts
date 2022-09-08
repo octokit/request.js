@@ -192,9 +192,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     const mock = fetchMock
       .sandbox()
       .mock("https://api.github.com/user/starred/octocat/hello-world", 204, {
-        headers: {
-          "content-length": 0,
-        },
+        body: undefined,
       });
 
     request("PUT /user/starred/{owner}/{repo}", {
