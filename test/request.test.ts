@@ -192,9 +192,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     const mock = fetchMock
       .sandbox()
       .mock("https://api.github.com/user/starred/octocat/hello-world", 204, {
-        headers: {
-          "content-length": 0,
-        },
+        body: undefined,
       });
 
     request("PUT /user/starred/{owner}/{repo}", {
@@ -590,11 +588,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       .catch((error) => {
         // We can't match on the entire string because the message differs between
         // Node versions.
-        //
-        // In v14 and v16, the message just mentions "signal" and has `instanceof`
-        // as one word, whereas in v18 it contains the stringified signal and uses
-        // proper English ("instance of").
-        expect(error.message).toMatch(/to be an instance ?of AbortSignal/);
+        expect(error.message).toMatch(/AbortSignal/);
       });
   });
 
