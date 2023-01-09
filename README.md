@@ -74,7 +74,7 @@ Load <code>@octokit/request</code> directly from <a href="https://cdn.skypack.de
 
 ```html
 <script type="module">
-import { request } from "https://cdn.skypack.dev/@octokit/request";
+  import { request } from "https://cdn.skypack.dev/@octokit/request";
 </script>
 ```
 
