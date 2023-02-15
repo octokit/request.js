@@ -39,6 +39,7 @@ export default function fetchWrapper(
         body: requestOptions.body,
         headers: requestOptions.headers as HeadersInit,
         redirect: requestOptions.redirect,
+        ...(requestOptions.body && { duplex: 'half' })
       },
       // `requestOptions.request.agent` type is incompatible
       // see https://github.com/octokit/types.ts/pull/264
