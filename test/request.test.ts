@@ -1,9 +1,13 @@
+if (parseInt(process.versions.node.split(".")[0]) < 18) {
+  const fetch = require("node-fetch");
+  globalThis.fetch = fetch;
+  globalThis.Headers = fetch.Headers;
+}
 import fs from "fs";
 import stream from "stream";
 
 import { getUserAgent } from "universal-user-agent";
 import fetchMock from "fetch-mock";
-import { Headers, RequestInit } from "node-fetch";
 import { createAppAuth } from "@octokit/auth-app";
 import lolex from "lolex";
 import {
@@ -447,7 +451,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
   });
 
   it("passes node-fetch options to fetch only", () => {
-    const mock = (url: string, options: RequestInit) => {
+    const mock = (url: string, options: { timeout: number }) => {
       expect(url).toEqual("https://api.github.com/");
       expect(options.timeout).toEqual(100);
       return Promise.reject(new Error("ok"));
@@ -890,7 +894,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       });
     };
 
-    const mock = (url: string, options: RequestInit) => {
+    const mock = (url: string, options: { timeout: number }) => {
       expect(url).toEqual("https://api.github.com/");
       expect(options.timeout).toEqual(100);
       return delay().then(() => {
