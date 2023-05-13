@@ -10,8 +10,7 @@ to interact with [GitHub’s REST API](https://developer.github.com/v3/) and
 [GitHub’s GraphQL API](https://developer.github.com/v4/guides/forming-calls/#the-graphql-endpoint).
 
 It uses [`@octokit/endpoint`](https://github.com/octokit/endpoint.js) to parse
-the passed options and sends the request using [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
-([node-fetch](https://github.com/bitinn/node-fetch) when the runtime has no native `fetch` API).
+the passed options and sends the request using [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API).
 
 <!-- update table of contents by running `npx markdown-toc README.md -i` -->
 
@@ -319,7 +318,7 @@ const { data: app } = await requestWithAuth(
       Function
     </td>
     <td>
-     Custom replacement for <a href="https://github.com/bitinn/node-fetch">built-in fetch method</a>. Useful for testing or request hooks.
+     Custom replacement for <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API">fetch</a>. Useful for testing or request hooks.
     </td>
   </tr>
   <tr>

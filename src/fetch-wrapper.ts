@@ -1,5 +1,4 @@
 import { isPlainObject } from "is-plain-object";
-import nodeFetch, { HeadersInit, Response } from "node-fetch";
 import { RequestError } from "@octokit/request-error";
 import { EndpointInterface } from "@octokit/types";
 
@@ -26,10 +25,10 @@ export default function fetchWrapper(
   let status: number;
   let url: string;
 
-  const fetch: typeof nodeFetch =
-    (requestOptions.request && requestOptions.request.fetch) ||
-    globalThis.fetch ||
-    /* istanbul ignore next */ nodeFetch;
+  let { fetch } = globalThis;
+  if (requestOptions.request?.fetch) {
+    fetch = requestOptions.request.fetch;
+  }
 
   return fetch(
     requestOptions.url,
