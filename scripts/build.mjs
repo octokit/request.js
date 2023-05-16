@@ -58,7 +58,7 @@ async function main() {
   ]);
 
   // Copy the README, LICENSE to the pkg folder
-  await copyFile("LICENSE.md", "pkg/LICENSE.md");
+  await copyFile("LICENSE", "pkg/LICENSE");
   await copyFile("README.md", "pkg/README.md");
 
   // Handle the package.json
