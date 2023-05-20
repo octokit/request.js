@@ -10,7 +10,7 @@ to interact with [GitHub’s REST API](https://developer.github.com/v3/) and
 [GitHub’s GraphQL API](https://developer.github.com/v4/guides/forming-calls/#the-graphql-endpoint).
 
 It uses [`@octokit/endpoint`](https://github.com/octokit/endpoint.js) to parse
-the passed options and sends the request using [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API).
+the passed options and sends the request using [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API). You can pass a custom `fetch` function using the `options.request.fetch` option, see below.
 
 <!-- update table of contents by running `npx markdown-toc README.md -i` -->
 
