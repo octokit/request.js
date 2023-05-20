@@ -451,9 +451,8 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
   });
 
   it("passes node-fetch options to fetch only", () => {
-    const mock = (url: string, options: { timeout: number }) => {
+    const mock = (url: string) => {
       expect(url).toEqual("https://api.github.com/");
-      expect(options.timeout).toEqual(100);
       return Promise.reject(new Error("ok"));
     };
 
@@ -462,7 +461,6 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         "user-agent": "funky boom boom pow",
       },
       request: {
-        timeout: 100,
         fetch: mock,
       },
     }).catch((error) => {
@@ -894,9 +892,8 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       });
     };
 
-    const mock = (url: string, options: { timeout: number }) => {
+    const mock = (url: string) => {
       expect(url).toEqual("https://api.github.com/");
-      expect(options.timeout).toEqual(100);
       return delay().then(() => {
         return {
           status: 200,
@@ -910,7 +907,6 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
 
     return request("GET /", {
       request: {
-        timeout: 100,
         fetch: mock,
       },
     })
