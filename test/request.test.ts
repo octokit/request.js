@@ -392,6 +392,20 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       });
   });
 
+  it("should error when globalThis.fetch is undefined", async () => {
+    const originalFetch = globalThis.fetch;
+    // @ts-expect-error force undefined to mimic older node version
+    globalThis.fetch = undefined
+    let error: Error | undefined
+    try {
+      await request("GET /orgs/me")
+    } catch (e) {
+      error = e as Error
+    }
+    globalThis.fetch = originalFetch
+    expect(error?.message).toEqual("Global \"fetch\" not found. Please provide `options.request.fetch` to octokit or upgrade to node@18 or newer.")
+  });
+
   it("non-JSON response", () => {
     const mock = fetchMock
       .sandbox()
