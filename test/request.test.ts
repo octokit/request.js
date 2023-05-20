@@ -1,8 +1,3 @@
-if (parseInt(process.versions.node.split(".")[0]) < 18) {
-  const fetch = require("node-fetch");
-  globalThis.fetch = fetch;
-  globalThis.Headers = fetch.Headers;
-}
 import fs from "fs";
 import stream from "stream";
 
