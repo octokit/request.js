@@ -353,17 +353,6 @@ const { data: app } = await requestWithAuth(
       Used for internal logging. Defaults to <a href="https://developer.mozilla.org/en-US/docs/Web/API/console"><code>console</code></a>.
     </td>
   </tr>
-  <tr>
-    <th align=left>
-      <code>options.request.timeout</code>
-    </th>
-    <td>
-      Number
-    </td>
-    <td>
-     Node only. Request/response timeout in ms, it resets on redirect. 0 to disable (OS limit applies). <a href="#options-request-signal">options.request.signal</a> is recommended instead.
-    </td>
-  </tr>
 </table>
 
 All other options except `options.request.*` will be passed depending on the `method` and `url` options.
