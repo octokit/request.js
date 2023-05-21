@@ -359,7 +359,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         fetch: mock,
       },
     })
-      .then((response) => {
+      .then(() => {
         throw new Error("should not resolve");
       })
       .catch((error) => {
@@ -444,7 +444,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     const mock = fetchMock
       .sandbox()
       .get(
-        (url, { headers }) =>
+        (_url, { headers }) =>
           (headers as ResponseHeaders)["user-agent"] === "funky boom boom pow",
         200
       );
@@ -897,7 +897,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         fetch: mock,
       },
     })
-      .then((response) => {
+      .then(() => {
         throw new Error("should not resolve");
       })
       .catch((error) => {
