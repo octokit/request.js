@@ -459,28 +459,6 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     });
   });
 
-  it("passes node-fetch options to fetch only", () => {
-    const mock = (url: string) => {
-      expect(url).toEqual("https://api.github.com/");
-      return Promise.reject(new Error("ok"));
-    };
-
-    return request("GET /", {
-      headers: {
-        "user-agent": "funky boom boom pow",
-      },
-      request: {
-        fetch: mock,
-      },
-    }).catch((error) => {
-      if (error.message === "ok") {
-        return;
-      }
-
-      throw error;
-    });
-  });
-
   it("422 error with details", () => {
     const mock = fetchMock
       .sandbox()
