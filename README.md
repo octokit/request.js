@@ -26,7 +26,7 @@ the passed options and sends the request using [fetch](https://developer.mozilla
 - [`request.defaults()`](#requestdefaults)
 - [`request.endpoint`](#requestendpoint)
 - [Special cases](#special-cases)
-  - [The `data` parameter – set request body directly](#the-data-parameter--set-request-body-directly)
+  - [The `data` parameter – set request body directly](#the-data-parameter-%E2%80%93-set-request-body-directly)
   - [Set parameters for both the URL/query and the request body](#set-parameters-for-both-the-urlquery-and-the-request-body)
 - [LICENSE](#license)
 
