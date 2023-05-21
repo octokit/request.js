@@ -31,7 +31,9 @@ export default function fetchWrapper(
   }
 
   if (!fetch) {
-    throw new Error('Global "fetch" not found. Please provide `options.request.fetch` to octokit or upgrade to node@18 or newer.')
+    throw new Error(
+      'Global "fetch" not found. Please provide `options.request.fetch` to octokit or upgrade to node@18 or newer.'
+    );
   }
 
   return fetch(
