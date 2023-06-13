@@ -3,10 +3,10 @@ import stream from "stream";
 
 import { getUserAgent } from "universal-user-agent";
 import fetchMock from "fetch-mock";
-import { Headers, RequestInit } from "node-fetch";
+import { Headers, type RequestInit } from "node-fetch";
 import { createAppAuth } from "@octokit/auth-app";
 import lolex from "lolex";
-import {
+import type {
   EndpointOptions,
   RequestInterface,
   ResponseHeaders,

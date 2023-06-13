@@ -1,7 +1,7 @@
 import { isPlainObject } from "is-plain-object";
-import nodeFetch, { HeadersInit, Response } from "node-fetch";
+import nodeFetch, { type HeadersInit, type Response } from "node-fetch";
 import { RequestError } from "@octokit/request-error";
-import { EndpointInterface } from "@octokit/types";
+import type { EndpointInterface } from "@octokit/types";
 
 import getBuffer from "./get-buffer-response";
 
