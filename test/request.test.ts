@@ -5,7 +5,7 @@ import { getUserAgent } from "universal-user-agent";
 import fetchMock from "fetch-mock";
 import { createAppAuth } from "@octokit/auth-app";
 import lolex from "lolex";
-import {
+import type {
   EndpointOptions,
   RequestInterface,
   ResponseHeaders,

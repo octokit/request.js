@@ -1,6 +1,6 @@
 import { isPlainObject } from "is-plain-object";
 import { RequestError } from "@octokit/request-error";
-import { EndpointInterface } from "@octokit/types";
+import type { EndpointInterface } from "@octokit/types";
 
 import getBuffer from "./get-buffer-response";
 

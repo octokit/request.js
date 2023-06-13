@@ -1,5 +1,5 @@
 import fetchWrapper from "./fetch-wrapper";
-import {
+import type {
   EndpointOptions,
   EndpointInterface,
   OctokitResponse,
