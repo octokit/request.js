@@ -48,8 +48,7 @@ describe("endpoint.defaults()", () => {
         [],
         {
           headers: {
-            accept:
-              "application/vnd.github.foo-preview.raw+json,application/vnd.github.bar-preview.raw+json",
+            accept: "application/vnd.github.v3.raw+json",
             authorization: "token 0000000000000000000000000000000000000001",
             "user-agent": "myApp/1.2.3",
           },
@@ -63,7 +62,6 @@ describe("endpoint.defaults()", () => {
       },
       mediaType: {
         format: "raw+json",
-        previews: ["foo", "bar"],
       },
       org: "my-project",
       request: {
