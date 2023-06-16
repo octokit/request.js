@@ -3,7 +3,6 @@ import stream from "stream";
 
 import { getUserAgent } from "universal-user-agent";
 import fetchMock from "fetch-mock";
-import { Headers, type RequestInit } from "node-fetch";
 import { createAppAuth } from "@octokit/auth-app";
 import lolex from "lolex";
 import type {
@@ -119,7 +118,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         { id: 123 },
         {
           headers: {
-            accept: "application/vnd.github.machine-man-preview+json",
+            accept: "application/vnd.github.v3+json",
             "user-agent": userAgent,
             authorization: `bearer ${BEARER}`,
           },
@@ -130,7 +129,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         { id: 456 },
         {
           headers: {
-            accept: "application/vnd.github.machine-man-preview+json",
+            accept: "application/vnd.github.v3+json",
             "user-agent": userAgent,
             authorization: `token secret123`,
           },
@@ -142,9 +141,6 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       installationId: 123,
     });
     const requestWithAuth = request.defaults({
-      mediaType: {
-        previews: ["machine-man"],
-      },
       request: {
         fetch: mock,
         hook: auth.hook,
@@ -388,6 +384,22 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       });
   });
 
+  it("should error when globalThis.fetch is undefined", async () => {
+    const originalFetch = globalThis.fetch;
+    // @ts-expect-error force undefined to mimic older node version
+    globalThis.fetch = undefined;
+    let error: Error | undefined;
+    try {
+      await request("GET /orgs/me");
+    } catch (e) {
+      error = e as Error;
+    }
+    globalThis.fetch = originalFetch;
+    expect(error?.message).toEqual(
+      'Global "fetch" not found. Please provide `options.request.fetch` to octokit or upgrade to node@18 or newer.'
+    );
+  });
+
   it("non-JSON response", () => {
     const mock = fetchMock
       .sandbox()
@@ -443,30 +455,6 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       request: {
         fetch: mock,
       },
-    });
-  });
-
-  it("passes node-fetch options to fetch only", () => {
-    const mock = (url: string, options: RequestInit) => {
-      expect(url).toEqual("https://api.github.com/");
-      expect(options.timeout).toEqual(100);
-      return Promise.reject(new Error("ok"));
-    };
-
-    return request("GET /", {
-      headers: {
-        "user-agent": "funky boom boom pow",
-      },
-      request: {
-        timeout: 100,
-        fetch: mock,
-      },
-    }).catch((error) => {
-      if (error.message === "ok") {
-        return;
-      }
-
-      throw error;
     });
   });
 
@@ -634,7 +622,6 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         },
         mediaType: {
           format: "",
-          previews: [],
         },
         method: "GET",
         request: {
@@ -696,7 +683,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
   it("options.mediaType.previews", function () {
     const mock = fetchMock
       .sandbox()
-      .mock("https://api.github.com/repos/octokit/request.js/issues/1", "ok", {
+      .mock("https://api.github.com/graphql", "ok", {
         headers: {
           accept:
             "application/vnd.github.foo-preview+json,application/vnd.github.bar-preview+json",
@@ -705,16 +692,13 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         },
       });
 
-    return request("GET /repos/{owner}/{repo}/issues/{number}", {
+    return request("GET /graphql", {
       headers: {
         authorization: "token 0000000000000000000000000000000000000001",
       },
       mediaType: {
         previews: ["foo", "bar"],
       },
-      owner: "octokit",
-      repo: "request.js",
-      number: 1,
       request: {
         fetch: mock,
       },
@@ -741,7 +725,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       {
         method: "PUT",
         headers: {
-          accept: "application/vnd.github.luke-cage-preview+json",
+          accept: "application/vnd.github.v3+json",
           authorization: "token secret123",
         },
       }
@@ -749,7 +733,6 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
 
     return request("PUT /repos/{owner}/{repo}/branches/{branch}/protection", {
       baseUrl: "https://request-errors-test.com",
-      mediaType: { previews: ["luke-cage"] },
       headers: {
         authorization: "token secret123",
       },
@@ -890,9 +873,8 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       });
     };
 
-    const mock = (url: string, options: RequestInit) => {
+    const mock = (url: string) => {
       expect(url).toEqual("https://api.github.com/");
-      expect(options.timeout).toEqual(100);
       return delay().then(() => {
         return {
           status: 200,
@@ -906,7 +888,6 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
 
     return request("GET /", {
       request: {
-        timeout: 100,
         fetch: mock,
       },
     })

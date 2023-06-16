@@ -1,5 +1,4 @@
 import { isPlainObject } from "is-plain-object";
-import nodeFetch, { type HeadersInit, type Response } from "node-fetch";
 import { RequestError } from "@octokit/request-error";
 import type { EndpointInterface } from "@octokit/types";
 
@@ -26,10 +25,16 @@ export default function fetchWrapper(
   let status: number;
   let url: string;
 
-  const fetch: typeof nodeFetch =
-    (requestOptions.request && requestOptions.request.fetch) ||
-    globalThis.fetch ||
-    /* istanbul ignore next */ nodeFetch;
+  let { fetch } = globalThis;
+  if (requestOptions.request?.fetch) {
+    fetch = requestOptions.request.fetch;
+  }
+
+  if (!fetch) {
+    throw new Error(
+      'Global "fetch" not found. Please provide `options.request.fetch` to octokit or upgrade to node@18 or newer.'
+    );
+  }
 
   return fetch(
     requestOptions.url,
