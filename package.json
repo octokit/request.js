@@ -23,7 +23,7 @@
   "license": "MIT",
   "dependencies": {
     "@octokit/endpoint": "^7.0.0",
-    "@octokit/request-error": "^4.0.0",
+    "@octokit/request-error": "^3.0.0",
     "@octokit/types": "^9.0.0",
     "is-plain-object": "^5.0.0",
     "node-fetch": "^2.6.7",
