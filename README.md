@@ -301,6 +301,7 @@ const { data: app } = await requestWithAuth(
   </tr>
   <tr>
     <th align=left>
+      <a name="options-request-agent"></a>
       <code>options.request.agent</code>
     </th>
     <td>
