@@ -302,7 +302,7 @@ const { data: app } = await requestWithAuth(
   <tr>
     <th align=left>
       <a name="options-request-agent"></a>
-      <code>options.request.agent</code>
+      <code>options.request.agent</code> (node-fetch only)
     </th>
     <td>
       <a href="https://nodejs.org/api/http.html#http_class_http_agent">http(s).Agent</a> instance
