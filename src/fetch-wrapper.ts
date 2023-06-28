@@ -36,6 +36,17 @@ export default function fetchWrapper(
     );
   }
 
+  if (
+    typeof globalThis.fetch !== "undefined" &&
+    typeof requestOptions.request?.agent !== "undefined"
+  ) {
+    throw new Error(
+      `Global "fetch" and "agent" options cannot be used together,
+      please use a custom fetch function with the "dispatcher" option,
+      or use "node-fetch" instead. See https://github.com/octokit/octokit.js/discussions/2484`
+    );
+  }
+
   return fetch(
     requestOptions.url,
     Object.assign(
