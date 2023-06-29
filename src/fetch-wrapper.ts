@@ -37,21 +37,7 @@ export default function fetchWrapper(
   }
 
   return fetch(
-    requestOptions.url,
-    Object.assign(
-      {
-        method: requestOptions.method,
-        body: requestOptions.body,
-        headers: requestOptions.headers as HeadersInit,
-        redirect: requestOptions.redirect,
-        // duplex must be set if request.body is ReadableStream or Async Iterables.
-        // See https://fetch.spec.whatwg.org/#dom-requestinit-duplex.
-        ...(requestOptions.body && { duplex: "half" }),
-      },
-      // `requestOptions.request.agent` type is incompatible
-      // see https://github.com/octokit/types.ts/pull/264
-      requestOptions.request as any
-    )
+    requestOptions.url
   )
     .then(async (response) => {
       url = response.url;
