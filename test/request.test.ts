@@ -995,25 +995,6 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
   });
 
   it("bubbles up AbortError if the request is aborted", () => {
-    // AbortSignal and AbortController do not exist on
-    // Node < 15. The main parts of their API have been
-    // reproduced in the mocks below.
-    class AbortSignal {
-      abort = () => {
-        const e = new Error("");
-        e.name = "AbortError";
-        throw e;
-      };
-
-      addEventListener = () => {};
-    }
-
-    class AbortController {
-      abort = () => {
-        this.signal.abort();
-      };
-      signal = new AbortSignal();
-    }
     const abortController = new AbortController();
     const mock = fetchMock.sandbox().post(
       "https://api.github.com/repos/octokit-fixture-org/release-assets/releases/tags/v1.0.0",
