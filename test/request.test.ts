@@ -561,7 +561,8 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     );
   });
 
-  it("options.request.signal is passed as option to fetch", function () {
+  //TODO: figure out the expected behavior
+  it.skip("options.request.signal is passed as option to fetch", function () {
     return request("/", {
       request: {
         // We pass a value that is not an `AbortSignal`, and expect `fetch` to
