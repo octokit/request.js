@@ -19,7 +19,7 @@ describe("endpoint.defaults()", () => {
             authorization: "token 0000000000000000000000000000000000000001",
             "user-agent": "myApp/1.2.3",
           },
-        }
+        },
       );
 
     const myRequest = request.defaults({
@@ -52,7 +52,7 @@ describe("endpoint.defaults()", () => {
             authorization: "token 0000000000000000000000000000000000000001",
             "user-agent": "myApp/1.2.3",
           },
-        }
+        },
       );
 
     const myProjectRequest = request.defaults({
@@ -77,7 +77,7 @@ describe("endpoint.defaults()", () => {
     return myProjectRequestWithAuth(`GET /orgs/{org}/repos`).then(
       (response) => {
         expect(response.status).toEqual(200);
-      }
+      },
     );
   });
 });
