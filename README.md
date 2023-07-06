@@ -274,6 +274,7 @@ const { data: app } = await requestWithAuth(
     </td>
     <td>
       Name of previews, such as `mercy`, `symmetra`, or `scarlet-witch`. See <a href="https://developer.github.com/v3/previews/">API Previews</a>.
+      Note that these only apply to GraphQL requests and have no effect on REST routes.
     </td>
   </tr>
   <tr>
