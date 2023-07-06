@@ -7,7 +7,7 @@ import getBuffer from "./get-buffer-response";
 export default function fetchWrapper(
   requestOptions: ReturnType<EndpointInterface> & {
     redirect?: "error" | "follow" | "manual";
-  }
+  },
 ) {
   const log =
     requestOptions.request && requestOptions.request.log
@@ -32,7 +32,7 @@ export default function fetchWrapper(
 
   if (!fetch) {
     throw new Error(
-      'Global "fetch" not found. Please provide `options.request.fetch` to octokit or upgrade to node@18 or newer.'
+      'Global "fetch" not found. Please provide `options.request.fetch` to octokit or upgrade to node@18 or newer.',
     );
   }
 
@@ -50,8 +50,8 @@ export default function fetchWrapper(
       },
       // `requestOptions.request.agent` type is incompatible
       // see https://github.com/octokit/types.ts/pull/264
-      requestOptions.request as any
-    )
+      requestOptions.request as any,
+    ),
   )
     .then(async (response) => {
       url = response.url;
@@ -70,7 +70,7 @@ export default function fetchWrapper(
             requestOptions.url
           }" is deprecated. It is scheduled to be removed on ${headers.sunset}${
             deprecationLink ? `. See ${deprecationLink}` : ""
-          }`
+          }`,
         );
       }
 
