@@ -185,7 +185,7 @@ const { data: app } = await requestWithAuth(
     owner: "octocat",
     repo: "hello-world",
     title: "Hello from the engine room",
-  }
+  },
 );
 ```
 
@@ -523,7 +523,7 @@ request(
       authorization: `token 0000000000000000000000000000000000000001`,
     },
     data: "Hello, world!",
-  }
+  },
 );
 ```
 

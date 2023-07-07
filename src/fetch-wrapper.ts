@@ -7,7 +7,7 @@ import getBuffer from "./get-buffer-response";
 export default function fetchWrapper(
   requestOptions: ReturnType<EndpointInterface> & {
     redirect?: "error" | "follow" | "manual";
-  }
+  },
 ) {
   const log =
     requestOptions.request && requestOptions.request.log
@@ -32,15 +32,24 @@ export default function fetchWrapper(
 
   if (!fetch) {
     throw new Error(
-      'Global "fetch" not found. Please provide `options.request.fetch` to octokit or upgrade to node@18 or newer.'
+      'Global "fetch" not found. Please provide `options.request.fetch` to octokit or upgrade to node@18 or newer.',
     );
   }
 
   return fetch(requestOptions.url,
-    { signal: (requestOptions as any).signal,
-      method: (requestOptions as any).method,
-      body: (requestOptions as any).body,
-      headers: (requestOptions as any).headers,})
+    Object.assign(
+      {
+        method: requestOptions.method,
+        body: requestOptions.body,
+        headers: requestOptions.headers as HeadersInit,
+        signal: (requestOptions as any).signal,
+        data: (requestOptions as any).data,
+        // duplex must be set if request.body is ReadableStream or Async Iterables.
+        // See https://fetch.spec.whatwg.org/#dom-requestinit-duplex.
+        ...(requestOptions.body && { duplex: "half" }),
+      },
+    ),
+  )
     .then(async (response) => {
       url = response.url;
       status = response.status;
@@ -54,11 +63,9 @@ export default function fetchWrapper(
           headers.link && headers.link.match(/<([^>]+)>; rel="deprecation"/);
         const deprecationLink = matches && matches.pop();
         log.warn(
-          `[@octokit/request] "${requestOptions.method} ${
-            requestOptions.url
-          }" is deprecated. It is scheduled to be removed on ${headers.sunset}${
-            deprecationLink ? `. See ${deprecationLink}` : ""
-          }`
+          `[@octokit/request] "${requestOptions.method} ${requestOptions.url
+          }" is deprecated. It is scheduled to be removed on ${headers.sunset}${deprecationLink ? `. See ${deprecationLink}` : ""
+          }`,
         );
       }
 

@@ -10,12 +10,12 @@ import type {
 
 export default function withDefaults(
   oldEndpoint: EndpointInterface,
-  newDefaults: RequestParameters
+  newDefaults: RequestParameters,
 ): RequestInterface {
   const endpoint = oldEndpoint.defaults(newDefaults);
   const newApi = function (
     route: Route | EndpointOptions,
-    parameters?: RequestParameters
+    parameters?: RequestParameters,
   ): Promise<OctokitResponse<any>> {
     const endpointOptions = endpoint.merge(<Route>route, parameters);
 
@@ -25,10 +25,10 @@ export default function withDefaults(
 
     const request = (
       route: Route | EndpointOptions,
-      parameters?: RequestParameters
+      parameters?: RequestParameters,
     ) => {
       return fetchWrapper(
-        endpoint.parse(endpoint.merge(<Route>route, parameters))
+        endpoint.parse(endpoint.merge(<Route>route, parameters)),
       );
     };
 

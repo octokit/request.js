@@ -122,7 +122,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
             "user-agent": userAgent,
             authorization: `bearer ${BEARER}`,
           },
-        }
+        },
       )
       .postOnce(
         "https://api.github.com/repos/octocat/hello-world/issues",
@@ -133,7 +133,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
             "user-agent": userAgent,
             authorization: `token secret123`,
           },
-        }
+        },
       );
     const auth = createAppAuth({
       appId: APP_ID,
@@ -238,7 +238,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
 
         return request(
           `HEAD /repos/{owner}/{repo}/pulls/{number}`,
-          Object.assign(options, { number: 2 })
+          Object.assign(options, { number: 2 }),
         );
       })
 
@@ -260,13 +260,13 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
           status: 200,
           body: Buffer.from(
             "1f8b0800000000000003cb4f2ec9cfce2cd14dcbac28292d4ad5cd2f4ad74d4f2dd14d2c4acec82c4bd53580007d060a0050bfb9b9a90203c428741ac2313436343307222320dbc010a8dc5c81c194124b8905a5c525894540a714e5e797e05347481edd734304e41319ff41ae8e2ebeae7ab92964d801d46f66668227fe0d4d51e3dfc8d0c8d808284f75df6201233cfe951590627ba01d330a46c1281805a3806e000024cb59d6000a0000",
-            "hex"
+            "hex",
           ),
           headers: {
             "content-type": "application/x-gzip",
             "content-length": "172",
           },
-        }
+        },
       );
 
     return request("GET /repos/{owner}/{repo}/{archive_format}/{ref}", {
@@ -295,13 +295,13 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
           // body: Buffer.from('1f8b0800000000000003cb4f2ec9cfce2cd14dcbac28292d4ad5cd2f4ad74d4f2dd14d2c4acec82c4bd53580007d060a0050bfb9b9a90203c428741ac2313436343307222320dbc010a8dc5c81c194124b8905a5c525894540a714e5e797e05347481edd734304e41319ff41ae8e2ebeae7ab92964d801d46f66668227fe0d4d51e3dfc8d0c8d808284f75df6201233cfe951590627ba01d330a46c1281805a3806e000024cb59d6000a0000', 'hex'),
           body: Buffer.from(
             "1f8b0800000000000003cb4f2ec9cfce2cd14dcbac28292d4ad5cd2f4ad74d4f2dd14d2c4acec82c4bd53580007d060a0050bfb9b9a90203c428741ac2313436343307222320dbc010a8dc5c81c194124b8905a5c525894540a714e5e797e05347481edd734304e41319ff41ae8e2ebeae7ab92964d801d46f66668227fe0d4d51e3dfc8d0c8d808284f75df6201233cfe951590627ba01d330a46c1281805a3806e000024cb59d6000a0000",
-            "hex"
+            "hex",
           ),
           headers: {
             "content-type": "application/x-gzip",
             "content-length": "172",
           },
-        }
+        },
       );
 
     return request(
@@ -310,7 +310,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         request: {
           fetch: mock,
         },
-      }
+      },
     );
   });
 
@@ -396,7 +396,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     }
     globalThis.fetch = originalFetch;
     expect(error?.message).toEqual(
-      'Global "fetch" not found. Please provide `options.request.fetch` to octokit or upgrade to node@18 or newer.'
+      'Global "fetch" not found. Please provide `options.request.fetch` to octokit or upgrade to node@18 or newer.',
     );
   });
 
@@ -445,7 +445,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       .get(
         (_url, { headers }) =>
           (headers as ResponseHeaders)["user-agent"] === "funky boom boom pow",
-        200
+        200,
       );
 
     return request("GET /", {
@@ -491,7 +491,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       expect(error.status).toEqual(422);
       expect(error.response.headers["x-foo"]).toEqual("bar");
       expect(error.response.data.documentation_url).toEqual(
-        "https://developer.github.com/v3/issues/labels/#create-a-label"
+        "https://developer.github.com/v3/issues/labels/#create-a-label",
       );
       expect(error.response.data.errors).toEqual([
         { resource: "Label", code: "invalid", field: "color" },
@@ -531,7 +531,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       },
     }).catch((error) => {
       expect(error.request.url).toEqual(
-        "https://api.github.com/?client_id=123&client_secret=[REDACTED]"
+        "https://api.github.com/?client_id=123&client_secret=[REDACTED]",
       );
     });
   });
@@ -557,7 +557,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     return request("https://www.githubstatus.com/api/v2/status.json").then(
       ({ url }) => {
         expect(url).toEqual("https://www.githubstatus.com/api/v2/status.json");
-      }
+      },
     );
   });
 
@@ -609,7 +609,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         headers: {
           "x-foo": "bar",
         },
-      }
+      },
     );
 
     const hook = (request: RequestInterface, options: EndpointOptions) => {
@@ -729,7 +729,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
           accept: "application/vnd.github.v3+json",
           authorization: "token secret123",
         },
-      }
+      },
     );
 
     return request("PUT /repos/{owner}/{repo}/branches/{branch}/protection", {
@@ -759,7 +759,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       .catch((error) => {
         expect(error).toHaveProperty(
           "message",
-          `Validation failed: "Only organization repositories can have users and team restrictions", {"resource":"Search","field":"q","code":"invalid"}`
+          `Validation failed: "Only organization repositories can have users and team restrictions", {"resource":"Search","field":"q","code":"invalid"}`,
         );
       });
   });
@@ -783,7 +783,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
           authorization: "token 0000000000000000000000000000000000000001",
           "user-agent": userAgent,
         },
-      }
+      },
     );
 
     const warn = jest.fn();
@@ -798,7 +798,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       expect(response.data).toEqual({ id: 123 });
       expect(warn).toHaveBeenCalledTimes(1);
       expect(warn).toHaveBeenCalledWith(
-        '[@octokit/request] "GET https://api.github.com/teams/123" is deprecated. It is scheduled to be removed on Mon, 01 Feb 2021 00:00:00 GMT. See https://developer.github.com/changes/2020-01-21-moving-the-team-api-endpoints/'
+        '[@octokit/request] "GET https://api.github.com/teams/123" is deprecated. It is scheduled to be removed on Mon, 01 Feb 2021 00:00:00 GMT. See https://developer.github.com/changes/2020-01-21-moving-the-team-api-endpoints/',
       );
     });
   });
@@ -821,7 +821,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
           authorization: "token 0000000000000000000000000000000000000001",
           "user-agent": userAgent,
         },
-      }
+      },
     );
 
     const warn = jest.fn();
@@ -836,7 +836,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       expect(response.data).toEqual({ id: 123 });
       expect(warn).toHaveBeenCalledTimes(1);
       expect(warn).toHaveBeenCalledWith(
-        '[@octokit/request] "GET https://api.github.com/teams/123" is deprecated. It is scheduled to be removed on Mon, 01 Feb 2021 00:00:00 GMT'
+        '[@octokit/request] "GET https://api.github.com/teams/123" is deprecated. It is scheduled to be removed on Mon, 01 Feb 2021 00:00:00 GMT',
       );
     });
   });
@@ -862,7 +862,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       expect(error.status).toEqual(404);
       expect(error.response.data.message).toEqual("Not Found");
       expect(error.response.data.documentation_url).toEqual(
-        "https://docs.github.com/en/rest/reference/repos#get-a-repository"
+        "https://docs.github.com/en/rest/reference/repos#get-a-repository",
       );
     });
   });
@@ -909,7 +909,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         "https://api.github.com/repos/octokit-fixture-org/release-assets/releases/v1.0.0/assets",
         {
           status: 200,
-        }
+        },
       );
 
     return request("POST /repos/{owner}/{repo}/releases/{release_id}/assets", {
@@ -940,7 +940,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         "https://api.github.com/repos/octokit-fixture-org/release-assets/releases/tags/v1.0.0",
         {
           status: 200,
-        }
+        },
       );
 
     return request("POST /repos/{owner}/{repo}/releases/tags/{tag}", {
@@ -970,7 +970,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         "https://api.github.com/repos/octokit-fixture-org/release-assets/releases/tags/v1.0.0",
         {
           status: 200,
-        }
+        },
       );
 
     return request("POST /repos/{owner}/{repo}/releases/tags/{tag}", {
@@ -989,7 +989,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     }).then((response) => {
       expect(response.status).toEqual(200);
       expect(mock.lastOptions()?.body).toEqual(
-        stringToArrayBuffer("Hello, world!\n")
+        stringToArrayBuffer("Hello, world!\n"),
       );
       expect(mock.done()).toBe(true);
     });
@@ -1020,7 +1020,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       "https://api.github.com/repos/octokit-fixture-org/release-assets/releases/tags/v1.0.0",
       new Promise(() => {
         abortController.abort();
-      })
+      }),
     );
 
     return request("POST /repos/{owner}/{repo}/releases/tags/{tag}", {
