@@ -561,26 +561,6 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     );
   });
 
-  //TODO: figure out the expected behavior
-  it.skip("options.request.signal is passed as option to fetch", function () {
-    return request("/", {
-      request: {
-        // We pass a value that is not an `AbortSignal`, and expect `fetch` to
-        // throw an exception complaining about the value
-        signal: "funk",
-      },
-    })
-      .then(() => {
-        throw new Error("Should not resolve");
-      })
-
-      .catch((error) => {
-        // We can't match on the entire string because the message differs between
-        // Node versions.
-        expect(error.message).toMatch(/AbortSignal/);
-      });
-  });
-
   it("options.request.fetch", function () {
     return request("/", {
       request: {
