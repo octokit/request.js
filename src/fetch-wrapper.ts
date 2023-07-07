@@ -36,19 +36,18 @@ export default function fetchWrapper(
     );
   }
 
-  return fetch(requestOptions.url,
-    Object.assign(
-      {
-        method: requestOptions.method,
-        body: requestOptions.body,
-        headers: requestOptions.headers as HeadersInit,
-        signal: (requestOptions as any).signal,
-        data: (requestOptions as any).data,
-        // duplex must be set if request.body is ReadableStream or Async Iterables.
-        // See https://fetch.spec.whatwg.org/#dom-requestinit-duplex.
-        ...(requestOptions.body && { duplex: "half" }),
-      },
-    ),
+  return fetch(
+    requestOptions.url,
+    Object.assign({
+      method: requestOptions.method,
+      body: requestOptions.body,
+      headers: requestOptions.headers as HeadersInit,
+      signal: (requestOptions as any).signal,
+      data: (requestOptions as any).data,
+      // duplex must be set if request.body is ReadableStream or Async Iterables.
+      // See https://fetch.spec.whatwg.org/#dom-requestinit-duplex.
+      ...(requestOptions.body && { duplex: "half" }),
+    }),
   )
     .then(async (response) => {
       url = response.url;
@@ -63,8 +62,10 @@ export default function fetchWrapper(
           headers.link && headers.link.match(/<([^>]+)>; rel="deprecation"/);
         const deprecationLink = matches && matches.pop();
         log.warn(
-          `[@octokit/request] "${requestOptions.method} ${requestOptions.url
-          }" is deprecated. It is scheduled to be removed on ${headers.sunset}${deprecationLink ? `. See ${deprecationLink}` : ""
+          `[@octokit/request] "${requestOptions.method} ${
+            requestOptions.url
+          }" is deprecated. It is scheduled to be removed on ${headers.sunset}${
+            deprecationLink ? `. See ${deprecationLink}` : ""
           }`,
         );
       }
