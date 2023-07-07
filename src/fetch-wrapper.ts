@@ -4,11 +4,14 @@ import type { EndpointInterface } from "@octokit/types";
 
 import getBuffer from "./get-buffer-response";
 
-export default function fetchWrapper(
-  requestOptions: ReturnType<EndpointInterface> & {
-    redirect?: "error" | "follow" | "manual";
-  },
-) {
+type RequestOptions = ReturnType<EndpointInterface> & {
+  redirect?: "error" | "follow" | "manual";
+  request?: {
+    asStream?: boolean;
+  };
+};
+
+export default function fetchWrapper(requestOptions: RequestOptions) {
   const log =
     requestOptions.request && requestOptions.request.log
       ? requestOptions.request.log
@@ -101,14 +104,14 @@ export default function fetchWrapper(
             url,
             status,
             headers,
-            data: await getResponseData(response),
+            data: await getResponseData(requestOptions, response),
           },
           request: requestOptions,
         });
       }
 
       if (status >= 400) {
-        const data = await getResponseData(response);
+        const data = await getResponseData(requestOptions, response);
 
         const error = new RequestError(toErrorMessage(data), status, {
           response: {
@@ -123,7 +126,7 @@ export default function fetchWrapper(
         throw error;
       }
 
-      return getResponseData(response);
+      return getResponseData(requestOptions, response);
     })
     .then((data) => {
       return {
@@ -143,8 +146,16 @@ export default function fetchWrapper(
     });
 }
 
-async function getResponseData(response: Response) {
+async function getResponseData(
+  requestOptions: RequestOptions,
+  response: Response,
+) {
+  if (requestOptions.request?.asStream) {
+    return response.body;
+  }
+
   const contentType = response.headers.get("content-type");
+
   if (/application\/json/.test(contentType!)) {
     return response.json();
   }

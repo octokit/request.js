@@ -1,5 +1,5 @@
 import fs from "fs";
-import stream from "stream";
+import stream, { Stream } from "stream";
 
 import { getUserAgent } from "universal-user-agent";
 import fetchMock from "fetch-mock";
@@ -1038,6 +1038,37 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       label: "test",
     }).catch((error) => {
       expect(error.name).toEqual("AbortError");
+    });
+  });
+
+  it("request should pass the stream in the response", () => {
+    const mock = fetchMock.sandbox().get(
+      "https://api.github.com/repos/octokit-fixture-org/release-assets/tarball/main",
+      {
+        status: 200,
+        headers: {
+          "content-type": "application/x-gzip",
+        },
+        body: fs.createReadStream(__filename),
+      },
+      {
+        sendAsJson: false,
+      },
+    );
+
+    return request("GET /repos/{owner}/{repo}/tarball/{branch}", {
+      owner: "octokit-fixture-org",
+      repo: "release-assets",
+      branch: "main",
+      request: {
+        asStream: true,
+        fetch: mock,
+      },
+    }).then((response) => {
+      expect(response.status).toEqual(200);
+      expect(response.headers["content-type"]).toEqual("application/x-gzip");
+      expect(response.data).toBeInstanceOf(Stream);
+      expect(mock.done()).toBe(true);
     });
   });
 });
