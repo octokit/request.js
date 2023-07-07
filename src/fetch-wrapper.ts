@@ -36,7 +36,7 @@ export default function fetchWrapper(
     );
   }
 
-  return fetch(requestOptions.url, requestOptions as any)
+  return fetch(requestOptions.url, { signal: (requestOptions as any).signal})
     .then(async (response) => {
       url = response.url;
       status = response.status;
