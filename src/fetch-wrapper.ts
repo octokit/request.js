@@ -38,7 +38,7 @@ export default function fetchWrapper(
 
   return fetch(
     requestOptions.url,
-    Object.assign({
+    {
       method: requestOptions.method,
       body: requestOptions.body,
       headers: requestOptions.headers as HeadersInit,
@@ -47,7 +47,7 @@ export default function fetchWrapper(
       // duplex must be set if request.body is ReadableStream or Async Iterables.
       // See https://fetch.spec.whatwg.org/#dom-requestinit-duplex.
       ...(requestOptions.body && { duplex: "half" }),
-    }),
+    },
   )
     .then(async (response) => {
       url = response.url;
