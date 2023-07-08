@@ -7,7 +7,7 @@ import getBuffer from "./get-buffer-response";
 type RequestOptions = ReturnType<EndpointInterface> & {
   redirect?: "error" | "follow" | "manual";
   request?: {
-    parseResponse?: boolean;
+    parseSuccessResponseBody?: boolean;
   };
 };
 
@@ -16,7 +16,7 @@ export default function fetchWrapper(requestOptions: RequestOptions) {
     requestOptions.request && requestOptions.request.log
       ? requestOptions.request.log
       : console;
-  const parseResponse = requestOptions.request?.parseResponse !== false
+  const parseSuccessResponseBody = requestOptions.request?.parseSuccessResponseBody !== false
 
   if (
     isPlainObject(requestOptions.body) ||
@@ -97,18 +97,14 @@ export default function fetchWrapper(requestOptions: RequestOptions) {
             url,
             status,
             headers,
-            data: parseResponse
-              ? await getResponseData(response)
-              : response.body,
+            data: await getResponseData(response),
           },
           request: requestOptions,
         });
       }
 
       if (status >= 400) {
-        const data = parseResponse
-          ? await getResponseData(response)
-          : response.body;
+        const data = await getResponseData(response);
 
         const error = new RequestError(toErrorMessage(data), status, {
           response: {
