@@ -245,6 +245,17 @@ const { data: app } = await requestWithAuth(
   </tr>
   <tr>
     <th align=left>
+      <code>options.method</code>
+    </th>
+    <td>
+      String
+    </td>
+    <td>
+      Any supported <a href="https://developer.github.com/v3/#http-verbs">http verb</a>, case insensitive. <em>Defaults to <code>Get</code></em>.
+    </td>
+  </tr>
+  <tr>
+    <th align=left>
       <code>options.mediaType.format</code>
     </th>
     <td>
@@ -262,18 +273,8 @@ const { data: app } = await requestWithAuth(
       Array of strings
     </td>
     <td>
-      Name of previews, such as `mercy`, `symmetra`, or `scarlet-witch`. See <a href="https://developer.github.com/v3/previews/">API Previews</a>.
-    </td>
-  </tr>
-  <tr>
-    <th align=left>
-      <code>options.method</code>
-    </th>
-    <td>
-      String
-    </td>
-    <td>
-      Any supported <a href="https://developer.github.com/v3/#http-verbs">http verb</a>, case insensitive. <em>Defaults to <code>Get</code></em>.
+      Name of previews, such as `mercy`, `symmetra`, or `scarlet-witch`. See <a href="https://docs.github.com/graphql/overview/schema-previews">GraphQL Schema Previews</a>.
+      Note that these only apply to GraphQL requests and have no effect on REST routes.
     </td>
   </tr>
   <tr>
@@ -299,18 +300,7 @@ const { data: app } = await requestWithAuth(
       Set request body directly instead of setting it to JSON based on additional parameters. See <a href="#data-parameter">"The `data` parameter"</a> below.
     </td>
   </tr>
-  <tr>
-    <th align=left>
-      <a name="options-request-agent"></a>
-      <code>options.request.agent</code>
-    </th>
-    <td>
-      <a href="https://nodejs.org/api/http.html#http_class_http_agent">http(s).Agent</a> instance
-    </td>
-    <td>
-     Node only. Useful for custom proxy, certificate, or dns lookup.
-    </td>
-  </tr>
+
   <tr>
     <th align=left>
       <code>options.request.fetch</code>
