@@ -7,7 +7,7 @@ import getBuffer from "./get-buffer-response";
 type RequestOptions = ReturnType<EndpointInterface> & {
   redirect?: "error" | "follow" | "manual";
   request?: {
-    asStream?: boolean;
+    parseResponse?: boolean;
   };
 };
 
@@ -16,6 +16,10 @@ export default function fetchWrapper(requestOptions: RequestOptions) {
     requestOptions.request && requestOptions.request.log
       ? requestOptions.request.log
       : console;
+  const parseResponse =
+    requestOptions.request && typeof requestOptions.request.parseResponse === "boolean"
+      ? requestOptions.request.parseResponse
+      : true
 
   if (
     isPlainObject(requestOptions.body) ||
@@ -104,14 +108,14 @@ export default function fetchWrapper(requestOptions: RequestOptions) {
             url,
             status,
             headers,
-            data: await getResponseData(requestOptions, response),
+            data: parseResponse ? await getResponseData(response) : response.body,
           },
           request: requestOptions,
         });
       }
 
       if (status >= 400) {
-        const data = await getResponseData(requestOptions, response);
+        const data = parseResponse ? await getResponseData(response) : response.body;
 
         const error = new RequestError(toErrorMessage(data), status, {
           response: {
@@ -126,7 +130,9 @@ export default function fetchWrapper(requestOptions: RequestOptions) {
         throw error;
       }
 
-      return getResponseData(requestOptions, response);
+      return parseResponse
+        ? await getResponseData(response)
+        : response.body;
     })
     .then((data) => {
       return {
@@ -146,16 +152,8 @@ export default function fetchWrapper(requestOptions: RequestOptions) {
     });
 }
 
-async function getResponseData(
-  requestOptions: RequestOptions,
-  response: Response,
-) {
-  if (requestOptions.request?.asStream) {
-    return response.body;
-  }
-
+async function getResponseData(response: Response) {
   const contentType = response.headers.get("content-type");
-
   if (/application\/json/.test(contentType!)) {
     return response.json();
   }
