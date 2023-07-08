@@ -16,11 +16,7 @@ export default function fetchWrapper(requestOptions: RequestOptions) {
     requestOptions.request && requestOptions.request.log
       ? requestOptions.request.log
       : console;
-  const parseResponse =
-    requestOptions.request &&
-    typeof requestOptions.request.parseResponse === "boolean"
-      ? requestOptions.request.parseResponse
-      : true;
+  const parseResponse = requestOptions.request?.parseResponse !== false
 
   if (
     isPlainObject(requestOptions.body) ||
