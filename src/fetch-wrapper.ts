@@ -17,9 +17,10 @@ export default function fetchWrapper(requestOptions: RequestOptions) {
       ? requestOptions.request.log
       : console;
   const parseResponse =
-    requestOptions.request && typeof requestOptions.request.parseResponse === "boolean"
+    requestOptions.request &&
+    typeof requestOptions.request.parseResponse === "boolean"
       ? requestOptions.request.parseResponse
-      : true
+      : true;
 
   if (
     isPlainObject(requestOptions.body) ||
@@ -108,14 +109,18 @@ export default function fetchWrapper(requestOptions: RequestOptions) {
             url,
             status,
             headers,
-            data: parseResponse ? await getResponseData(response) : response.body,
+            data: parseResponse
+              ? await getResponseData(response)
+              : response.body,
           },
           request: requestOptions,
         });
       }
 
       if (status >= 400) {
-        const data = parseResponse ? await getResponseData(response) : response.body;
+        const data = parseResponse
+          ? await getResponseData(response)
+          : response.body;
 
         const error = new RequestError(toErrorMessage(data), status, {
           response: {
@@ -130,9 +135,7 @@ export default function fetchWrapper(requestOptions: RequestOptions) {
         throw error;
       }
 
-      return parseResponse
-        ? await getResponseData(response)
-        : response.body;
+      return parseResponse ? await getResponseData(response) : response.body;
     })
     .then((data) => {
       return {
