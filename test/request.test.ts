@@ -1061,7 +1061,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       repo: "release-assets",
       branch: "main",
       request: {
-        parseResponse: true,
+        parseResponse: false,
         fetch: mock,
       },
     }).then((response) => {
