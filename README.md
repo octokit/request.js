@@ -344,6 +344,18 @@ const { data: app } = await requestWithAuth(
       Used for internal logging. Defaults to <a href="https://developer.mozilla.org/en-US/docs/Web/API/console"><code>console</code></a>.
     </td>
   </tr>
+  </tr>
+    <th align=left>
+      <code>options.request.parseSuccessResponseBody</code>
+    </th>
+    <td>
+      <code>boolean</code>
+    </td>
+    <td>
+      If set to <code>false</code> the request will return a Stream as response.data for successful requests (e.g. <code>200 OK</code> status code).
+      Defaults to <code>true</code>.
+    </td>
+  </tr>
 </table>
 
 All other options except `options.request.*` will be passed depending on the `method` and `url` options.
