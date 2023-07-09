@@ -6,9 +6,9 @@
   },
   "description": "Send parameterized requests to GitHub's APIs with sensible defaults in browsers and Node",
   "scripts": {
-    "build": "node scripts/build.mjs && tsc -p tsconfig.json",
-    "lint": "prettier --check '{src,test}/**/*' README.md package.json",
-    "lint:fix": "prettier --write '{src,test}/**/*' README.md package.json",
+    "build": "tsup --config scripts/tsup.config.ts && tsc -p tsconfig.json",
+    "lint": "prettier --check '{scripts,src,test}/**/*' README.md package.json",
+    "lint:fix": "prettier --write '{scripts,src,test}/**/*' README.md package.json",
     "pretest": "npm run -s lint",
     "test": "jest --coverage"
   },
@@ -36,7 +36,7 @@
     "@types/lolex": "^5.1.0",
     "@types/node": "^18.0.0",
     "@types/once": "^1.4.0",
-    "esbuild": "^0.18.0",
+    "esbuild": "^0.18.11",
     "fetch-mock": "^9.3.1",
     "glob": "^10.2.4",
     "jest": "^29.0.0",
@@ -45,6 +45,7 @@
     "semantic-release-plugin-update-version-in-files": "^1.0.0",
     "string-to-arraybuffer": "^1.0.2",
     "ts-jest": "^29.0.0",
+    "tsup": "^7.1.0",
     "typescript": "^5.0.0"
   },
   "jest": {
