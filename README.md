@@ -16,19 +16,20 @@ the passed options and sends the request using [fetch](https://developer.mozilla
 
 <!-- toc -->
 
-- [Features](#features)
-- [Usage](#usage)
-  - [REST API example](#rest-api-example)
-  - [GraphQL example](#graphql-example)
-  - [Alternative: pass `method` & `url` as part of options](#alternative-pass-method--url-as-part-of-options)
-- [Authentication](#authentication)
-- [request()](#request)
-- [`request.defaults()`](#requestdefaults)
-- [`request.endpoint`](#requestendpoint)
-- [Special cases](#special-cases)
-  - [The `data` parameter – set request body directly](#the-data-parameter-%E2%80%93-set-request-body-directly)
-  - [Set parameters for both the URL/query and the request body](#set-parameters-for-both-the-urlquery-and-the-request-body)
-- [LICENSE](#license)
+- [request.js](#requestjs)
+  - [Features](#features)
+  - [Usage](#usage)
+    - [REST API example](#rest-api-example)
+    - [GraphQL example](#graphql-example)
+    - [Alternative: pass `method` \& `url` as part of options](#alternative-pass-method--url-as-part-of-options)
+  - [Authentication](#authentication)
+  - [request()](#request)
+  - [`request.defaults()`](#requestdefaults)
+  - [`request.endpoint`](#requestendpoint)
+  - [Special cases](#special-cases)
+    - [The `data` parameter – set request body directly](#the-data-parameter--set-request-body-directly)
+    - [Set parameters for both the URL/query and the request body](#set-parameters-for-both-the-urlquery-and-the-request-body)
+  - [LICENSE](#license)
 
 <!-- tocstop -->
 
@@ -85,8 +86,8 @@ Node
 Install with <code>npm install @octokit/request</code>
 
 ```js
-const { request } = require("@octokit/request");
-// or: import { request } from "@octokit/request";
+import { request } from "@octokit/request";
+// or: const { request } = require("@octokit/request");
 ```
 
 </td></tr>
@@ -163,7 +164,7 @@ const result = await requestWithAuth("GET /user");
 For more complex authentication strategies such as GitHub Apps or Basic, we recommend the according authentication library exported by [`@octokit/auth`](https://github.com/octokit/auth.js).
 
 ```js
-const { createAppAuth } = require("@octokit/auth-app");
+import { createAppAuth } from "@octokit/auth-app";
 const auth = createAppAuth({
   appId: process.env.APP_ID,
   privateKey: process.env.PRIVATE_KEY,
@@ -405,7 +406,8 @@ If the error is due to an `AbortSignal` being used, the resulting `AbortError` i
 Override or set default options. Example:
 
 ```js
-const myrequest = require("@octokit/request").defaults({
+import { request } from "@octokit/request";
+const myrequest = request.defaults({
   baseUrl: "https://github-enterprise.acme-inc.com/api/v3",
   headers: {
     "user-agent": "myApp/1.2.3",
