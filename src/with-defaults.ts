@@ -8,10 +8,10 @@ import type {
   RequestParameters,
 } from "@octokit/types";
 
-export default function withDefaults(
+const withDefaults = (
   oldEndpoint: EndpointInterface,
   newDefaults: RequestParameters,
-): RequestInterface {
+): RequestInterface => {
   const endpoint = oldEndpoint.defaults(newDefaults);
   const newApi = function (
     route: Route | EndpointOptions,
@@ -44,4 +44,6 @@ export default function withDefaults(
     endpoint,
     defaults: withDefaults.bind(null, endpoint),
   }) as RequestInterface<typeof endpoint.DEFAULTS & typeof newDefaults>;
-}
+};
+
+export default withDefaults;

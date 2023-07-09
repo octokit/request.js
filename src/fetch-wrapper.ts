@@ -4,11 +4,11 @@ import type { EndpointInterface } from "@octokit/types";
 
 import getBuffer from "./get-buffer-response";
 
-export default function fetchWrapper(
+const fetchWrapper = (
   requestOptions: ReturnType<EndpointInterface> & {
     redirect?: "error" | "follow" | "manual";
   },
-) {
+) => {
   const log =
     requestOptions.request && requestOptions.request.log
       ? requestOptions.request.log
@@ -133,9 +133,9 @@ export default function fetchWrapper(
         request: requestOptions,
       });
     });
-}
+};
 
-async function getResponseData(response: Response) {
+const getResponseData = async (response: Response) => {
   const contentType = response.headers.get("content-type");
   if (/application\/json/.test(contentType!)) {
     return response.json();
@@ -146,9 +146,9 @@ async function getResponseData(response: Response) {
   }
 
   return getBuffer(response);
-}
+};
 
-function toErrorMessage(data: any) {
+const toErrorMessage = (data: any) => {
   if (typeof data === "string") return data;
 
   // istanbul ignore else - just in case
@@ -162,4 +162,6 @@ function toErrorMessage(data: any) {
 
   // istanbul ignore next - just in case
   return `Unknown error: ${JSON.stringify(data)}`;
-}
+};
+
+export default fetchWrapper;
