@@ -4,14 +4,14 @@ import type { EndpointInterface } from "@octokit/types";
 
 import getBuffer from "./get-buffer-response";
 
-type RequestOptions = ReturnType<EndpointInterface> & {
-  redirect?: "error" | "follow" | "manual";
+type RequestOptions =  & {
   request?: {
     parseSuccessResponseBody?: boolean;
   };
 };
 
 export default function fetchWrapper(requestOptions: RequestOptions) {
+
   const log =
     requestOptions.request && requestOptions.request.log
       ? requestOptions.request.log
