@@ -353,6 +353,7 @@ const { data: app } = await requestWithAuth(
     </td>
     <td>
       If set to <code>false</code> the request will return a Stream as response.data for successful requests (e.g. <code>200 OK</code> status code).
+      This option may be useful when downloading files from the GitHub API.
       Defaults to <code>true</code>.
     </td>
   </tr>
