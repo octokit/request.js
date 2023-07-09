@@ -5,9 +5,7 @@ import type { EndpointInterface } from "@octokit/types";
 import getBuffer from "./get-buffer-response";
 
 export default function fetchWrapper(
-  requestOptions: ReturnType<EndpointInterface> & {
-    redirect?: "error" | "follow" | "manual";
-  },
+  requestOptions: ReturnType<EndpointInterface>,
 ) {
   const log =
     requestOptions.request && requestOptions.request.log
