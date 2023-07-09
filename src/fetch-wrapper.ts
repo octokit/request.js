@@ -16,7 +16,8 @@ export default function fetchWrapper(requestOptions: RequestOptions) {
     requestOptions.request && requestOptions.request.log
       ? requestOptions.request.log
       : console;
-  const parseSuccessResponseBody = requestOptions.request?.parseSuccessResponseBody !== false
+  const parseSuccessResponseBody =
+    requestOptions.request?.parseSuccessResponseBody !== false;
 
   if (
     isPlainObject(requestOptions.body) ||
@@ -119,7 +120,9 @@ export default function fetchWrapper(requestOptions: RequestOptions) {
         throw error;
       }
 
-      return parseSuccessResponseBody ? await getResponseData(response) : response.body;
+      return parseSuccessResponseBody
+        ? await getResponseData(response)
+        : response.body;
     })
     .then((data) => {
       return {
