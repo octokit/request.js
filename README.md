@@ -57,7 +57,7 @@ request("POST /repos/{owner}/{repo}/issues/{number}/labels", {
 
 - `baseUrl`: `https://api.github.com`
 - `headers.accept`: `application/vnd.github.v3+json`
-- `headers.agent`: `octokit-request.js/<current version> <OS information>`, e.g. `octokit-request.js/1.2.3 Node.js/10.15.0 (macOS Mojave; x64)`
+- `headers['user-agent']`: `octokit-request.js/<current version> <OS information>`, e.g. `octokit-request.js/1.2.3 Node.js/10.15.0 (macOS Mojave; x64)`
 
 👌 Simple to test: mock requests by passing a custom fetch method.
 
