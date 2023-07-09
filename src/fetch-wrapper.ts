@@ -119,7 +119,7 @@ export default function fetchWrapper(requestOptions: RequestOptions) {
         throw error;
       }
 
-      return parseResponse ? await getResponseData(response) : response.body;
+      return parseSuccessResponseBody ? await getResponseData(response) : response.body;
     })
     .then((data) => {
       return {
