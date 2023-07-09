@@ -5,9 +5,7 @@ import type { EndpointInterface } from "@octokit/types";
 import getBuffer from "./get-buffer-response";
 
 export default function fetchWrapper(
-  requestOptions: ReturnType<EndpointInterface> & {
-    redirect?: "error" | "follow" | "manual";
-  },
+  requestOptions: ReturnType<EndpointInterface>,
 ) {
   const log =
     requestOptions.request && requestOptions.request.log
@@ -41,7 +39,6 @@ export default function fetchWrapper(
     body: requestOptions.body,
     headers: requestOptions.headers as HeadersInit,
     signal: requestOptions.request?.signal,
-    redirect: requestOptions.redirect,
     // duplex must be set if request.body is ReadableStream or Async Iterables.
     // See https://fetch.spec.whatwg.org/#dom-requestinit-duplex.
     ...(requestOptions.body && { duplex: "half" }),
