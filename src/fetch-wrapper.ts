@@ -44,7 +44,6 @@ export default function fetchWrapper(
     // duplex must be set if request.body is ReadableStream or Async Iterables.
     // See https://fetch.spec.whatwg.org/#dom-requestinit-duplex.
     ...(requestOptions.body && { duplex: "half" }),
-    redirect: requestOptions.redirect,
   })
     .then(async (response) => {
       url = response.url;
