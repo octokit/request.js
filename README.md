@@ -531,7 +531,7 @@ request(
 
 ### Set a custom Agent to your requests
 
-The way to pass a custom `Agent` to requests is by creating a custom `fetch` implementation and passing that to octokit's request `options`. A good example can be [undici's `fetch` implementation](https://undici.nodejs.org/#/?id=undicifetchinput-init-promise).
+The way to pass a custom `Agent` to requests is by creating a custom `fetch` function and pass it as `options.request.fetch`. A good example can be [undici's `fetch` implementation](https://undici.nodejs.org/#/?id=undicifetchinput-init-promise).
 
 Example ([See example in CodeSandbox](https://codesandbox.io/p/sandbox/nifty-stitch-wdlwlf))
 
