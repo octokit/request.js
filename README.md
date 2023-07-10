@@ -550,7 +550,6 @@ const myFetch = (url, options) => {
   });
 };
 
-/** @type {typeof import("@octokit/request").RequestInterface<object>} */
 const { data } = await request("GET /users/{username}", {
   username: "octocat",
   headers: {
