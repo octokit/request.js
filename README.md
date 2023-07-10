@@ -540,9 +540,9 @@ import { request } from "@octokit/request";
 import { fetch as undiciFetch, Agent } from "undici";
 
 /** @type {typeof import("undici").fetch} */
-const myFetch = (url, opts) => {
+const myFetch = (url, options) => {
   return undiciFetch(url, {
-    ...opts,
+    ...options,
     dispatcher: new Agent({
       keepAliveTimeout: 10,
       keepAliveMaxTimeout: 10,
