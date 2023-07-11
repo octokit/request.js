@@ -29,6 +29,7 @@ the passed options and sends the request using [fetch](https://developer.mozilla
   - [Special cases](#special-cases)
     - [The `data` parameter – set request body directly](#the-data-parameter--set-request-body-directly)
     - [Set parameters for both the URL/query and the request body](#set-parameters-for-both-the-urlquery-and-the-request-body)
+    - [Set a custom Agent to your requests](#set-a-custom-agent-to-your-requests)
   - [LICENSE](#license)
 
 <!-- tocstop -->
@@ -537,6 +538,40 @@ request(
     data: "Hello, world!",
   },
 );
+```
+
+### Set a custom Agent to your requests
+
+The way to pass a custom `Agent` to requests is by creating a custom `fetch` function and pass it as `options.request.fetch`. A good example can be [undici's `fetch` implementation](https://undici.nodejs.org/#/?id=undicifetchinput-init-promise).
+
+Example ([See example in CodeSandbox](https://codesandbox.io/p/sandbox/nifty-stitch-wdlwlf))
+
+```js
+import { request } from "@octokit/request";
+import { fetch as undiciFetch, Agent } from "undici";
+
+/** @type {typeof import("undici").fetch} */
+const myFetch = (url, options) => {
+  return undiciFetch(url, {
+    ...options,
+    dispatcher: new Agent({
+      keepAliveTimeout: 10,
+      keepAliveMaxTimeout: 10,
+    }),
+  });
+};
+
+const { data } = await request("GET /users/{username}", {
+  username: "octocat",
+  headers: {
+    "X-GitHub-Api-Version": "2022-11-28",
+  },
+  options: {
+    request: {
+      fetch: myFetch,
+    },
+  },
+});
 ```
 
 ## LICENSE
