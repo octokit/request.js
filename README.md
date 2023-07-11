@@ -346,6 +346,17 @@ const { data: app } = await requestWithAuth(
       Used for internal logging. Defaults to <a href="https://developer.mozilla.org/en-US/docs/Web/API/console"><code>console</code></a>.
     </td>
   </tr>
+  </tr>
+    <th align=left>
+      <code>options.request.parseSuccessResponseBody</code>
+    </th>
+    <td>
+      <code>boolean</code>
+    </td>
+    <td>
+      If set to <code>false</code> the returned `response` will be passed through from `fetch`. This is useful to stream response.body when downloading files from the GitHub API.
+    </td>
+  </tr>
 </table>
 
 All other options except `options.request.*` will be passed depending on the `method` and `url` options.
