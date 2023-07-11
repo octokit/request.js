@@ -4,13 +4,9 @@ import type { EndpointInterface } from "@octokit/types";
 
 import getBuffer from "./get-buffer-response";
 
-type RequestOptions = ReturnType<EndpointInterface> & {
-  request?: {
-    parseSuccessResponseBody?: boolean;
-  };
-};
-
-export default function fetchWrapper(requestOptions: RequestOptions) {
+export default function fetchWrapper(
+  requestOptions: ReturnType<EndpointInterface>,
+) {
   const log =
     requestOptions.request && requestOptions.request.log
       ? requestOptions.request.log
