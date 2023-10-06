@@ -131,7 +131,20 @@ export default function fetchWrapper(
       if (error instanceof RequestError) throw error;
       else if (error.name === "AbortError") throw error;
 
-      throw new RequestError(error.message, 500, {
+      let message = error.message;
+
+      // undici throws a TypeError for network errors
+      // and puts the error message in `error.cause`
+      // https://github.com/nodejs/undici/blob/e5c9d703e63cd5ad691b8ce26e3f9a81c598f2e3/lib/fetch/index.js#L227
+      if (
+        error instanceof TypeError &&
+        "cause" in error &&
+        typeof error.cause === "string"
+      ) {
+        message = error.cause;
+      }
+
+      throw new RequestError(message, 500, {
         request: requestOptions,
       });
     });
