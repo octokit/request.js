@@ -139,9 +139,9 @@ export default function fetchWrapper(
       if (
         error instanceof TypeError &&
         "cause" in error &&
-        typeof error.cause == "string"
+        typeof error.cause === "string"
       ) {
-        message = error?.cause ?? message;
+        message = error.cause;
       }
 
       throw new RequestError(message, 500, {
