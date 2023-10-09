@@ -136,12 +136,12 @@ export default function fetchWrapper(
       // undici throws a TypeError for network errors
       // and puts the error message in `error.cause`
       // https://github.com/nodejs/undici/blob/e5c9d703e63cd5ad691b8ce26e3f9a81c598f2e3/lib/fetch/index.js#L227
-      if (
-        error instanceof TypeError &&
-        "cause" in error &&
-        typeof error.cause === "string"
-      ) {
-        message = error.cause;
+      if (error.name === "TypeError" && "cause" in error) {
+        if (error.cause instanceof Error) {
+          message = error.cause.message;
+        } else if (typeof error.cause === "string") {
+          message = error.cause;
+        }
       }
 
       throw new RequestError(message, 500, {
