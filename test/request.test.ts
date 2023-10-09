@@ -439,7 +439,29 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       });
   });
 
-  it("Request TypeError error", () => {
+  it("Request TypeError error with an Error cause", () => {
+    const mock = fetchMock.sandbox().get("https://127.0.0.1:8/", {
+      throws: Object.assign(new TypeError("fetch failed"), {
+        cause: new Error("bad"),
+      }),
+    });
+
+    // port: 8 // officially unassigned port. See https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
+    return request("GET https://127.0.0.1:8/", {
+      request: {
+        fetch: mock,
+      },
+    })
+      .then(() => {
+        throw new Error("should not resolve");
+      })
+      .catch((error) => {
+        expect(error.status).toEqual(500);
+        expect(error.message).toEqual("bad");
+      });
+  });
+
+  it("Request TypeError error with a string cause", () => {
     const mock = fetchMock.sandbox().get("https://127.0.0.1:8/", {
       throws: Object.assign(new TypeError("fetch failed"), { cause: "bad" }),
     });
