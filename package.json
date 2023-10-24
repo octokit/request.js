@@ -34,7 +34,7 @@
     "@types/fetch-mock": "^7.2.4",
     "@types/jest": "^29.0.0",
     "@types/lolex": "^5.1.0",
-    "@types/node": "^18.0.0",
+    "@types/node": "^20.0.0",
     "@types/once": "^1.4.0",
     "esbuild": "^0.19.0",
     "fetch-mock": "^9.3.1",
