@@ -153,10 +153,16 @@ export default function fetchWrapper(
 async function getResponseData(response: Response) {
   const contentType = response.headers.get("content-type");
   if (/application\/json/.test(contentType!)) {
-    // In the event that we get an empty response body we fallback to
-    // using .text(), but this should be investigated since if this were
-    // to occur in the GitHub API it really should not return an empty body.
-    return response.json().catch(() => response.text());
+    
+    return response
+      .json()
+      // In the event that we get an empty response body we fallback to
+      // using .text(), but this should be investigated since if this were
+      // to occur in the GitHub API it really should not return an empty body.
+      .catch(() => response.text())
+      // `node-fetch` is throwing a "body used already for" error if `.text()` is run
+      // after a failed .json(). To account for that we fallback to an empty string
+      .catch(() => "");
   }
 
   if (!contentType || /^text\/|charset=utf-8$/.test(contentType)) {

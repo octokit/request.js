@@ -400,7 +400,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     );
   });
 
-  it("response with no body", () => {
+  it("error response with no body (octokit/request.js#649)", () => {
     const mock = fetchMock
       .sandbox()
       .get("path:/repos/octokit-fixture-org/hello-world/contents/README.md", {
@@ -421,8 +421,8 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       request: {
         fetch: mock,
       },
-    }).then((response) => {
-      expect(response.data).toEqual("");
+    }).catch((error) => {
+      expect(error.response.data).toEqual("");
     });
   });
 
