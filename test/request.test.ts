@@ -400,6 +400,32 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     );
   });
 
+  it("response with no body", () => {
+    const mock = fetchMock
+      .sandbox()
+      .get("path:/repos/octokit-fixture-org/hello-world/contents/README.md", {
+        status: 500,
+        body: undefined,
+        headers: {
+          "content-type": "application/json",
+        },
+      });
+
+    return request("GET /repos/{owner}/{repo}/contents/{path}", {
+      headers: {
+        accept: "content-type: application/json",
+      },
+      owner: "octokit-fixture-org",
+      repo: "hello-world",
+      path: "README.md",
+      request: {
+        fetch: mock,
+      },
+    }).then((response) => {
+      expect(response.data).toEqual("");
+    });
+  });
+
   it("non-JSON response", () => {
     const mock = fetchMock
       .sandbox()

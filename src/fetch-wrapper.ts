@@ -156,11 +156,7 @@ async function getResponseData(response: Response) {
     // In the event that we get an empty response body we fallback to
     // using .text(), but this should be investigated since if this were
     // to occur in the GitHub API it really should not return an empty body.
-    try {
-      return response.json();
-    } catch (e) {
-      return response.text();
-    }
+    return response.json().catch(() => response.text());
   }
 
   if (!contentType || /^text\/|charset=utf-8$/.test(contentType)) {
