@@ -1,4 +1,4 @@
-import { isPlainObject } from "is-plain-object";
+import { isPlainObject } from "./is-plain-object";
 import { RequestError } from "@octokit/request-error";
 import type { EndpointInterface } from "@octokit/types";
 
