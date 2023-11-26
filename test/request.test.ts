@@ -1,5 +1,5 @@
-import fs from "fs";
-import stream, { Stream } from "stream";
+import fs from "node:fs";
+import stream, { Stream } from "node:stream";
 
 import { getUserAgent } from "universal-user-agent";
 import fetchMock from "fetch-mock";
