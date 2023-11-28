@@ -11,7 +11,7 @@ import type {
   ResponseHeaders,
 } from "@octokit/types";
 
-import { request } from "../src";
+import { request } from "../src/index.ts";
 
 const userAgent = `octokit-request.js/0.0.0-development ${getUserAgent()}`;
 const stringToArrayBuffer = require("string-to-arraybuffer");

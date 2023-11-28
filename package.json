@@ -65,7 +65,10 @@
     },
     "modulePathIgnorePatterns": [
       "<rootDir>/pkg"
-    ]
+    ],
+    "moduleNameMapper": {
+      "^(.+)\\.jsx?$": "$1"
+    }
   },
   "release": {
     "branches": [
