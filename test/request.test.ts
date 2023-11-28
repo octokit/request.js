@@ -1,5 +1,6 @@
 import fs from "node:fs";
-import stream, { Stream } from "node:stream";
+import stream from "node:stream";
+import { ReadableStream } from "node:stream/web";
 
 import { getUserAgent } from "universal-user-agent";
 import fetchMock from "fetch-mock";
@@ -1116,7 +1117,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     }).then((response) => {
       expect(response.status).toEqual(200);
       expect(response.headers["content-type"]).toEqual("application/x-gzip");
-      expect(response.data).toBeInstanceOf(Stream);
+      expect(response.data).toBeInstanceOf(ReadableStream);
       expect(mock.done()).toBe(true);
     });
   });
