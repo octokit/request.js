@@ -1120,4 +1120,27 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       expect(mock.done()).toBe(true);
     });
   });
+
+  it("should not error for empty response body and json media type (#649)", () => {
+    const mock = fetchMock.sandbox().get("path:/", {
+      status: 200,
+      body: "",
+      headers: {
+        "content-length": "0",
+        "content-type": "application/json; charset=utf-8",
+      },
+    });
+
+    expect(request).not.toThrow();
+    return request("GET /", {
+      headers: {
+        accept: "application/json",
+      },
+      request: {
+        fetch: mock,
+      },
+    }).then((response) => {
+      expect(response.data).toEqual("");
+    });
+  });
 });
