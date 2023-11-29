@@ -405,12 +405,13 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       .sandbox()
       .get("path:/repos/octokit-fixture-org/hello-world/contents/README.md", {
         status: 500,
-        body: undefined,
+        body: "",
         headers: {
           "content-type": "application/json",
         },
       });
 
+    expect(request).not.toThrow();
     return request("GET /repos/{owner}/{repo}/contents/{path}", {
       headers: {
         accept: "content-type: application/json",
@@ -1118,29 +1119,6 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       expect(response.headers["content-type"]).toEqual("application/x-gzip");
       expect(response.data).toBeInstanceOf(Stream);
       expect(mock.done()).toBe(true);
-    });
-  });
-
-  it("should not error for empty response body and json media type (#649)", () => {
-    const mock = fetchMock.sandbox().get("path:/", {
-      status: 200,
-      body: "",
-      headers: {
-        "content-length": "0",
-        "content-type": "application/json; charset=utf-8",
-      },
-    });
-
-    expect(request).not.toThrow();
-    return request("GET /", {
-      headers: {
-        accept: "application/json",
-      },
-      request: {
-        fetch: mock,
-      },
-    }).then((response) => {
-      expect(response.data).toEqual("");
     });
   });
 });
