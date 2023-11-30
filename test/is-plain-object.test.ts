@@ -1,4 +1,4 @@
-import { isPlainObject } from "../src/is-plain-object";
+import { isPlainObject } from "../src/is-plain-object.ts";
 
 describe("isPlainObject", () => {
   function Foo() {

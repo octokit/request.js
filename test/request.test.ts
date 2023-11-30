@@ -1,5 +1,6 @@
-import fs from "fs";
-import stream, { Stream } from "stream";
+import fs from "node:fs";
+import stream from "node:stream";
+import { ReadableStream } from "node:stream/web";
 
 import { getUserAgent } from "universal-user-agent";
 import fetchMock from "fetch-mock";
@@ -11,7 +12,7 @@ import type {
   ResponseHeaders,
 } from "@octokit/types";
 
-import { request } from "../src";
+import { request } from "../src/index.ts";
 
 const userAgent = `octokit-request.js/0.0.0-development ${getUserAgent()}`;
 const stringToArrayBuffer = require("string-to-arraybuffer");
@@ -1117,7 +1118,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     }).then((response) => {
       expect(response.status).toEqual(200);
       expect(response.headers["content-type"]).toEqual("application/x-gzip");
-      expect(response.data).toBeInstanceOf(Stream);
+      expect(response.data).toBeInstanceOf(ReadableStream);
       expect(mock.done()).toBe(true);
     });
   });

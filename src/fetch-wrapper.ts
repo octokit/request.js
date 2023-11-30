@@ -1,8 +1,8 @@
-import { isPlainObject } from "./is-plain-object";
+import { isPlainObject } from "./is-plain-object.js";
 import { RequestError } from "@octokit/request-error";
 import type { EndpointInterface } from "@octokit/types";
 
-import getBuffer from "./get-buffer-response";
+import getBuffer from "./get-buffer-response.js";
 
 export default function fetchWrapper(
   requestOptions: ReturnType<EndpointInterface>,

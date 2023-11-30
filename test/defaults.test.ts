@@ -1,6 +1,6 @@
 import fetchMock from "fetch-mock";
 
-import { request } from "../src";
+import { request } from "../src/index.ts";
 
 describe("endpoint.defaults()", () => {
   it("is a function", () => {
