@@ -405,12 +405,13 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       .sandbox()
       .get("path:/repos/octokit-fixture-org/hello-world/contents/README.md", {
         status: 500,
-        body: undefined,
+        body: "",
         headers: {
           "content-type": "application/json",
         },
       });
 
+    expect(request).not.toThrow();
     return request("GET /repos/{owner}/{repo}/contents/{path}", {
       headers: {
         accept: "content-type: application/json",
