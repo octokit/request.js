@@ -8,6 +8,10 @@ name: Test
     types:
       - opened
       - synchronize
+
+permissions:
+  contents: read
+
 jobs:
   test_matrix:
     runs-on: ubuntu-latest
