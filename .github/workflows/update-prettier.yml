@@ -3,6 +3,10 @@ name: Update Prettier
   push:
     branches:
       - renovate/prettier-*
+
+permissions:
+  contents: read
+
 jobs:
   update_prettier:
     runs-on: ubuntu-latest
