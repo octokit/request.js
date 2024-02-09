@@ -8,7 +8,8 @@ name: Release
       - "*.x"
 
 permissions:
-  contents: read
+  contents: write
+  issues: write
 
 jobs:
   release:
