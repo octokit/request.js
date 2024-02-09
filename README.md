@@ -253,7 +253,7 @@ const { data: app } = await requestWithAuth(
       String
     </td>
     <td>
-      Any supported <a href="https://developer.github.com/v3/#http-verbs">http verb</a>, case insensitive. <em>Defaults to <code>Get</code></em>.
+      Any supported <a href="https://developer.github.com/v3/#http-verbs">http verb</a>, case-insensitive. <em>Defaults to <code>Get</code></em>.
     </td>
   </tr>
   <tr>
