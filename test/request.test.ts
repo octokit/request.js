@@ -15,7 +15,9 @@ import type {
 import { request } from "../src/index.ts";
 
 const userAgent = `octokit-request.js/0.0.0-development ${getUserAgent()}`;
-const stringToArrayBuffer = require("string-to-arraybuffer");
+function stringToArrayBuffer(str: string) {
+  return new TextEncoder().encode(str).buffer;
+}
 
 describe("request()", () => {
   it("is a function", () => {
