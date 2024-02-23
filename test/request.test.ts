@@ -5,7 +5,7 @@ import { ReadableStream } from "node:stream/web";
 import { getUserAgent } from "universal-user-agent";
 import fetchMock from "fetch-mock";
 import { createAppAuth } from "@octokit/auth-app";
-import lolex from "lolex";
+import fakeTimers from "@sinonjs/fake-timers";
 import type {
   EndpointOptions,
   RequestInterface,
@@ -73,7 +73,7 @@ describe("request()", () => {
   });
 
   it("README authentication example", async () => {
-    const clock = lolex.install({
+    const clock = fakeTimers.install({
       now: 0,
       toFake: ["Date"],
     });
