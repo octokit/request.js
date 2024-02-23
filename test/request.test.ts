@@ -16,6 +16,7 @@ import { request } from "../src/index.ts";
 import { jest } from "@jest/globals";
 
 const userAgent = `octokit-request.js/0.0.0-development ${getUserAgent()}`;
+const __filename = new URL(import.meta.url);
 function stringToArrayBuffer(str: string) {
   return new TextEncoder().encode(str).buffer;
 }
