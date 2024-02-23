@@ -13,6 +13,7 @@ import type {
 } from "@octokit/types";
 
 import { request } from "../src/index.ts";
+import { jest } from "@jest/globals";
 
 const userAgent = `octokit-request.js/0.0.0-development ${getUserAgent()}`;
 function stringToArrayBuffer(str: string) {
