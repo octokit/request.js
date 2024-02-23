@@ -48,10 +48,10 @@
     "typescript": "^5.0.0"
   },
   "jest": {
+    "extensionsToTreatAsEsm": [
+      ".ts"
+    ],
     "transform": {
-      "extensionsToTreatAsEsm": [
-        ".ts"
-      ],
       "^.+\\.(ts|tsx)$": [
         "ts-jest",
         {
