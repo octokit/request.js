@@ -39,7 +39,13 @@ export default function fetchWrapper(
   return fetch(requestOptions.url, {
     method: requestOptions.method,
     body: requestOptions.body,
-    headers: requestOptions.headers as HeadersInit,
+    // Header values must be `string`
+    headers: Object.fromEntries(
+      Object.entries(requestOptions.headers).map(([name, value]) => [
+        name,
+        String(value),
+      ]),
+    ),
     signal: requestOptions.request?.signal,
     // duplex must be set if request.body is ReadableStream or Async Iterables.
     // See https://fetch.spec.whatwg.org/#dom-requestinit-duplex.

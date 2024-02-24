@@ -87,8 +87,7 @@ Node
 Install with <code>npm install @octokit/request</code>
 
 ```js
-const { request } = require("@octokit/request");
-// or: import { request } from "@octokit/request";
+import { request } from "@octokit/request";
 ```
 
 </td></tr>

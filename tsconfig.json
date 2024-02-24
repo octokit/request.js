@@ -1,6 +1,7 @@
 {
   "extends": "@octokit/tsconfig",
   "compilerOptions": {
+    "lib": ["dom", "DOM.Iterable", "es2023"],
     "esModuleInterop": true,
     "declaration": true,
     "outDir": "pkg/dist-types",

@@ -5,7 +5,7 @@ import { ReadableStream } from "node:stream/web";
 import { getUserAgent } from "universal-user-agent";
 import fetchMock from "fetch-mock";
 import { createAppAuth } from "@octokit/auth-app";
-import lolex from "lolex";
+import fakeTimers from "@sinonjs/fake-timers";
 import type {
   EndpointOptions,
   RequestInterface,
@@ -13,9 +13,13 @@ import type {
 } from "@octokit/types";
 
 import { request } from "../src/index.ts";
+import { jest } from "@jest/globals";
 
 const userAgent = `octokit-request.js/0.0.0-development ${getUserAgent()}`;
-const stringToArrayBuffer = require("string-to-arraybuffer");
+const __filename = new URL(import.meta.url);
+function stringToArrayBuffer(str: string) {
+  return new TextEncoder().encode(str).buffer;
+}
 
 describe("request()", () => {
   it("is a function", () => {
@@ -69,7 +73,7 @@ describe("request()", () => {
   });
 
   it("README authentication example", async () => {
-    const clock = lolex.install({
+    const clock = fakeTimers.install({
       now: 0,
       toFake: ["Date"],
     });
