@@ -164,7 +164,7 @@ const result = await requestWithAuth("GET /user");
 For more complex authentication strategies such as GitHub Apps or Basic, we recommend the according authentication library exported by [`@octokit/auth`](https://github.com/octokit/auth.js).
 
 ```js
-const { createAppAuth } = require("@octokit/auth-app");
+import { createAppAuth } from "@octokit/auth-app";
 const auth = createAppAuth({
   appId: process.env.APP_ID,
   privateKey: process.env.PRIVATE_KEY,
@@ -417,7 +417,8 @@ If the error is due to an `AbortSignal` being used, the resulting `AbortError` i
 Override or set default options. Example:
 
 ```js
-const myrequest = require("@octokit/request").defaults({
+import { request } from "@octokit/request";
+const myrequest = request.defaults({
   baseUrl: "https://github-enterprise.acme-inc.com/api/v3",
   headers: {
     "user-agent": "myApp/1.2.3",
