@@ -1,4 +1,4 @@
-import fetchWrapper from "./fetch-wrapper";
+import fetchWrapper from "./fetch-wrapper.js";
 import type {
   EndpointOptions,
   EndpointInterface,

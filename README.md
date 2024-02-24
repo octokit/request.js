@@ -29,6 +29,7 @@ the passed options and sends the request using [fetch](https://developer.mozilla
   - [Special cases](#special-cases)
     - [The `data` parameter – set request body directly](#the-data-parameter--set-request-body-directly)
     - [Set parameters for both the URL/query and the request body](#set-parameters-for-both-the-urlquery-and-the-request-body)
+    - [Set a custom Agent to your requests](#set-a-custom-agent-to-your-requests)
   - [LICENSE](#license)
 
 <!-- tocstop -->
@@ -87,7 +88,6 @@ Install with <code>npm install @octokit/request</code>
 
 ```js
 import { request } from "@octokit/request";
-// or: const { request } = require("@octokit/request");
 ```
 
 </td></tr>
@@ -252,7 +252,7 @@ const { data: app } = await requestWithAuth(
       String
     </td>
     <td>
-      Any supported <a href="https://developer.github.com/v3/#http-verbs">http verb</a>, case insensitive. <em>Defaults to <code>Get</code></em>.
+      Any supported <a href="https://developer.github.com/v3/#http-verbs">http verb</a>, case-insensitive. <em>Defaults to <code>Get</code></em>.
     </td>
   </tr>
   <tr>
@@ -321,7 +321,7 @@ const { data: app } = await requestWithAuth(
       Function
     </td>
     <td>
-     Function with the signature <code>hook(request, endpointOptions)</code>, where <code>endpointOptions</code> are the parsed options as returned by <a href="https://github.com/octokit/endpoint.js#endpointmergeroute-options-or-endpointmergeoptions"><code>endpoint.merge()</code></a>, and <code>request</code> is <a href="https://github.com/octokit/request.js#request"><code>request()</code></a>. This option works great in conjuction with <a href="https://github.com/gr2m/before-after-hook">before-after-hook</a>.
+     Function with the signature <code>hook(request, endpointOptions)</code>, where <code>endpointOptions</code> are the parsed options as returned by <a href="https://github.com/octokit/endpoint.js#endpointmergeroute-options-or-endpointmergeoptions"><code>endpoint.merge()</code></a>, and <code>request</code> is <a href="https://github.com/octokit/request.js#request"><code>request()</code></a>. This option works great in conjunction with <a href="https://github.com/gr2m/before-after-hook">before-after-hook</a>.
     </td>
   </tr>
   <tr>
@@ -343,6 +343,17 @@ const { data: app } = await requestWithAuth(
     </td>
     <td>
       Used for internal logging. Defaults to <a href="https://developer.mozilla.org/en-US/docs/Web/API/console"><code>console</code></a>.
+    </td>
+  </tr>
+  </tr>
+    <th align=left>
+      <code>options.request.parseSuccessResponseBody</code>
+    </th>
+    <td>
+      <code>boolean</code>
+    </td>
+    <td>
+      If set to <code>false</code> the returned `response` will be passed through from `fetch`. This is useful to stream response.body when downloading files from the GitHub API.
     </td>
   </tr>
 </table>
@@ -527,6 +538,40 @@ request(
     data: "Hello, world!",
   },
 );
+```
+
+### Set a custom Agent to your requests
+
+The way to pass a custom `Agent` to requests is by creating a custom `fetch` function and pass it as `options.request.fetch`. A good example can be [undici's `fetch` implementation](https://undici.nodejs.org/#/?id=undicifetchinput-init-promise).
+
+Example ([See example in CodeSandbox](https://codesandbox.io/p/sandbox/nifty-stitch-wdlwlf))
+
+```js
+import { request } from "@octokit/request";
+import { fetch as undiciFetch, Agent } from "undici";
+
+/** @type {typeof import("undici").fetch} */
+const myFetch = (url, options) => {
+  return undiciFetch(url, {
+    ...options,
+    dispatcher: new Agent({
+      keepAliveTimeout: 10,
+      keepAliveMaxTimeout: 10,
+    }),
+  });
+};
+
+const { data } = await request("GET /users/{username}", {
+  username: "octocat",
+  headers: {
+    "X-GitHub-Api-Version": "2022-11-28",
+  },
+  options: {
+    request: {
+      fetch: myFetch,
+    },
+  },
+});
 ```
 
 ## LICENSE
