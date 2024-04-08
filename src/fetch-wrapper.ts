@@ -5,7 +5,10 @@ import type { EndpointInterface } from "@octokit/types";
 import getBuffer from "./get-buffer-response.js";
 
 export default function fetchWrapper(
-  requestOptions: ReturnType<EndpointInterface>,
+  requestOptions: ReturnType<EndpointInterface> & {
+    /** A string indicating whether request follows redirects, results in an error upon encountering a redirect, or returns the redirect (in an opaque fashion). Sets request's redirect. */
+    redirect?: RequestRedirect;
+  },
 ) {
   const log =
     requestOptions.request && requestOptions.request.log
@@ -39,7 +42,7 @@ export default function fetchWrapper(
   return fetch(requestOptions.url, {
     method: requestOptions.method,
     body: requestOptions.body,
-    redirect: requestOptions.request?.redirect,
+    redirect: requestOptions.redirect,
     // Header values must be `string`
     headers: Object.fromEntries(
       Object.entries(requestOptions.headers).map(([name, value]) => [
