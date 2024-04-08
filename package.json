@@ -1,8 +1,10 @@
 {
   "name": "@octokit/request",
   "version": "0.0.0-development",
+  "type": "module",
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "provenance": true
   },
   "description": "Send parameterized requests to GitHub's APIs with sensible defaults in browsers and Node",
   "scripts": {
@@ -10,7 +12,7 @@
     "lint": "prettier --check '{src,test}/**/*' README.md package.json",
     "lint:fix": "prettier --write '{src,test}/**/*' README.md package.json",
     "pretest": "npm run -s lint",
-    "test": "jest --coverage"
+    "test": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" npx jest --coverage"
   },
   "repository": "github:octokit/request.js",
   "keywords": [
@@ -22,37 +24,40 @@
   "author": "Gregor Martynus (https://github.com/gr2m)",
   "license": "MIT",
   "dependencies": {
-    "@octokit/endpoint": "^9.0.0",
-    "@octokit/request-error": "^5.0.0",
-    "@octokit/types": "^11.1.0",
-    "is-plain-object": "^5.0.0",
-    "universal-user-agent": "^6.0.0"
+    "@octokit/endpoint": "^10.0.0",
+    "@octokit/request-error": "^6.0.1",
+    "@octokit/types": "^12.0.0",
+    "universal-user-agent": "^7.0.2"
   },
   "devDependencies": {
     "@octokit/auth-app": "^6.0.0",
-    "@octokit/tsconfig": "^2.0.0",
+    "@octokit/tsconfig": "^3.0.0",
     "@types/fetch-mock": "^7.2.4",
     "@types/jest": "^29.0.0",
     "@types/lolex": "^5.1.0",
-    "@types/node": "^18.0.0",
+    "@types/node": "^20.0.0",
     "@types/once": "^1.4.0",
-    "esbuild": "^0.19.0",
-    "fetch-mock": "^9.3.1",
+    "@types/sinonjs__fake-timers": "^8.1.5",
+    "@sinonjs/fake-timers": "^11.2.2",
+    "esbuild": "^0.20.0",
+    "fetch-mock": "npm:@gr2m/fetch-mock@^9.11.0-pull-request-644.1",
     "glob": "^10.2.4",
     "jest": "^29.0.0",
-    "lolex": "^6.0.0",
-    "prettier": "3.0.3",
+    "prettier": "3.2.5",
     "semantic-release-plugin-update-version-in-files": "^1.0.0",
-    "string-to-arraybuffer": "^1.0.2",
     "ts-jest": "^29.0.0",
     "typescript": "^5.0.0"
   },
   "jest": {
+    "extensionsToTreatAsEsm": [
+      ".ts"
+    ],
     "transform": {
       "^.+\\.(ts|tsx)$": [
         "ts-jest",
         {
-          "tsconfig": "test/tsconfig.test.json"
+          "tsconfig": "test/tsconfig.test.json",
+          "useESM": true
         }
       ]
     },
@@ -66,7 +71,11 @@
     },
     "modulePathIgnorePatterns": [
       "<rootDir>/pkg"
-    ]
+    ],
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "^(.+)\\.jsx?$": "$1"
+    }
   },
   "release": {
     "branches": [

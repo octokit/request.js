@@ -1,20 +1,25 @@
-import fs from "fs";
-import stream, { Stream } from "stream";
+import fs from "node:fs";
+import stream from "node:stream";
+import { ReadableStream } from "node:stream/web";
 
 import { getUserAgent } from "universal-user-agent";
 import fetchMock from "fetch-mock";
 import { createAppAuth } from "@octokit/auth-app";
-import lolex from "lolex";
+import fakeTimers from "@sinonjs/fake-timers";
 import type {
   EndpointOptions,
   RequestInterface,
   ResponseHeaders,
 } from "@octokit/types";
 
-import { request } from "../src";
+import { request } from "../src/index.ts";
+import { jest } from "@jest/globals";
 
 const userAgent = `octokit-request.js/0.0.0-development ${getUserAgent()}`;
-const stringToArrayBuffer = require("string-to-arraybuffer");
+const __filename = new URL(import.meta.url);
+function stringToArrayBuffer(str: string) {
+  return new TextEncoder().encode(str).buffer;
+}
 
 describe("request()", () => {
   it("is a function", () => {
@@ -68,7 +73,7 @@ describe("request()", () => {
   });
 
   it("README authentication example", async () => {
-    const clock = lolex.install({
+    const clock = fakeTimers.install({
       now: 0,
       toFake: ["Date"],
     });
@@ -400,6 +405,33 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     );
   });
 
+  it("error response with no body (octokit/request.js#649)", () => {
+    const mock = fetchMock
+      .sandbox()
+      .get("path:/repos/octokit-fixture-org/hello-world/contents/README.md", {
+        status: 500,
+        body: "",
+        headers: {
+          "content-type": "application/json",
+        },
+      });
+
+    expect(request).not.toThrow();
+    return request("GET /repos/{owner}/{repo}/contents/{path}", {
+      headers: {
+        accept: "content-type: application/json",
+      },
+      owner: "octokit-fixture-org",
+      repo: "hello-world",
+      path: "README.md",
+      request: {
+        fetch: mock,
+      },
+    }).catch((error) => {
+      expect(error.response.data).toEqual("");
+    });
+  });
+
   it("non-JSON response", () => {
     const mock = fetchMock
       .sandbox()
@@ -436,6 +468,48 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
 
       .catch((error) => {
         expect(error.status).toEqual(500);
+      });
+  });
+
+  it("Request TypeError error with an Error cause", () => {
+    const mock = fetchMock.sandbox().get("https://127.0.0.1:8/", {
+      throws: Object.assign(new TypeError("fetch failed"), {
+        cause: new Error("bad"),
+      }),
+    });
+
+    // port: 8 // officially unassigned port. See https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
+    return request("GET https://127.0.0.1:8/", {
+      request: {
+        fetch: mock,
+      },
+    })
+      .then(() => {
+        throw new Error("should not resolve");
+      })
+      .catch((error) => {
+        expect(error.status).toEqual(500);
+        expect(error.message).toEqual("bad");
+      });
+  });
+
+  it("Request TypeError error with a string cause", () => {
+    const mock = fetchMock.sandbox().get("https://127.0.0.1:8/", {
+      throws: Object.assign(new TypeError("fetch failed"), { cause: "bad" }),
+    });
+
+    // port: 8 // officially unassigned port. See https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
+    return request("GET https://127.0.0.1:8/", {
+      request: {
+        fetch: mock,
+      },
+    })
+      .then(() => {
+        throw new Error("should not resolve");
+      })
+      .catch((error) => {
+        expect(error.status).toEqual(500);
+        expect(error.message).toEqual("bad");
       });
   });
 
@@ -739,7 +813,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       .catch((error) => {
         expect(error).toHaveProperty(
           "message",
-          `Validation failed: "Only organization repositories can have users and team restrictions", {"resource":"Search","field":"q","code":"invalid"}`,
+          `Validation failed: "Only organization repositories can have users and team restrictions", {"resource":"Search","field":"q","code":"invalid"} - https://developer.github.com/v3/repos/branches/#update-branch-protection`,
         );
       });
   });
@@ -976,25 +1050,6 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
   });
 
   it("bubbles up AbortError if the request is aborted", () => {
-    // AbortSignal and AbortController do not exist on
-    // Node < 15. The main parts of their API have been
-    // reproduced in the mocks below.
-    class AbortSignal {
-      abort = () => {
-        const e = new Error("");
-        e.name = "AbortError";
-        throw e;
-      };
-
-      addEventListener = () => {};
-    }
-
-    class AbortController {
-      abort = () => {
-        this.signal.abort();
-      };
-      signal = new AbortSignal();
-    }
     const abortController = new AbortController();
     const mock = fetchMock.sandbox().post(
       "https://api.github.com/repos/octokit-fixture-org/release-assets/releases/tags/v1.0.0",
@@ -1048,7 +1103,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     }).then((response) => {
       expect(response.status).toEqual(200);
       expect(response.headers["content-type"]).toEqual("application/x-gzip");
-      expect(response.data).toBeInstanceOf(Stream);
+      expect(response.data).toBeInstanceOf(ReadableStream);
       expect(mock.done()).toBe(true);
     });
   });

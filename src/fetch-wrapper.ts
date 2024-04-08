@@ -1,8 +1,8 @@
-import { isPlainObject } from "is-plain-object";
+import { isPlainObject } from "./is-plain-object.js";
 import { RequestError } from "@octokit/request-error";
 import type { EndpointInterface } from "@octokit/types";
 
-import getBuffer from "./get-buffer-response";
+import getBuffer from "./get-buffer-response.js";
 
 export default function fetchWrapper(
   requestOptions: ReturnType<EndpointInterface>,
@@ -40,7 +40,13 @@ export default function fetchWrapper(
     method: requestOptions.method,
     body: requestOptions.body,
     redirect: requestOptions.request?.redirect,
-    headers: requestOptions.headers as HeadersInit,
+    // Header values must be `string`
+    headers: Object.fromEntries(
+      Object.entries(requestOptions.headers).map(([name, value]) => [
+        name,
+        String(value),
+      ]),
+    ),
     signal: requestOptions.request?.signal,
     // duplex must be set if request.body is ReadableStream or Async Iterables.
     // See https://fetch.spec.whatwg.org/#dom-requestinit-duplex.
@@ -132,7 +138,20 @@ export default function fetchWrapper(
       if (error instanceof RequestError) throw error;
       else if (error.name === "AbortError") throw error;
 
-      throw new RequestError(error.message, 500, {
+      let message = error.message;
+
+      // undici throws a TypeError for network errors
+      // and puts the error message in `error.cause`
+      // https://github.com/nodejs/undici/blob/e5c9d703e63cd5ad691b8ce26e3f9a81c598f2e3/lib/fetch/index.js#L227
+      if (error.name === "TypeError" && "cause" in error) {
+        if (error.cause instanceof Error) {
+          message = error.cause.message;
+        } else if (typeof error.cause === "string") {
+          message = error.cause;
+        }
+      }
+
+      throw new RequestError(message, 500, {
         request: requestOptions,
       });
     });
@@ -141,7 +160,17 @@ export default function fetchWrapper(
 async function getResponseData(response: Response) {
   const contentType = response.headers.get("content-type");
   if (/application\/json/.test(contentType!)) {
-    return response.json();
+    return (
+      response
+        .json()
+        // In the event that we get an empty response body we fallback to
+        // using .text(), but this should be investigated since if this were
+        // to occur in the GitHub API it really should not return an empty body.
+        .catch(() => response.text())
+        // `node-fetch` is throwing a "body used already for" error if `.text()` is run
+        // after a failed .json(). To account for that we fallback to an empty string
+        .catch(() => "")
+    );
   }
 
   if (!contentType || /^text\/|charset=utf-8$/.test(contentType)) {
@@ -154,13 +183,22 @@ async function getResponseData(response: Response) {
 function toErrorMessage(data: any) {
   if (typeof data === "string") return data;
 
+  let suffix: string;
+
+  // istanbul ignore else - just in case
+  if ("documentation_url" in data) {
+    suffix = ` - ${data.documentation_url}`;
+  } else {
+    suffix = "";
+  }
+
   // istanbul ignore else - just in case
   if ("message" in data) {
     if (Array.isArray(data.errors)) {
-      return `${data.message}: ${data.errors.map(JSON.stringify).join(", ")}`;
+      return `${data.message}: ${data.errors.map(JSON.stringify).join(", ")}${suffix}`;
     }
 
-    return data.message;
+    return `${data.message}${suffix}`;
   }
 
   // istanbul ignore next - just in case
