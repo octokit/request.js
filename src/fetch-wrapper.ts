@@ -39,6 +39,7 @@ export default function fetchWrapper(
   return fetch(requestOptions.url, {
     method: requestOptions.method,
     body: requestOptions.body,
+    redirect: requestOptions.request?.redirect,
     // Header values must be `string`
     headers: Object.fromEntries(
       Object.entries(requestOptions.headers).map(([name, value]) => [
