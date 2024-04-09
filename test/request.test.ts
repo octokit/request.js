@@ -1117,7 +1117,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     return request("/", {
       request: {
         redirect: "manual",
-        fetch: customFetch
+        fetch: customFetch,
       },
     });
   });
