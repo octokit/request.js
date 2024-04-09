@@ -1122,4 +1122,18 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       expect(mock.done()).toBe(true);
     });
   });
+
+  it("request should pass the `redirect` option to fetch", () => {
+    const customFetch = async (url: string, options: RequestInit) => {
+      expect(options.redirect).toEqual("manual");
+      return await fetch(url, options);
+    };
+
+    return request("/", {
+      request: {
+        redirect: "manual",
+        fetch: customFetch,
+      },
+    });
+  });
 });

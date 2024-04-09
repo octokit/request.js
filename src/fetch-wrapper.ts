@@ -39,6 +39,7 @@ export default function fetchWrapper(
   return fetch(requestOptions.url, {
     method: requestOptions.method,
     body: requestOptions.body,
+    redirect: requestOptions.request?.redirect,
     headers: requestOptions.headers as HeadersInit,
     signal: requestOptions.request?.signal,
     // duplex must be set if request.body is ReadableStream or Async Iterables.
