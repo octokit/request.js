@@ -1,6 +1,6 @@
 import esbuild from "esbuild";
-import { copyFile, readFile, writeFile, rm } from "node:fs/promises";
-import { glob } from "glob";
+import { sep } from "node:path";
+import { copyFile, readFile, writeFile, rm, readdir } from "node:fs/promises";
 
 const sharedOptions = {
   sourcemap: "external",
@@ -10,12 +10,24 @@ const sharedOptions = {
   packages: "external",
 };
 
+async function listFiles(dir) {
+  const dirents = await readdir(dir, { withFileTypes: true });
+  const files = await Promise.all(dirents.map((dirent) => {
+    const res = dirent.name;
+    return dirent.isDirectory() ? listFiles(dir + sep + res) : dirent.path + sep + res;
+  }
+  ));
+
+  return Array.prototype.concat(...files);
+}
+
+
 async function main() {
   // Start with a clean slate
   await rm("pkg", { recursive: true, force: true });
   // Build the source code for a neutral platform as ESM
   await esbuild.build({
-    entryPoints: await glob(["./src/*.ts", "./src/**/*.ts"]),
+    entryPoints: (await listFiles("src")).filter((file) => file.endsWith(".ts")),
     outdir: "pkg/dist-src",
     bundle: false,
     platform: "neutral",
@@ -23,15 +35,6 @@ async function main() {
     ...sharedOptions,
     sourcemap: false,
   });
-
-  // Remove the types file from the dist-src folder
-  const typeFiles = await glob([
-    "./pkg/dist-src/**/types.js.map",
-    "./pkg/dist-src/**/types.js",
-  ]);
-  for (const typeFile of typeFiles) {
-    await rm(typeFile);
-  }
 
   const entryPoints = ["./pkg/dist-src/index.js"];
 
