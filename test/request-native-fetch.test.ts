@@ -7,11 +7,7 @@ import { describe, it, expect, vi } from "vitest";
 import { getUserAgent } from "universal-user-agent";
 import fetchMock from "fetch-mock";
 import { createAppAuth } from "@octokit/auth-app";
-import type {
-  EndpointOptions,
-  RequestInterface,
-  ResponseHeaders,
-} from "@octokit/types";
+import type { EndpointOptions, RequestInterface } from "@octokit/types";
 
 import mockRequestHttpServer from "./mockRequestHttpServer.ts";
 import { request } from "../src/index.ts";
@@ -413,6 +409,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       res.writeHead(404);
       res.end();
     });
+
     try {
       await request("GET /orgs/{org}", {
         org: "nope",
@@ -449,54 +446,57 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     },
   );
 
-  it(
-    "error response with no body (octokit/request.js#649)",
-    { skip: true },
-    async () => {
-      expect.assertions(1);
+  it("error response with no body (octokit/request.js#649)", async () => {
+    expect.assertions(5);
 
-      const mock = fetchMock
-        .sandbox()
-        .get("path:/repos/octokit-fixture-org/hello-world/contents/README.md", {
-          status: 500,
-          body: "",
-          headers: {
-            "content-type": "application/json",
-          },
-        });
+    const request = await mockRequestHttpServer((req, res) => {
+      expect(req.method).toBe("GET");
+      expect(req.url).toBe(
+        "/repos/octokit-fixture-org/hello-world/contents/README.md",
+      );
+      expect(req.headers.accept).toBe("content-type: application/json");
+      expect(req.headers["user-agent"]).toBe(userAgent);
 
-      try {
-        await request("GET /repos/{owner}/{repo}/contents/{path}", {
-          headers: {
-            accept: "content-type: application/json",
-          },
-          owner: "octokit-fixture-org",
-          repo: "hello-world",
-          path: "README.md",
-          request: {
-            fetch: mock,
-          },
-        });
-        throw new Error("should not resolve");
-      } catch (error) {
-        expect(error.response.data).toBe("");
-      }
-    },
-  );
-
-  it("non-JSON response", { skip: true }, async () => {
-    expect.assertions(1);
-
-    const mock = fetchMock
-      .sandbox()
-      .get("path:/repos/octokit-fixture-org/hello-world/contents/README.md", {
-        status: 200,
-        body: "# hello-world",
-        headers: {
-          "content-length": "13",
-          "content-type": "application/vnd.github.v3.raw; charset=utf-8",
-        },
+      res.writeHead(500, {
+        "content-type": "application/json",
       });
+      res.end("");
+    });
+
+    try {
+      await request("GET /repos/{owner}/{repo}/contents/{path}", {
+        headers: {
+          accept: "content-type: application/json",
+        },
+        owner: "octokit-fixture-org",
+        repo: "hello-world",
+        path: "README.md",
+      });
+      throw new Error("should not resolve");
+    } catch (error) {
+      expect(error.response.data).toBe("");
+    } finally {
+      request.closeMockServer();
+    }
+  });
+
+  it("non-JSON response", async () => {
+    expect.assertions(5);
+
+    const request = await mockRequestHttpServer((req, res) => {
+      expect(req.method).toBe("GET");
+      expect(req.url).toBe(
+        "/repos/octokit-fixture-org/hello-world/contents/README.md",
+      );
+      expect(req.headers.accept).toBe("application/vnd.github.v3.raw");
+      expect(req.headers["user-agent"]).toBe(userAgent);
+
+      res.writeHead(200, {
+        "content-length": "13",
+        "content-type": "application/vnd.github.v3.raw; charset=utf-8",
+      });
+      res.end("# hello-world");
+    });
 
     const response = await request(
       "GET /repos/{owner}/{repo}/contents/{path}",
@@ -507,9 +507,6 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         owner: "octokit-fixture-org",
         repo: "hello-world",
         path: "README.md",
-        request: {
-          fetch: mock,
-        },
       },
     );
     expect(response.data).toEqual("# hello-world");
@@ -577,20 +574,21 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     },
   );
 
-  it("custom user-agent", { skip: true }, async () => {
-    expect.assertions(1);
+  it("custom user-agent", async () => {
+    expect.assertions(3);
 
-    const mock = fetchMock.sandbox().get((_url, mockRequest) => {
-      expect(mockRequest.headers!["user-agent"]).toEqual("funky boom boom pow");
-      return true;
-    }, 200);
+    const request = await mockRequestHttpServer((req, res) => {
+      expect(req.method).toBe("GET");
+      expect(req.url).toBe("/");
+      expect(req.headers["user-agent"]).toBe("funky boom boom pow");
+
+      res.writeHead(200);
+      res.end("");
+    });
 
     await request("GET /", {
       headers: {
         "user-agent": "funky boom boom pow",
-      },
-      request: {
-        fetch: mock,
       },
     });
   });
