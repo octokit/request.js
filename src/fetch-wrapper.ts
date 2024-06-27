@@ -185,14 +185,12 @@ function toErrorMessage(data: any) {
 
   let suffix: string;
 
-  // istanbul ignore else - just in case
   if ("documentation_url" in data) {
     suffix = ` - ${data.documentation_url}`;
   } else {
     suffix = "";
   }
 
-  // istanbul ignore else - just in case
   if ("message" in data) {
     if (Array.isArray(data.errors)) {
       return `${data.message}: ${data.errors.map(JSON.stringify).join(", ")}${suffix}`;
@@ -201,6 +199,5 @@ function toErrorMessage(data: any) {
     return `${data.message}${suffix}`;
   }
 
-  // istanbul ignore next - just in case
   return `Unknown error: ${JSON.stringify(data)}`;
 }

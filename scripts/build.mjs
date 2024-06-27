@@ -1,3 +1,5 @@
+/* c8 ignore start */
+
 import esbuild from "esbuild";
 import { copyFile, readFile, writeFile, rm } from "node:fs/promises";
 import { glob } from "glob";
@@ -54,7 +56,7 @@ async function main() {
   delete pkg.scripts;
   delete pkg.prettier;
   delete pkg.release;
-  delete pkg.jest;
+
   await writeFile(
     "pkg/package.json",
     JSON.stringify(
