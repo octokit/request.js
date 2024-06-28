@@ -1,14 +1,14 @@
 import zlib from "node:zlib";
 import fs from "node:fs";
-import stream from "node:stream";
 import { ReadableStream } from "node:stream/web";
 
 import { describe, it, expect, vi } from "vitest";
 import { getUserAgent } from "universal-user-agent";
-import fetchMock from "fetch-mock";
+import fetchMock, { reset } from "fetch-mock";
 import { createAppAuth } from "@octokit/auth-app";
 import type { EndpointOptions, RequestInterface } from "@octokit/types";
 
+import bodyParser from "./body-parser.ts";
 import mockRequestHttpServer from "./mockRequestHttpServer.ts";
 import { request } from "../src/index.ts";
 
@@ -84,8 +84,8 @@ describe("request()", () => {
     expect(response.data).toEqual([]);
   });
 
-  it("README authentication example", { skip: true }, async () => {
-    expect.assertions(1);
+  it("README authentication example", async () => {
+    expect.assertions(12);
 
     vi.useFakeTimers({
       now: 0,
@@ -122,38 +122,75 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     // see https://runkit.com/gr2m/reproducable-jwt
     const BEARER =
       "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOi0zMCwiZXhwIjo1NzAsImlzcyI6MX0.q3foRa78U3WegM5PrWLEh5N0bH1SD62OqW66ZYzArp95JBNiCbo8KAlGtiRENCIfBZT9ibDUWy82cI4g3F09mdTq3bD1xLavIfmTksIQCz5EymTWR5v6gL14LSmQdWY9lSqkgUG0XCFljWUglEP39H4yeHbFgdjvAYg3ifDS12z9oQz2ACdSpvxPiTuCC804HkPVw8Qoy0OSXvCkFU70l7VXCVUxnuhHnk8-oCGcKUspmeP6UdDnXk-Aus-eGwDfJbU2WritxxaXw6B4a3flTPojkYLSkPBr6Pi0H2-mBsW_Nvs0aLPVLKobQd4gqTkosX3967DoAG8luUMhrnxe8Q";
-    const mock = fetchMock
-      .sandbox()
-      .postOnce("https://api.github.com/app/installations/123/access_tokens", {
-        token: "secret123",
-        expires_at: "1970-01-01T01:00:00.000Z",
-        permissions: {
-          metadata: "read",
-        },
-        repository_selection: "all",
-      })
-      .getOnce(
-        "https://api.github.com/app",
-        { id: 123 },
-        {
-          headers: {
-            accept: "application/vnd.github.v3+json",
-            "user-agent": userAgent,
-            authorization: `bearer ${BEARER}`,
-          },
-        },
-      )
-      .postOnce(
-        "https://api.github.com/repos/octocat/hello-world/issues",
-        { id: 456 },
-        {
-          headers: {
-            accept: "application/vnd.github.v3+json",
-            "user-agent": userAgent,
-            authorization: `token secret123`,
-          },
-        },
-      );
+
+    let called = 0;
+
+    const request = await mockRequestHttpServer((req, res) => {
+      switch (req.url) {
+        case "/app/installations/123/access_tokens":
+          {
+            expect(req.method).toBe("POST");
+            expect(req.headers.accept).toBe("application/vnd.github.v3+json");
+            expect(req.headers["user-agent"]).toBe(userAgent);
+
+            res.writeHead(200, {
+              "Content-Type": "application/json",
+            });
+            res.end(
+              JSON.stringify({
+                token: "secret123",
+                expires_at: "1970-01-01T01:00:00.000Z",
+                permissions: {
+                  metadata: "read",
+                },
+                repository_selection: "all",
+              }),
+            );
+            called += 0b1;
+          }
+          break;
+        case "/app":
+          {
+            expect(req.method).toBe("GET");
+            expect(req.headers.accept).toBe("application/vnd.github.v3+json");
+            expect(req.headers["user-agent"]).toBe(userAgent);
+            expect(req.headers.authorization).toBe(`bearer ${BEARER}`);
+
+            res.writeHead(200, {
+              "Content-Type": "application/json",
+            });
+            res.end(
+              JSON.stringify({
+                id: 123,
+              }),
+            );
+            called += 0b10;
+          }
+          break;
+        case "/repos/octocat/hello-world/issues":
+          {
+            expect(req.method).toBe("POST");
+            expect(req.headers.accept).toBe("application/vnd.github.v3+json");
+            expect(req.headers["user-agent"]).toBe(userAgent);
+            expect(req.headers.authorization).toBe(`token secret123`);
+
+            res.writeHead(200, {
+              "Content-Type": "application/json",
+            });
+            res.end(
+              JSON.stringify({
+                id: 456,
+              }),
+            );
+            called += 0b100;
+          }
+          break;
+        default:
+          res.writeHead(404);
+          res.end();
+      }
+    });
+
     const auth = createAppAuth({
       appId: APP_ID,
       privateKey: PRIVATE_KEY,
@@ -161,7 +198,6 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     });
     const requestWithAuth = request.defaults({
       request: {
-        fetch: mock,
         hook: auth.hook,
       },
     });
@@ -172,20 +208,27 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       title: "Hello from the engine room",
     });
 
-    expect(mock.done()).toBe(true);
+    expect(called).toBe(0b111);
     vi.useRealTimers();
   });
 
-  it("Request with body", { skip: true }, async () => {
-    expect.assertions(1);
+  it("Request with body", async () => {
+    expect.assertions(6);
 
-    const mock = fetchMock
-      .sandbox()
-      .mock("https://api.github.com/repos/octocat/hello-world/issues", 201, {
-        headers: {
-          "content-type": "application/json; charset=utf-8",
-        },
+    const request = await mockRequestHttpServer(async (req, res) => {
+      expect(req.method).toBe("POST");
+      expect(req.url).toBe("/repos/octocat/hello-world/issues");
+      expect(req.headers.accept).toBe("text/html;charset=utf-8");
+      expect(req.headers["user-agent"]).toBe(userAgent);
+      expect(await bodyParser(req)).toBe(
+        '{"title":"Found a bug","body":"I\'m having a problem with this.","assignees":["octocat"],"milestone":1,"labels":["bug"]}',
+      );
+
+      res.writeHead(201, {
+        "Content-Type": "application/json; charset=utf-8",
       });
+      res.end();
+    });
 
     const response = await request("POST /repos/{owner}/{repo}/issues", {
       owner: "octocat",
@@ -198,22 +241,27 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       assignees: ["octocat"],
       milestone: 1,
       labels: ["bug"],
-      request: {
-        fetch: mock,
-      },
     });
 
     expect(response.status).toEqual(201);
+
+    request.closeMockServer();
   });
 
-  it("Put without request body", { skip: true }, async () => {
-    expect.assertions(1);
+  it("Put without request body", async () => {
+    expect.assertions(5);
 
-    const mock = fetchMock
-      .sandbox()
-      .mock("https://api.github.com/user/starred/octocat/hello-world", 204, {
-        body: undefined,
-      });
+    const request = await mockRequestHttpServer(async (req, res) => {
+      expect(req.method).toBe("PUT");
+      expect(req.url).toBe("/user/starred/octocat/hello-world");
+      expect(req.headers.authorization).toBe(
+        "token 0000000000000000000000000000000000000001",
+      );
+      expect(await bodyParser(req)).toBe("");
+
+      res.writeHead(204);
+      res.end();
+    });
 
     const response = await request("PUT /user/starred/{owner}/{repo}", {
       headers: {
@@ -221,40 +269,45 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       },
       owner: "octocat",
       repo: "hello-world",
-      request: {
-        fetch: mock,
-      },
     });
     expect(response.status).toEqual(204);
   });
 
-  it("HEAD requests (octokit/rest.js#841)", { skip: true }, async () => {
-    expect.assertions(2);
+  it("HEAD requests (octokit/rest.js#841)", async () => {
+    expect.assertions(4);
 
-    const mock = fetchMock
-      .sandbox()
-      .head("https://api.github.com/repos/whatwg/html/pulls/1", {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json; charset=utf-8",
-          "Content-Length": "19137",
-        },
-      })
-      .head("https://api.github.com/repos/whatwg/html/pulls/2", {
-        status: 404,
-        headers: {
-          "Content-Type": "application/json; charset=utf-8",
-          "Content-Length": "120",
-        },
-      });
+    const request = await mockRequestHttpServer((req, res) => {
+      expect(req.method).toBe("HEAD");
+
+      switch (req.url) {
+        case "/repos/whatwg/html/pulls/1":
+          {
+            res.writeHead(200, {
+              "Content-Type": "application/json; charset=utf-8",
+              "Content-Length": "19137",
+            });
+          }
+          break;
+        case "/repos/whatwg/html/pulls/2":
+          {
+            res.writeHead(404, {
+              "Content-Type": "application/json; charset=utf-8",
+              "Content-Length": "120",
+            });
+          }
+          break;
+        default: {
+          res.writeHead(500);
+        }
+      }
+
+      res.end();
+    });
 
     const options = {
       owner: "whatwg",
       repo: "html",
       number: 1,
-      request: {
-        fetch: mock,
-      },
     };
 
     const response = await request(
@@ -302,38 +355,29 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     });
   });
 
-  it("Binary response", { skip: true }, async () => {
-    expect.assertions(5);
+  it("Binary response", async () => {
+    expect.assertions(9);
 
     const payload =
       "1f8b0800000000000003cb4f2ec9cfce2cd14dcbac28292d4ad5cd2f4ad74d4f2dd14d2c4acec82c4bd53580007d060a0050bfb9b9a90203c428741ac2313436343307222320dbc010a8dc5c81c194124b8905a5c525894540a714e5e797e05347481edd734304e41319ff41ae8e2ebeae7ab92964d801d46f66668227fe0d4d51e3dfc8d0c8d808284f75df6201233cfe951590627ba01d330a46c1281805a3806e000024cb59d6000a0000";
-    const mock = fetchMock
-      .sandbox()
-      .get(
-        "https://codeload.github.com/octokit-fixture-org/get-archive/legacy.tar.gz/master",
-        {
-          status: 200,
 
-          // expect(response.data.length).toEqual(172)
-          // body: Buffer.from('1f8b0800000000000003cb4f2ec9cfce2cd14dcbac28292d4ad5cd2f4ad74d4f2dd14d2c4acec82c4bd53580007d060a0050bfb9b9a90203c428741ac2313436343307222320dbc010a8dc5c81c194124b8905a5c525894540a714e5e797e05347481edd734304e41319ff41ae8e2ebeae7ab92964d801d46f66668227fe0d4d51e3dfc8d0c8d808284f75df6201233cfe951590627ba01d330a46c1281805a3806e000024cb59d6000a0000', 'hex'),
-          body: Buffer.from(
-            "1f8b0800000000000003cb4f2ec9cfce2cd14dcbac28292d4ad5cd2f4ad74d4f2dd14d2c4acec82c4bd53580007d060a0050bfb9b9a90203c428741ac2313436343307222320dbc010a8dc5c81c194124b8905a5c525894540a714e5e797e05347481edd734304e41319ff41ae8e2ebeae7ab92964d801d46f66668227fe0d4d51e3dfc8d0c8d808284f75df6201233cfe951590627ba01d330a46c1281805a3806e000024cb59d6000a0000",
-            "hex",
-          ),
-          headers: {
-            "content-type": "application/x-gzip",
-            "content-length": "172",
-          },
-        },
+    const request = await mockRequestHttpServer((req, res) => {
+      expect(req.method).toBe("GET");
+      expect(req.url).toBe(
+        "/octokit-fixture-org/get-archive/legacy.tar.gz/master",
       );
+      expect(req.headers.accept).toBe("application/vnd.github.v3+json");
+      expect(req.headers["user-agent"]).toBe(userAgent);
+
+      res.writeHead(200, {
+        "content-type": "application/x-gzip",
+        "content-length": "172",
+      });
+      res.end(Buffer.from(payload, "hex"));
+    });
 
     const response = await request(
-      "GET https://codeload.github.com/octokit-fixture-org/get-archive/legacy.tar.gz/master",
-      {
-        request: {
-          fetch: mock,
-        },
-      },
+      `GET ${request.baseUrlMockServer}/octokit-fixture-org/get-archive/legacy.tar.gz/master`,
     );
 
     expect(response.headers["content-type"]).toEqual("application/x-gzip");
@@ -917,112 +961,110 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     );
   });
 
-  it(
-    "logs deprecation warning if `deprecation` header is present",
-    { skip: true },
-    async () => {
-      expect.assertions(3);
+  it("logs deprecation warning if `deprecation` header is present", async () => {
+    expect.assertions(8);
 
-      const mock = fetchMock.sandbox().mock(
-        "https://api.github.com/teams/123",
-        {
-          body: {
-            id: 123,
-          },
-          headers: {
-            deprecation: "Sat, 01 Feb 2020 00:00:00 GMT",
-            sunset: "Mon, 01 Feb 2021 00:00:00 GMT",
-            link: '<https://developer.github.com/changes/2020-01-21-moving-the-team-api-endpoints/>; rel="deprecation"; type="text/html", <https://api.github.com/organizations/3430433/team/4177875>; rel="alternate"',
-          },
-        },
-        {
-          headers: {
-            accept: "application/vnd.github.v3+json",
-            authorization: "token 0000000000000000000000000000000000000001",
-            "user-agent": userAgent,
-          },
-        },
+    const request = await mockRequestHttpServer(async (req, res) => {
+      expect(req.method).toBe("GET");
+      expect(req.url).toBe("/teams/123");
+      expect(req.headers.accept).toBe("application/vnd.github.v3+json");
+      expect(req.headers.authorization).toBe(
+        "token 0000000000000000000000000000000000000001",
       );
+      expect(req.headers["user-agent"]).toBe(userAgent);
 
-      const warn = vi.fn();
-
-      const response = await request("GET /teams/{team_id}", {
-        headers: {
-          authorization: "token 0000000000000000000000000000000000000001",
-        },
-        team_id: 123,
-        request: { fetch: mock, log: { warn } },
+      res.writeHead(200, {
+        "content-type": "application/json",
+        deprecation: "Sat, 01 Feb 2020 00:00:00 GMT",
+        sunset: "Mon, 01 Feb 2021 00:00:00 GMT",
+        link: '<https://developer.github.com/changes/2020-01-21-moving-the-team-api-endpoints/>; rel="deprecation"; type="text/html", <https://api.github.com/organizations/3430433/team/4177875>; rel="alternate"',
       });
-      expect(response.data).toEqual({ id: 123 });
-      expect(warn).toHaveBeenCalledTimes(1);
-      expect(warn).toHaveBeenCalledWith(
-        '[@octokit/request] "GET https://api.github.com/teams/123" is deprecated. It is scheduled to be removed on Mon, 01 Feb 2021 00:00:00 GMT. See https://developer.github.com/changes/2020-01-21-moving-the-team-api-endpoints/',
+      res.end(
+        JSON.stringify({
+          id: 123,
+        }),
       );
-    },
-  );
+    });
 
-  it(
-    "deprecation header without deprecation link",
-    { skip: true },
-    async () => {
-      const mock = fetchMock.sandbox().mock(
-        "https://api.github.com/teams/123",
-        {
-          body: {
-            id: 123,
-          },
-          headers: {
-            deprecation: "Sat, 01 Feb 2020 00:00:00 GMT",
-            sunset: "Mon, 01 Feb 2021 00:00:00 GMT",
-          },
-        },
-        {
-          headers: {
-            accept: "application/vnd.github.v3+json",
-            authorization: "token 0000000000000000000000000000000000000001",
-            "user-agent": userAgent,
-          },
-        },
+    let calledWarn = 0;
+    const warn = (message: string) => {
+      expect(++calledWarn).toBe(1);
+      expect(message).toBe(
+        `[@octokit/request] "GET ${request.baseUrlMockServer}/teams/123" is deprecated. It is scheduled to be removed on Mon, 01 Feb 2021 00:00:00 GMT. See https://developer.github.com/changes/2020-01-21-moving-the-team-api-endpoints/`,
       );
+    };
 
-      const warn = vi.fn();
+    const response = await request("GET /teams/{team_id}", {
+      headers: {
+        authorization: "token 0000000000000000000000000000000000000001",
+      },
+      team_id: 123,
+      request: { log: { warn } },
+    });
+    expect(response.data).toEqual({ id: 123 });
+  });
 
-      const response = await request("GET /teams/{team_id}", {
-        headers: {
-          authorization: "token 0000000000000000000000000000000000000001",
-        },
-        team_id: 123,
-        request: { fetch: mock, log: { warn } },
+  it("deprecation header without deprecation link", async () => {
+    expect.assertions(8);
+
+    const request = await mockRequestHttpServer(async (req, res) => {
+      expect(req.method).toBe("GET");
+      expect(req.url).toBe("/teams/123");
+      expect(req.headers.accept).toBe("application/vnd.github.v3+json");
+      expect(req.headers.authorization).toBe(
+        "token 0000000000000000000000000000000000000001",
+      );
+      expect(req.headers["user-agent"]).toBe(userAgent);
+
+      res.writeHead(200, {
+        "content-type": "application/json",
+        deprecation: "Sat, 01 Feb 2020 00:00:00 GMT",
+        sunset: "Mon, 01 Feb 2021 00:00:00 GMT",
       });
-      expect(response.data).toEqual({ id: 123 });
-      expect(warn).toHaveBeenCalledTimes(1);
-      expect(warn).toHaveBeenCalledWith(
-        '[@octokit/request] "GET https://api.github.com/teams/123" is deprecated. It is scheduled to be removed on Mon, 01 Feb 2021 00:00:00 GMT',
+      res.end(
+        JSON.stringify({
+          id: 123,
+        }),
       );
-    },
-  );
+    });
+
+    let calledWarn = 0;
+    const warn = (message: string) => {
+      expect(++calledWarn).toBe(1);
+      expect(message).toBe(
+        `[@octokit/request] "GET ${request.baseUrlMockServer}/teams/123" is deprecated. It is scheduled to be removed on Mon, 01 Feb 2021 00:00:00 GMT`,
+      );
+    };
+
+    const response = await request("GET /teams/{team_id}", {
+      headers: {
+        authorization: "token 0000000000000000000000000000000000000001",
+      },
+      team_id: 123,
+      request: { log: { warn } },
+    });
+    expect(response.data).toEqual({ id: 123 });
+  });
 
   it("404 not found", { skip: true }, async () => {
     expect.assertions(3);
 
-    const mock = fetchMock
-      .sandbox()
-      .get("https://api.github.com/repos/octocat/unknown", {
-        status: 404,
-        headers: {},
-        body: {
+    const request = await mockRequestHttpServer(async (req, res) => {
+      expect(req.method).toBe("GET");
+      expect(req.url).toBe("/repos/octocat/unknown");
+
+      res.writeHead(404);
+      res.end(
+        JSON.stringify({
           message: "Not Found",
           documentation_url:
             "https://docs.github.com/en/rest/reference/repos#get-a-repository",
-        },
-      });
+        }),
+      );
+    });
 
     try {
-      await request("GET /repos/octocat/unknown", {
-        request: {
-          fetch: mock,
-        },
-      });
+      await request("GET /repos/octocat/unknown");
       throw new Error("Should have thrown");
     } catch (error) {
       expect(error.status).toEqual(404);
@@ -1034,33 +1076,23 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
   });
 
   it("Request timeout", { skip: true }, async () => {
-    expect.assertions(3);
+    expect.assertions(4);
 
-    const delay = (millis = 3000) => {
-      return new Promise((resolve) => {
-        setTimeout(resolve, millis);
-      });
-    };
+    const request = await mockRequestHttpServer(async (req, res) => {
+      expect(req.method).toBe("GET");
+      expect(req.url).toBe("/");
 
-    const mock = (url: string) => {
-      expect(url).toEqual("https://api.github.com/");
-      return delay().then(() => {
-        return {
-          status: 200,
-          headers: {},
-          body: {
-            message: "OK",
-          },
-        };
-      });
-    };
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+      res.writeHead(200);
+      res.end(
+        JSON.stringify({
+          message: "OK",
+        }),
+      );
+    });
 
     try {
-      await request("GET /", {
-        request: {
-          fetch: mock,
-        },
-      });
+      await request("GET /");
       throw new Error("should not resolve");
     } catch (error) {
       expect(error.name).toEqual("HttpError");
@@ -1068,18 +1100,27 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     }
   });
 
-  it("validate request with readstream data", { skip: true }, async () => {
-    expect.assertions(3);
+  it("validate request with readstream data", async () => {
+    expect.assertions(6);
 
     const size = fs.statSync(__filename).size;
-    const mock = fetchMock
-      .sandbox()
-      .post(
-        "https://api.github.com/repos/octokit-fixture-org/release-assets/releases/v1.0.0/assets",
-        {
-          status: 200,
-        },
+
+    const request = await mockRequestHttpServer(async (req, res) => {
+      expect(req.method).toBe("POST");
+      expect(req.url).toBe(
+        "/repos/octokit-fixture-org/release-assets/releases/v1.0.0/assets",
       );
+      expect(req.headers["content-type"]).toBe("text/json");
+      expect(req.headers["content-length"]).toBe(size.toString());
+
+      expect(
+        await bodyParser(req),
+        fs.readFileSync(__filename).toString("ascii"),
+      );
+
+      res.writeHead(200);
+      res.end();
+    });
 
     const response = await request(
       "POST /repos/{owner}/{repo}/releases/{release_id}/assets",
@@ -1087,9 +1128,6 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         owner: "octokit-fixture-org",
         repo: "release-assets",
         release_id: "v1.0.0",
-        request: {
-          fetch: mock,
-        },
         headers: {
           "content-type": "text/json",
           "content-length": size,
@@ -1100,88 +1138,74 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       },
     );
     expect(response.status).toEqual(200);
-    expect(mock.lastOptions()?.body).toBeInstanceOf(stream.Readable);
-    expect(mock.done()).toBe(true);
   });
 
-  it(
-    "validate request with data set to Buffer type",
-    { skip: true },
-    async () => {
-      expect.assertions(3);
+  it("validate request with data set to Buffer type", async () => {
+    expect.assertions(5);
 
-      const mock = fetchMock
-        .sandbox()
-        .post(
-          "https://api.github.com/repos/octokit-fixture-org/release-assets/releases/tags/v1.0.0",
-          {
-            status: 200,
-          },
-        );
+    const request = await mockRequestHttpServer(async (req, res) => {
+      expect(req.method).toBe("POST");
+      expect(req.url).toBe(
+        "/repos/octokit-fixture-org/release-assets/releases/tags/v1.0.0",
+      );
+      expect(req.headers["content-type"]).toBe("text/plain");
 
-      const response = await request(
-        "POST /repos/{owner}/{repo}/releases/tags/{tag}",
-        {
-          owner: "octokit-fixture-org",
-          repo: "release-assets",
-          tag: "v1.0.0",
-          request: {
-            fetch: mock,
-          },
-          headers: {
-            "content-type": "text/plain",
-          },
-          data: Buffer.from("Hello, world!\n"),
-          name: "test-upload.txt",
-          label: "test",
+      expect(await bodyParser(req), "Hello, world!\n");
+
+      res.writeHead(200);
+      res.end();
+    });
+
+    const response = await request(
+      "POST /repos/{owner}/{repo}/releases/tags/{tag}",
+      {
+        owner: "octokit-fixture-org",
+        repo: "release-assets",
+        tag: "v1.0.0",
+        headers: {
+          "content-type": "text/plain",
         },
+        data: Buffer.from("Hello, world!\n"),
+        name: "test-upload.txt",
+        label: "test",
+      },
+    );
+    expect(response.status).toEqual(200);
+  });
+
+  it("validate request with data set to ArrayBuffer type", async () => {
+    expect.assertions(5);
+
+    const request = await mockRequestHttpServer(async (req, res) => {
+      expect(req.method).toBe("POST");
+      expect(req.url).toBe(
+        "/repos/octokit-fixture-org/release-assets/releases/tags/v1.0.0",
       );
-      expect(response.status).toEqual(200);
-      expect(mock.lastOptions()?.body).toEqual(Buffer.from("Hello, world!\n"));
-      expect(mock.done()).toBe(true);
-    },
-  );
+      expect(req.headers["content-type"]).toBe("text/plain");
 
-  it(
-    "validate request with data set to ArrayBuffer type",
-    { skip: true },
-    async () => {
-      expect.assertions(3);
+      expect(await bodyParser(req), "Hello, world!\n");
 
-      const mock = fetchMock
-        .sandbox()
-        .post(
-          "https://api.github.com/repos/octokit-fixture-org/release-assets/releases/tags/v1.0.0",
-          {
-            status: 200,
-          },
-        );
+      res.writeHead(200);
+      res.end();
+    });
 
-      const response = await request(
-        "POST /repos/{owner}/{repo}/releases/tags/{tag}",
-        {
-          owner: "octokit-fixture-org",
-          repo: "release-assets",
-          tag: "v1.0.0",
-          request: {
-            fetch: mock,
-          },
-          headers: {
-            "content-type": "text/plain",
-          },
-          data: stringToArrayBuffer("Hello, world!\n"),
-          name: "test-upload.txt",
-          label: "test",
+    const response = await request(
+      "POST /repos/{owner}/{repo}/releases/tags/{tag}",
+      {
+        owner: "octokit-fixture-org",
+        repo: "release-assets",
+        tag: "v1.0.0",
+        headers: {
+          "content-type": "text/plain",
         },
-      );
+        data: stringToArrayBuffer("Hello, world!\n"),
+        name: "test-upload.txt",
+        label: "test",
+      },
+    );
 
-      expect(response.status).toEqual(200);
-      expect(mock.lastOptions()?.body).toEqual(
-        stringToArrayBuffer("Hello, world!\n"),
-      );
-      expect(mock.done()).toBe(true);
-    },
-  );
+    expect(response.status).toEqual(200);
+  });
 
   it("bubbles up AbortError if the request is aborted", async () => {
     expect.assertions(3);
