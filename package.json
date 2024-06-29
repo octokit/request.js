@@ -33,11 +33,10 @@
   "devDependencies": {
     "@octokit/auth-app": "^7.0.0",
     "@octokit/tsconfig": "^3.0.0",
-    "@types/fetch-mock": "^7.2.4",
     "@types/node": "^20.0.0",
     "@vitest/coverage-v8": "^1.6.0",
     "esbuild": "^0.21.0",
-    "fetch-mock": "npm:@gr2m/fetch-mock@^9.11.0-pull-request-644.1",
+    "fetch-mock": "^10.0.0",
     "glob": "^10.2.4",
     "prettier": "3.3.2",
     "semantic-release-plugin-update-version-in-files": "^1.0.0",
