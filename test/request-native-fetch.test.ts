@@ -4,7 +4,7 @@ import { ReadableStream } from "node:stream/web";
 
 import { describe, it, expect, vi } from "vitest";
 import { getUserAgent } from "universal-user-agent";
-import fetchMock, { reset } from "fetch-mock";
+import fetchMock from "fetch-mock";
 import { createAppAuth } from "@octokit/auth-app";
 import type { EndpointOptions, RequestInterface } from "@octokit/types";
 
@@ -468,28 +468,6 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     }
   });
 
-  it(
-    "should error when globalThis.fetch is undefined",
-    { skip: true },
-    async () => {
-      expect.assertions(1);
-
-      const originalFetch = globalThis.fetch;
-      // @ts-expect-error force undefined to mimic older node version
-      globalThis.fetch = undefined;
-
-      try {
-        await request("GET /orgs/me");
-      } catch (error) {
-        expect(error.message).toEqual(
-          "fetch is not set. Please pass a fetch implementation as new Octokit({ request: { fetch }}). Learn more at https://github.com/octokit/octokit.js/#fetch-missing",
-        );
-      } finally {
-        globalThis.fetch = originalFetch;
-      }
-    },
-  );
-
   it("error response with no body (octokit/request.js#649)", async () => {
     expect.assertions(5);
 
@@ -555,68 +533,6 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     );
     expect(response.data).toEqual("# hello-world");
   });
-
-  it("Request error", { skip: true }, async () => {
-    expect.assertions(1);
-
-    // port: 8 // officially unassigned port. See https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
-    await expect(request("GET https://127.0.0.1:8/")).rejects.toHaveProperty(
-      "status",
-      500,
-    );
-  });
-
-  it(
-    "Request TypeError error with an Error cause",
-    { skip: true },
-    async () => {
-      expect.assertions(2);
-
-      const mock = fetchMock.sandbox().get("https://127.0.0.1:8/", {
-        throws: Object.assign(new TypeError("fetch failed"), {
-          cause: new Error("bad"),
-        }),
-      });
-
-      try {
-        // port: 8 // officially unassigned port. See https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
-        await request("GET https://127.0.0.1:8/", {
-          request: {
-            fetch: mock,
-          },
-        });
-        throw new Error("should not resolve");
-      } catch (error) {
-        expect(error.status).toEqual(500);
-        expect(error.message).toEqual("bad");
-      }
-    },
-  );
-
-  it(
-    "Request TypeError error with a string cause",
-    { skip: true },
-    async () => {
-      expect.assertions(2);
-
-      const mock = fetchMock.sandbox().get("https://127.0.0.1:8/", {
-        throws: Object.assign(new TypeError("fetch failed"), { cause: "bad" }),
-      });
-
-      try {
-        // port: 8 // officially unassigned port. See https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
-        await request("GET https://127.0.0.1:8/", {
-          request: {
-            fetch: mock,
-          },
-        });
-        throw new Error("should not resolve");
-      } catch (error) {
-        expect(error.status).toEqual(500);
-        expect(error.message).toEqual("bad");
-      }
-    },
-  );
 
   it("custom user-agent", async () => {
     expect.assertions(3);
@@ -759,44 +675,6 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     request.closeMockServer();
   });
 
-  it("Resolves with url", { skip: true }, async () => {
-    expect.assertions(1);
-
-    // this test cannot be mocked with `fetch-mock`. I don’t like to rely on
-    // external websites to run tests, but in this case I’ll make an exception.
-    // The alternative would be to start a local server we then send a request to,
-    // this would only work in Node, so we would need to adapt the test setup, too.
-    // We also can’t test the GitHub API, because on Travis unauthenticated
-    // GitHub API requests are usually blocked due to IP rate limiting
-    const response = await request(
-      "https://www.githubstatus.com/api/v2/status.json",
-    );
-    expect(response.url).toEqual(
-      "https://www.githubstatus.com/api/v2/status.json",
-    );
-  });
-
-  it("options.request.fetch", { skip: true }, async () => {
-    expect.assertions(1);
-
-    const response = await request("/", {
-      request: {
-        fetch: () =>
-          Promise.resolve({
-            status: 200,
-            headers: new Headers({
-              "Content-Type": "application/json; charset=utf-8",
-            }),
-            url: "http://api.github.com/",
-            json() {
-              return Promise.resolve("funk");
-            },
-          }),
-      },
-    });
-    expect(response.data).toEqual("funk");
-  });
-
   it("options.request.hook", async () => {
     expect.assertions(7);
 
@@ -848,18 +726,18 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     expect(response.data).toEqual({ ok: true });
   });
 
-  it("options.mediaType.format", { skip: true }, async () => {
-    expect.assertions(1);
+  it("options.mediaType.format", async () => {
+    expect.assertions(5);
 
-    const mock = fetchMock
-      .sandbox()
-      .mock("https://api.github.com/repos/octokit/request.js/issues/1", "ok", {
-        headers: {
-          accept: "application/vnd.github.v3.raw+json",
-          authorization: "token 0000000000000000000000000000000000000001",
-          "user-agent": userAgent,
-        },
-      });
+    const request = await mockRequestHttpServer((req, res) => {
+      expect(req.method).toBe("GET");
+      expect(req.url).toBe("/repos/octokit/request.js/issues/1");
+      expect(req.headers.accept).toBe("application/vnd.github.v3.raw+json");
+      expect(req.headers["user-agent"]).toBe(userAgent);
+
+      res.writeHead(200);
+      res.end("ok");
+    });
 
     const response = await request(
       "GET /repos/{owner}/{repo}/issues/{number}",
@@ -873,27 +751,28 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         owner: "octokit",
         repo: "request.js",
         number: 1,
-        request: {
-          fetch: mock,
-        },
       },
     );
     expect(response.data).toEqual("ok");
   });
 
-  it("options.mediaType.previews", { skip: true }, async () => {
-    expect.assertions(1);
+  it("options.mediaType.previews", async () => {
+    expect.assertions(6);
 
-    const mock = fetchMock
-      .sandbox()
-      .mock("https://api.github.com/graphql", "ok", {
-        headers: {
-          accept:
-            "application/vnd.github.foo-preview+json,application/vnd.github.bar-preview+json",
-          authorization: "token 0000000000000000000000000000000000000001",
-          "user-agent": userAgent,
-        },
-      });
+    const request = await mockRequestHttpServer((req, res) => {
+      expect(req.method).toBe("GET");
+      expect(req.url).toBe("/graphql");
+      expect(req.headers.accept).toBe(
+        "application/vnd.github.foo-preview+json,application/vnd.github.bar-preview+json",
+      );
+      expect(req.headers.authorization).toBe(
+        "token 0000000000000000000000000000000000000001",
+      );
+      expect(req.headers["user-agent"]).toBe(userAgent);
+
+      res.writeHead(200);
+      res.end("ok");
+    });
 
     const response = await request("GET /graphql", {
       headers: {
@@ -902,19 +781,25 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       mediaType: {
         previews: ["foo", "bar"],
       },
-      request: {
-        fetch: mock,
-      },
     });
     expect(response.data).toEqual("ok");
   });
 
-  it("octokit/octokit.js#1497", { skip: true }, async () => {
-    const mock = fetchMock.sandbox().mock(
-      "https://request-errors-test.com/repos/gr2m/sandbox/branches/gr2m-patch-1/protection",
-      {
-        status: 400,
-        body: {
+  it("octokit/octokit.js#1497", async () => {
+    const request = await mockRequestHttpServer((req, res) => {
+      expect(req.method).toBe("PUT");
+      expect(req.url).toBe(
+        "/repos/gr2m/sandbox/branches/gr2m-patch-1/protection",
+      );
+      expect(req.headers.accept).toBe("application/vnd.github.v3+json");
+      expect(req.headers.authorization).toBe("token secret123");
+      expect(req.headers["user-agent"]).toBe(userAgent);
+
+      res.writeHead(400, {
+        "content-type": "application/json",
+      });
+      res.end(
+        JSON.stringify({
           message: "Validation failed",
           errors: [
             "Only organization repositories can have users and team restrictions",
@@ -922,20 +807,13 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
           ],
           documentation_url:
             "https://developer.github.com/v3/repos/branches/#update-branch-protection",
-        },
-      },
-      {
-        method: "PUT",
-        headers: {
-          accept: "application/vnd.github.v3+json",
-          authorization: "token secret123",
-        },
-      },
-    );
+        }),
+      );
+    });
 
     await expect(
       request("PUT /repos/{owner}/{repo}/branches/{branch}/protection", {
-        baseUrl: "https://request-errors-test.com",
+        baseUrl: request.baseUrlMockServer,
         headers: {
           authorization: "token secret123",
         },
@@ -951,9 +829,6 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
           dismissal_restrictions: { users: [], teams: [] },
         },
         restrictions: { users: [], teams: [] },
-        request: {
-          fetch: mock,
-        },
       }),
     ).rejects.toHaveProperty(
       "message",
@@ -1275,26 +1150,6 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     expect(response.data).toBeInstanceOf(ReadableStream);
     expect(done).toBe(true);
   });
-
-  it(
-    "request should pass the `redirect` option to fetch",
-    { skip: true },
-    () => {
-      expect.assertions(1);
-
-      const customFetch = async (url: string, options: RequestInit) => {
-        expect(options.redirect).toEqual("manual");
-        return await fetch(url, options);
-      };
-
-      return request("/", {
-        request: {
-          redirect: "manual",
-          fetch: customFetch,
-        },
-      });
-    },
-  );
 
   it("invalid error responses should result in errors with a message field describing the error as an unknown error", async () => {
     expect.assertions(6);
