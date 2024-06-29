@@ -10,9 +10,9 @@
   "scripts": {
     "build": "node scripts/build.mjs && tsc -p tsconfig.json",
     "lint": "prettier --check '{src,test}/**/*' README.md package.json",
-    "lint:fix": "prettier --write '{src,test}/**/*' README.md package.json",
+    "lint:fix": "prettier --write '{src,test}/**/*' README.md package.json vite.config.js",
     "pretest": "npm run -s lint",
-    "test": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" npx jest --coverage"
+    "test": "vitest run --coverage"
   },
   "repository": "github:octokit/request.js",
   "keywords": [
@@ -32,47 +32,15 @@
   "devDependencies": {
     "@octokit/auth-app": "^7.0.0",
     "@octokit/tsconfig": "^3.0.0",
-    "@sinonjs/fake-timers": "^11.2.2",
-    "@types/jest": "^29.0.0",
     "@types/node": "^20.0.0",
-    "@types/sinonjs__fake-timers": "^8.1.5",
+    "@vitest/coverage-v8": "^1.6.0",
     "esbuild": "^0.21.0",
     "fetch-mock": "^10.0.0",
     "glob": "^10.2.4",
-    "jest": "^29.0.0",
     "prettier": "3.3.2",
     "semantic-release-plugin-update-version-in-files": "^1.0.0",
-    "ts-jest": "^29.0.0",
-    "typescript": "^5.0.0"
-  },
-  "jest": {
-    "extensionsToTreatAsEsm": [
-      ".ts"
-    ],
-    "transform": {
-      "^.+\\.(ts|tsx)$": [
-        "ts-jest",
-        {
-          "tsconfig": "test/tsconfig.test.json",
-          "useESM": true
-        }
-      ]
-    },
-    "coverageThreshold": {
-      "global": {
-        "statements": 100,
-        "branches": 100,
-        "functions": 100,
-        "lines": 100
-      }
-    },
-    "modulePathIgnorePatterns": [
-      "<rootDir>/pkg"
-    ],
-    "testEnvironment": "node",
-    "moduleNameMapper": {
-      "^(.+)\\.jsx?$": "$1"
-    }
+    "typescript": "^5.0.0",
+    "vitest": "^1.6.0"
   },
   "release": {
     "branches": [

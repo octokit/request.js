@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import { isPlainObject } from "../src/is-plain-object.ts";
 
 describe("isPlainObject", () => {

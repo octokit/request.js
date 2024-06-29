@@ -2,10 +2,10 @@ import fs from "node:fs";
 import stream from "node:stream";
 import { ReadableStream } from "node:stream/web";
 
+import { describe, it, expect, vi } from "vitest";
 import { getUserAgent } from "universal-user-agent";
 import fetchMock from "fetch-mock";
 import { createAppAuth } from "@octokit/auth-app";
-import fakeTimers from "@sinonjs/fake-timers";
 import type {
   EndpointOptions,
   RequestInterface,
@@ -13,7 +13,6 @@ import type {
 } from "@octokit/types";
 
 import { request } from "../src/index.ts";
-import { jest } from "@jest/globals";
 
 const userAgent = `octokit-request.js/0.0.0-development ${getUserAgent()}`;
 const __filename = new URL(import.meta.url);
@@ -73,7 +72,7 @@ describe("request()", () => {
   });
 
   it("README authentication example", async () => {
-    const clock = fakeTimers.install({
+    const clock = vi.useFakeTimers({
       now: 0,
       toFake: ["Date"],
     });
@@ -158,7 +157,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       title: "Hello from the engine room",
     });
     expect(mock.done()).toBe(true);
-    clock.reset();
+    vi.useRealTimers();
   });
 
   it("Request with body", () => {
@@ -808,7 +807,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       },
     })
       .then(() => {
-        fail("This should return error.");
+        throw new Error("This should return error.");
       })
       .catch((error) => {
         expect(error).toHaveProperty(
@@ -840,7 +839,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       },
     );
 
-    const warn = jest.fn();
+    const warn = vi.fn();
 
     return request("GET /teams/{team_id}", {
       headers: {
@@ -878,7 +877,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       },
     );
 
-    const warn = jest.fn();
+    const warn = vi.fn();
 
     return request("GET /teams/{team_id}", {
       headers: {
@@ -1120,5 +1119,53 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         fetch: customFetch,
       },
     });
+  });
+
+  it("invalid error responses should result in errors with a message field describing the error as an unknown error", function () {
+    const mock = fetchMock.sandbox().mock(
+      "https://request-errors-test.com/repos/gr2m/sandbox/branches/gr2m-patch-1/protection",
+      {
+        status: 400,
+        body: {},
+      },
+      {
+        method: "PUT",
+        headers: {
+          accept: "application/vnd.github.v3+json",
+          authorization: "token secret123",
+        },
+      },
+    );
+
+    return request("PUT /repos/{owner}/{repo}/branches/{branch}/protection", {
+      baseUrl: "https://request-errors-test.com",
+      headers: {
+        authorization: "token secret123",
+      },
+      owner: "gr2m",
+      repo: "sandbox",
+      branch: "gr2m-patch-1",
+      required_status_checks: { strict: true, contexts: ["wip"] },
+      enforce_admins: true,
+      required_pull_request_reviews: {
+        required_approving_review_count: 1,
+        dismiss_stale_reviews: true,
+        require_code_owner_reviews: true,
+        dismissal_restrictions: { users: [], teams: [] },
+      },
+      restrictions: { users: [], teams: [] },
+      request: {
+        fetch: mock,
+      },
+    })
+      .then(() => {
+        throw new Error("This should return error.");
+      })
+      .catch((error) => {
+        expect(error).toHaveProperty(
+          "message",
+          `Unknown error: ${JSON.stringify({})}`,
+        );
+      });
   });
 });

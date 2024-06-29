@@ -3,7 +3,8 @@
   "compilerOptions": {
     "emitDeclarationOnly": false,
     "noEmit": true,
-    "allowImportingTsExtensions": true
+    "allowImportingTsExtensions": true,
+    "types": ["vitest/globals"]
   },
   "include": ["src/**/*"]
 }

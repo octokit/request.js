@@ -1,5 +1,6 @@
 import fetchMock from "fetch-mock";
 
+import { describe, it, expect } from "vitest";
 import { request } from "../src/index.ts";
 
 describe("endpoint.defaults()", () => {
