@@ -1,5 +1,3 @@
-/* c8 ignore start */
-
 import esbuild from "esbuild";
 import { copyFile, readFile, writeFile, rm } from "node:fs/promises";
 import { glob } from "glob";
