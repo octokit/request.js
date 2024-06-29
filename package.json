@@ -12,7 +12,8 @@
     "lint": "prettier --check '{src,test}/**/*' README.md package.json",
     "lint:fix": "prettier --write '{src,test}/**/*' README.md package.json vite.config.js",
     "pretest": "npm run -s lint",
-    "test": "vitest run --coverage"
+    "test": "vitest run --coverage",
+    "test:watch": "vitest --coverage"
   },
   "repository": "github:octokit/request.js",
   "keywords": [
