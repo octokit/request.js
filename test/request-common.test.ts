@@ -1,25 +1,7 @@
-import zlib from "node:zlib";
-import fs from "node:fs";
-import stream from "node:stream";
-import { ReadableStream } from "node:stream/web";
-
-import { describe, it, expect, vi } from "vitest";
-import { getUserAgent } from "universal-user-agent";
+import { describe, it, expect } from "vitest";
 import fetchMock from "fetch-mock";
-import { createAppAuth } from "@octokit/auth-app";
-import type {
-  EndpointOptions,
-  RequestInterface,
-  ResponseHeaders,
-} from "@octokit/types";
 
 import { request } from "../src/index.ts";
-
-const userAgent = `octokit-request.js/0.0.0-development ${getUserAgent()}`;
-const __filename = new URL(import.meta.url);
-function stringToArrayBuffer(str: string) {
-  return new TextEncoder().encode(str).buffer;
-}
 
 describe("request()", () => {
   it("is a function", () => {

@@ -9,7 +9,7 @@ import { createAppAuth } from "@octokit/auth-app";
 import type { EndpointOptions, RequestInterface } from "@octokit/types";
 
 import bodyParser from "./body-parser.ts";
-import mockRequestHttpServer from "./mockRequestHttpServer.ts";
+import mockRequestHttpServer from "./mock-request-http-server.ts";
 import { request } from "../src/index.ts";
 
 const userAgent = `octokit-request.js/0.0.0-development ${getUserAgent()}`;
