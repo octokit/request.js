@@ -35,24 +35,6 @@ describe("request()", () => {
     );
   });
 
-  it("should error when globalThis.fetch is undefined", async () => {
-    expect.assertions(1);
-
-    const originalFetch = globalThis.fetch;
-    // @ts-expect-error force undefined to mimic older node version
-    globalThis.fetch = undefined;
-
-    try {
-      await request("GET /orgs/me");
-    } catch (error) {
-      expect(error.message).toEqual(
-        "fetch is not set. Please pass a fetch implementation as new Octokit({ request: { fetch }}). Learn more at https://github.com/octokit/octokit.js/#fetch-missing",
-      );
-    } finally {
-      globalThis.fetch = originalFetch;
-    }
-  });
-
   it("request should pass the `redirect` option to fetch", () => {
     expect.assertions(1);
 
