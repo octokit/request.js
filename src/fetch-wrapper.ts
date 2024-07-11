@@ -25,10 +25,8 @@ export default function fetchWrapper(
   let status: number;
   let url: string;
 
-  let { fetch } = globalThis;
-  if (requestOptions.request?.fetch) {
-    fetch = requestOptions.request.fetch;
-  }
+  const fetch: typeof globalThis.fetch =
+    requestOptions.request?.fetch || globalThis.fetch;
 
   if (!fetch) {
     throw new Error(
