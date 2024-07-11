@@ -2,8 +2,6 @@ import { isPlainObject } from "./is-plain-object.js";
 import { RequestError } from "@octokit/request-error";
 import type { EndpointInterface } from "@octokit/types";
 
-import getBuffer from "./get-buffer-response.js";
-
 export default function fetchWrapper(
   requestOptions: ReturnType<EndpointInterface>,
 ) {
@@ -175,7 +173,7 @@ async function getResponseData(response: Response) {
     return response.text();
   }
 
-  return getBuffer(response);
+  return response.arrayBuffer();
 }
 
 function toErrorMessage(data: any) {
