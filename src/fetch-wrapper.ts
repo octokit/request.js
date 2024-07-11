@@ -5,24 +5,6 @@ import type { EndpointInterface } from "@octokit/types";
 export default function fetchWrapper(
   requestOptions: ReturnType<EndpointInterface>,
 ) {
-  const log =
-    requestOptions.request && requestOptions.request.log
-      ? requestOptions.request.log
-      : console;
-  const parseSuccessResponseBody =
-    requestOptions.request?.parseSuccessResponseBody !== false;
-
-  if (
-    isPlainObject(requestOptions.body) ||
-    Array.isArray(requestOptions.body)
-  ) {
-    requestOptions.body = JSON.stringify(requestOptions.body);
-  }
-
-  let headers: { [header: string]: string } = {};
-  let status: number;
-  let url: string;
-
   const fetch: typeof globalThis.fetch =
     requestOptions.request?.fetch || globalThis.fetch;
 
@@ -32,17 +14,32 @@ export default function fetchWrapper(
     );
   }
 
+  const log = requestOptions.request?.log || console;
+  const parseSuccessResponseBody =
+    requestOptions.request?.parseSuccessResponseBody !== false;
+
+  const body =
+    isPlainObject(requestOptions.body) || Array.isArray(requestOptions.body)
+      ? JSON.stringify(requestOptions.body)
+      : requestOptions.body;
+
+  const requestHeaders = Object.fromEntries(
+    Object.entries(requestOptions.headers).map(([name, value]) => [
+      name,
+      String(value),
+    ]),
+  );
+
+  let responseHeaders: { [header: string]: string } = {};
+  let status: number;
+  let url: string;
+
   return fetch(requestOptions.url, {
     method: requestOptions.method,
-    body: requestOptions.body,
+    body,
     redirect: requestOptions.request?.redirect,
     // Header values must be `string`
-    headers: Object.fromEntries(
-      Object.entries(requestOptions.headers).map(([name, value]) => [
-        name,
-        String(value),
-      ]),
-    ),
+    headers: requestHeaders,
     signal: requestOptions.request?.signal,
     // duplex must be set if request.body is ReadableStream or Async Iterables.
     // See https://fetch.spec.whatwg.org/#dom-requestinit-duplex.
@@ -53,17 +50,18 @@ export default function fetchWrapper(
       status = response.status;
 
       for (const keyAndValue of response.headers) {
-        headers[keyAndValue[0]] = keyAndValue[1];
+        responseHeaders[keyAndValue[0]] = keyAndValue[1];
       }
 
-      if ("deprecation" in headers) {
+      if ("deprecation" in responseHeaders) {
         const matches =
-          headers.link && headers.link.match(/<([^>]+)>; rel="deprecation"/);
+          responseHeaders.link &&
+          responseHeaders.link.match(/<([^>]+)>; rel="deprecation"/);
         const deprecationLink = matches && matches.pop();
         log.warn(
           `[@octokit/request] "${requestOptions.method} ${
             requestOptions.url
-          }" is deprecated. It is scheduled to be removed on ${headers.sunset}${
+          }" is deprecated. It is scheduled to be removed on ${responseHeaders.sunset}${
             deprecationLink ? `. See ${deprecationLink}` : ""
           }`,
         );
@@ -83,7 +81,7 @@ export default function fetchWrapper(
           response: {
             url,
             status,
-            headers,
+            headers: responseHeaders,
             data: undefined,
           },
           request: requestOptions,
@@ -95,7 +93,7 @@ export default function fetchWrapper(
           response: {
             url,
             status,
-            headers,
+            headers: responseHeaders,
             data: await getResponseData(response),
           },
           request: requestOptions,
@@ -109,7 +107,7 @@ export default function fetchWrapper(
           response: {
             url,
             status,
-            headers,
+            headers: responseHeaders,
             data,
           },
           request: requestOptions,
@@ -126,7 +124,7 @@ export default function fetchWrapper(
       return {
         status,
         url,
-        headers,
+        headers: responseHeaders,
         data,
       };
     })
