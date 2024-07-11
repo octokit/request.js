@@ -1,5 +1,4 @@
 import { describe, it, expect } from "vitest";
-import fetchMock from "fetch-mock";
 
 import { request } from "../src/index.ts";
 
@@ -96,10 +95,6 @@ describe("request()", () => {
 
   it("Request TypeError error with a string cause", async () => {
     expect.assertions(2);
-
-    const mock = fetchMock.sandbox().get("https://127.0.0.1:8/", {
-      throws: Object.assign(new TypeError("fetch failed"), { cause: "bad" }),
-    });
 
     try {
       // port: 8 // officially unassigned port. See https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
