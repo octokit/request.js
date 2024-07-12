@@ -153,9 +153,15 @@ export default function fetchWrapper(
     });
 }
 
-async function getResponseData(response: Response) {
+const applicationJsonRE = /^application\/json\b/;
+const textUtf8RE = /^text\/|(\b)+charset=utf-8$/;
+
+function getResponseData(response: Response): Promise<any> {
   const contentType = response.headers.get("content-type");
-  if (/application\/json/.test(contentType!)) {
+
+  if (!contentType) {
+    return response.text();
+  } else if (applicationJsonRE.test(contentType)) {
     return (
       response
         .json()
@@ -167,13 +173,11 @@ async function getResponseData(response: Response) {
         // after a failed .json(). To account for that we fallback to an empty string
         .catch(() => "")
     );
-  }
-
-  if (!contentType || /^text\/|charset=utf-8$/.test(contentType)) {
+  } else if (textUtf8RE.test(contentType)) {
     return response.text();
+  } else {
+    return response.arrayBuffer();
   }
-
-  return response.arrayBuffer();
 }
 
 function toErrorMessage(data: any) {
