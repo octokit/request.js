@@ -4,7 +4,6 @@ import { ReadableStream } from "node:stream/web";
 
 import { describe, it, expect, vi } from "vitest";
 import { getUserAgent } from "universal-user-agent";
-import fetchMock from "fetch-mock";
 import { createAppAuth } from "@octokit/auth-app";
 import type { EndpointOptions, RequestInterface } from "@octokit/types";
 
@@ -324,35 +323,53 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     ).rejects.toHaveProperty("status", 404);
   });
 
-  it.skip("Binary response with redirect (🤔 unclear how to mock fetch redirect properly)", () => {
-    const mock = fetchMock
-      .sandbox()
-      .get(
-        "https://codeload.github.com/octokit-fixture-org/get-archive/legacy.tar.gz/master",
-        {
-          status: 200,
-          body: Buffer.from(
-            "1f8b0800000000000003cb4f2ec9cfce2cd14dcbac28292d4ad5cd2f4ad74d4f2dd14d2c4acec82c4bd53580007d060a0050bfb9b9a90203c428741ac2313436343307222320dbc010a8dc5c81c194124b8905a5c525894540a714e5e797e05347481edd734304e41319ff41ae8e2ebeae7ab92964d801d46f66668227fe0d4d51e3dfc8d0c8d808284f75df6201233cfe951590627ba01d330a46c1281805a3806e000024cb59d6000a0000",
-            "hex",
-          ),
-          headers: {
-            "content-type": "application/x-gzip",
-            "content-length": "172",
-          },
-        },
-      );
+  it("Binary response with redirect", async () => {
+    expect.assertions(7);
 
-    return request("GET /repos/{owner}/{repo}/{archive_format}/{ref}", {
-      owner: "octokit-fixture-org",
-      repo: "get-archive",
-      archive_format: "tarball",
-      ref: "master",
-      request: {
-        fetch: mock,
-      },
-    }).then((response) => {
-      expect(response.data.length).toEqual(172);
+    const payload =
+      "1f8b0800000000000003cb4f2ec9cfce2cd14dcbac28292d4ad5cd2f4ad74d4f2dd14d2c4acec82c4bd53580007d060a0050bfb9b9a90203c428741ac2313436343307222320dbc010a8dc5c81c194124b8905a5c525894540a714e5e797e05347481edd734304e41319ff41ae8e2ebeae7ab92964d801d46f66668227fe0d4d51e3dfc8d0c8d808284f75df6201233cfe951590627ba01d330a46c1281805a3806e000024cb59d6000a0000";
+
+    const request = await mockRequestHttpServer((req, res) => {
+      expect(req.method).toBe("GET");
+
+      switch (req.url) {
+        case "/octokit-fixture-org/get-archive-1/legacy.tar.gz/master":
+          {
+            res.writeHead(301, {
+              Location:
+                "/octokit-fixture-org/get-archive-2/legacy.tar.gz/master",
+            });
+            res.end();
+          }
+          break;
+        case "/octokit-fixture-org/get-archive-2/legacy.tar.gz/master":
+          {
+            res.writeHead(200, {
+              "content-type": "application/x-gzip",
+              "content-length": "172",
+            });
+            res.end(Buffer.from(payload, "hex"));
+          }
+          break;
+        default: {
+          res.writeHead(500);
+        }
+      }
+
+      res.end();
     });
+
+    const response = await request(
+      `GET ${request.baseUrlMockServer}/octokit-fixture-org/get-archive-1/legacy.tar.gz/master`,
+    );
+
+    expect(response.headers["content-type"]).toEqual("application/x-gzip");
+    expect(response.headers["content-length"]).toEqual("172");
+    expect(response.status).toEqual(200);
+    expect(response.data).toBeInstanceOf(ArrayBuffer);
+    expect(zlib.gunzipSync(Buffer.from(payload, "hex")).buffer).toEqual(
+      response.data,
+    );
   });
 
   it("Binary response", async () => {
@@ -921,14 +938,16 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     expect(response.data).toEqual({ id: 123 });
   });
 
-  it("404 not found", { skip: true }, async () => {
-    expect.assertions(3);
+  it("404 not found", async () => {
+    expect.assertions(5);
 
     const request = await mockRequestHttpServer(async (req, res) => {
       expect(req.method).toBe("GET");
       expect(req.url).toBe("/repos/octocat/unknown");
 
-      res.writeHead(404);
+      res.writeHead(404, {
+        "content-type": "application/json",
+      });
       res.end(
         JSON.stringify({
           message: "Not Found",
@@ -950,7 +969,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     }
   });
 
-  it("Request timeout", { skip: true }, async () => {
+  it("Request timeout", async () => {
     expect.assertions(4);
 
     const request = await mockRequestHttpServer(async (req, res) => {
@@ -967,7 +986,11 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     });
 
     try {
-      await request("GET /");
+      await request("GET /", {
+        request: {
+          signal: AbortSignal.timeout(500),
+        },
+      });
       throw new Error("should not resolve");
     } catch (error) {
       expect(error.name).toEqual("HttpError");

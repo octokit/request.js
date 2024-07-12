@@ -260,11 +260,21 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     ).rejects.toHaveProperty("status", 404);
   });
 
-  it.skip("Binary response with redirect (🤔 unclear how to mock fetch redirect properly)", () => {
+  it.skip("Binary response with redirect (🤔 unclear how to mock fetch redirect properly)", async () => {
     const mock = fetchMock
       .sandbox()
       .get(
-        "https://codeload.github.com/octokit-fixture-org/get-archive/legacy.tar.gz/master",
+        "https://codeload.github.com/repos/octokit-fixture-org/get-archive-1/tarball/master",
+        {
+          status: 301,
+          headers: {
+            location:
+              "https://codeload.github.com/repos/octokit-fixture-org/get-archive-2/tarball/master",
+          },
+        },
+      )
+      .get(
+        "https://codeload.github.com/repos/octokit-fixture-org/get-archive-2/tarball/master",
         {
           status: 200,
           body: Buffer.from(
@@ -278,17 +288,20 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         },
       );
 
-    return request("GET /repos/{owner}/{repo}/{archive_format}/{ref}", {
-      owner: "octokit-fixture-org",
-      repo: "get-archive",
-      archive_format: "tarball",
-      ref: "master",
-      request: {
-        fetch: mock,
+    const response = await request(
+      "GET https://codeload.github.com/repos/{owner}/{repo}/{archive_format}/{ref}",
+      {
+        owner: "octokit-fixture-org",
+        repo: "get-archive-1",
+        archive_format: "tarball",
+        ref: "master",
+        request: {
+          fetch: mock,
+        },
       },
-    }).then((response) => {
-      expect(response.data.length).toEqual(172);
-    });
+    );
+    expect(response.status).toEqual(200);
+    expect(response.data.length).toEqual(172);
   });
 
   it("Binary response", async () => {
@@ -989,7 +1002,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       await request("GET /", {
         request: {
           fetch: mock,
-          signal: AbortSignal.timeout(1000),
+          signal: AbortSignal.timeout(500),
         },
       });
       throw new Error("should not resolve");
