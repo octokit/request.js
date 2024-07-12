@@ -132,31 +132,20 @@ export default async function fetchWrapper(
   if (status >= 400) {
     octokitResponse.data = await getResponseData(fetchResponse);
 
-    const error = new RequestError(
-      toErrorMessage(octokitResponse.data),
-      status,
-      {
-        response: octokitResponse,
-        request: requestOptions,
-      },
-    );
-
-    throw error;
+    throw new RequestError(toErrorMessage(octokitResponse.data), status, {
+      response: octokitResponse,
+      request: requestOptions,
+    });
   }
 
-  const responseBody = parseSuccessResponseBody
+  octokitResponse.data = parseSuccessResponseBody
     ? await getResponseData(fetchResponse)
     : fetchResponse.body;
 
-  return {
-    status,
-    url,
-    headers: responseHeaders,
-    data: responseBody,
-  };
+  return octokitResponse;
 }
 
-async function getResponseData(response: Response) {
+function getResponseData(response: Response) {
   const contentType = response.headers.get("content-type");
   if (/application\/json/.test(contentType!)) {
     return (
