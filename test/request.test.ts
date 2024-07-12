@@ -1009,7 +1009,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     } catch (error) {
       expect(error.name).toEqual("AbortError");
       expect(error.message).toEqual("The operation was aborted.");
-      expect(error.status).toEqual(500);
+      expect(error.status).toEqual(0);
     }
   });
 

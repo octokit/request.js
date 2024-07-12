@@ -49,7 +49,7 @@ export default async function fetchWrapper(
     let message = "Unknown Error";
     if (error instanceof Error) {
       if (error.name === "AbortError") {
-        (error as RequestError).status = 500;
+        (error as RequestError).status = 0;
         throw error;
       }
 
