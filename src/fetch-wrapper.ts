@@ -23,6 +23,7 @@ export default async function fetchWrapper(
       ? JSON.stringify(requestOptions.body)
       : requestOptions.body;
 
+  // Header values must be `string`
   const requestHeaders = Object.fromEntries(
     Object.entries(requestOptions.headers).map(([name, value]) => [
       name,
@@ -37,7 +38,6 @@ export default async function fetchWrapper(
       method: requestOptions.method,
       body,
       redirect: requestOptions.request?.redirect,
-      // Header values must be `string`
       headers: requestHeaders,
       signal: requestOptions.request?.signal,
       // duplex must be set if request.body is ReadableStream or Async Iterables.
@@ -145,7 +145,7 @@ export default async function fetchWrapper(
   return octokitResponse;
 }
 
-function getResponseData(response: Response) {
+async function getResponseData(response: Response): Promise<any> {
   const contentType = response.headers.get("content-type");
   if (/application\/json/.test(contentType!)) {
     return (
