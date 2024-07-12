@@ -161,10 +161,7 @@ function getResponseData(response: Response) {
     );
   }
 
-  if (
-    (!contentType || /^text\/|charset=utf-8$/.test(contentType)) &&
-    response.text
-  ) {
+  if (!contentType || /^text\/|charset=utf-8$/.test(contentType)) {
     return response.text();
   }
 
