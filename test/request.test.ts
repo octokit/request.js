@@ -981,7 +981,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     }
   });
 
-  it("Request timeout", async () => {
+  it("Request timeout via an AbortSignal", async () => {
     expect.assertions(3);
 
     const delay = (millis = 3000) => {

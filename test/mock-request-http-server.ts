@@ -10,6 +10,7 @@ import defaults from "../src/defaults.ts";
 
 export default async function mockRequestHttpServer(
   requestListener: RequestListener,
+  fetch = globalThis.fetch,
 ): Promise<
   RequestInterface<object> & {
     closeMockServer: () => void;
@@ -25,6 +26,9 @@ export default async function mockRequestHttpServer(
   const request = withDefaults(endpoint, {
     ...defaults,
     baseUrl,
+    request: {
+      fetch,
+    },
   }) as RequestInterface<object> & {
     closeMockServer: () => void;
     baseUrlMockServer: string;

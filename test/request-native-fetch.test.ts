@@ -6,10 +6,10 @@ import { describe, it, expect, vi } from "vitest";
 import { getUserAgent } from "universal-user-agent";
 import { createAppAuth } from "@octokit/auth-app";
 import type { EndpointOptions, RequestInterface } from "@octokit/types";
+import { fetch as undiciFetch, Agent, RequestInit } from "undici";
 
 import bodyParser from "./body-parser.ts";
 import mockRequestHttpServer from "./mock-request-http-server.ts";
-import { request } from "../src/index.ts";
 
 const userAgent = `octokit-request.js/0.0.0-development ${getUserAgent()}`;
 const __filename = new URL(import.meta.url);
@@ -724,6 +724,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         method: "GET",
         request: {
           hook,
+          fetch: globalThis.fetch,
         },
         url: "/",
       });
@@ -969,7 +970,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     }
   });
 
-  it("Request timeout", async () => {
+  it("Request timeout via an AbortSignal", async () => {
     expect.assertions(4);
 
     const request = await mockRequestHttpServer(async (req, res) => {
@@ -993,6 +994,48 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       });
       throw new Error("should not resolve");
     } catch (error) {
+      expect(error.name).toEqual("HttpError");
+      expect(error.status).toEqual(500);
+    }
+  });
+
+  it("Request timeout via a Dispatcher", async () => {
+    expect.assertions(5);
+
+    const fetch = (url: string, options: RequestInit) => {
+      return undiciFetch(url, {
+        ...options,
+        dispatcher: new Agent({
+          bodyTimeout: 500,
+          headersTimeout: 500,
+          keepAliveTimeout: 500,
+          keepAliveMaxTimeout: 500,
+        }),
+      });
+    };
+
+    const request = await mockRequestHttpServer(async (req, res) => {
+      expect(req.method).toBe("GET");
+      expect(req.url).toBe("/");
+
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+      res.writeHead(200);
+      res.end(
+        JSON.stringify({
+          message: "OK",
+        }),
+      );
+    });
+
+    try {
+      await request("GET /", {
+        request: {
+          fetch,
+        },
+      });
+      throw new Error("should not resolve");
+    } catch (error) {
+      expect(error.message).not.toEqual("should not resolve");
       expect(error.name).toEqual("HttpError");
       expect(error.status).toEqual(500);
     }
