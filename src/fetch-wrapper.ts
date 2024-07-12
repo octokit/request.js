@@ -79,8 +79,8 @@ export default async function fetchWrapper(
   const url = fetchResponse.url;
   const responseHeaders: { [header: string]: string } = {};
 
-  for (const keyAndValue of fetchResponse.headers) {
-    responseHeaders[keyAndValue[0]] = keyAndValue[1];
+  for (const [key, value] of fetchResponse.headers) {
+    responseHeaders[key] = value;
   }
 
   const octokitResponse: OctokitResponse<any> = {
