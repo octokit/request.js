@@ -977,28 +977,25 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       });
     };
 
-    const mock = (url: string) => {
-      expect(url).toEqual("https://api.github.com/");
-      return delay().then(() => {
-        return {
-          status: 200,
-          headers: {},
-          body: {
-            message: "OK",
-          },
-        };
-      });
-    };
+    const mock = fetchMock.sandbox().get("https://api.github.com/", () =>
+      delay(3000).then(() => ({
+        message: "Not Found",
+        documentation_url:
+          "https://docs.github.com/en/rest/reference/repos#get-a-repository",
+      })),
+    );
 
     try {
       await request("GET /", {
         request: {
           fetch: mock,
+          signal: AbortSignal.timeout(1000),
         },
       });
       throw new Error("should not resolve");
     } catch (error) {
-      expect(error.name).toEqual("HttpError");
+      expect(error.name).toEqual("AbortError");
+      expect(error.message).toEqual("The operation was aborted.");
       expect(error.status).toEqual(500);
     }
   });

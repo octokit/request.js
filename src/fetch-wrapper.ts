@@ -1,10 +1,10 @@
 import { isPlainObject } from "./is-plain-object.js";
 import { RequestError } from "@octokit/request-error";
-import type { EndpointInterface } from "@octokit/types";
+import type { EndpointInterface, OctokitResponse } from "@octokit/types";
 
-export default function fetchWrapper(
+export default async function fetchWrapper(
   requestOptions: ReturnType<EndpointInterface>,
-) {
+): Promise<OctokitResponse<any>> {
   const fetch: typeof globalThis.fetch =
     requestOptions.request?.fetch || globalThis.fetch;
 
@@ -30,109 +30,30 @@ export default function fetchWrapper(
     ]),
   );
 
-  let responseHeaders: { [header: string]: string } = {};
-  let status: number;
-  let url: string;
+  let fetchResponse: Response;
 
-  return fetch(requestOptions.url, {
-    method: requestOptions.method,
-    body,
-    redirect: requestOptions.request?.redirect,
-    // Header values must be `string`
-    headers: requestHeaders,
-    signal: requestOptions.request?.signal,
-    // duplex must be set if request.body is ReadableStream or Async Iterables.
-    // See https://fetch.spec.whatwg.org/#dom-requestinit-duplex.
-    ...(requestOptions.body && { duplex: "half" }),
-  })
-    .then(async (response) => {
-      url = response.url;
-      status = response.status;
-
-      for (const keyAndValue of response.headers) {
-        responseHeaders[keyAndValue[0]] = keyAndValue[1];
-      }
-
-      if ("deprecation" in responseHeaders) {
-        const matches =
-          responseHeaders.link &&
-          responseHeaders.link.match(/<([^>]+)>; rel="deprecation"/);
-        const deprecationLink = matches && matches.pop();
-        log.warn(
-          `[@octokit/request] "${requestOptions.method} ${
-            requestOptions.url
-          }" is deprecated. It is scheduled to be removed on ${responseHeaders.sunset}${
-            deprecationLink ? `. See ${deprecationLink}` : ""
-          }`,
-        );
-      }
-
-      if (status === 204 || status === 205) {
-        return;
-      }
-
-      // GitHub API returns 200 for HEAD requests
-      if (requestOptions.method === "HEAD") {
-        if (status < 400) {
-          return;
-        }
-
-        throw new RequestError(response.statusText, status, {
-          response: {
-            url,
-            status,
-            headers: responseHeaders,
-            data: undefined,
-          },
-          request: requestOptions,
-        });
-      }
-
-      if (status === 304) {
-        throw new RequestError("Not modified", status, {
-          response: {
-            url,
-            status,
-            headers: responseHeaders,
-            data: await getResponseData(response),
-          },
-          request: requestOptions,
-        });
-      }
-
-      if (status >= 400) {
-        const data = await getResponseData(response);
-
-        const error = new RequestError(toErrorMessage(data), status, {
-          response: {
-            url,
-            status,
-            headers: responseHeaders,
-            data,
-          },
-          request: requestOptions,
-        });
-
+  try {
+    fetchResponse = await fetch(requestOptions.url, {
+      method: requestOptions.method,
+      body,
+      redirect: requestOptions.request?.redirect,
+      // Header values must be `string`
+      headers: requestHeaders,
+      signal: requestOptions.request?.signal,
+      // duplex must be set if request.body is ReadableStream or Async Iterables.
+      // See https://fetch.spec.whatwg.org/#dom-requestinit-duplex.
+      ...(requestOptions.body && { duplex: "half" }),
+    });
+    // wrap fetch errors as RequestError if it is not a AbortError
+  } catch (error) {
+    let message = "Unknown Error";
+    if (error instanceof Error) {
+      if (error.name === "AbortError") {
+        (error as RequestError).status = 500;
         throw error;
       }
 
-      return parseSuccessResponseBody
-        ? await getResponseData(response)
-        : response.body;
-    })
-    .then((data) => {
-      return {
-        status,
-        url,
-        headers: responseHeaders,
-        data,
-      };
-    })
-    .catch((error) => {
-      if (error instanceof RequestError) throw error;
-      else if (error.name === "AbortError") throw error;
-
-      let message = error.message;
+      message = error.message;
 
       // undici throws a TypeError for network errors
       // and puts the error message in `error.cause`
@@ -144,11 +65,95 @@ export default function fetchWrapper(
           message = error.cause;
         }
       }
+    }
 
-      throw new RequestError(message, 500, {
-        request: requestOptions,
-      });
+    const requestError = new RequestError(message, 500, {
+      request: requestOptions,
     });
+    requestError.cause = error;
+
+    throw requestError;
+  }
+
+  const status = fetchResponse.status;
+  const url = fetchResponse.url;
+  const responseHeaders: { [header: string]: string } = {};
+
+  for (const keyAndValue of fetchResponse.headers) {
+    responseHeaders[keyAndValue[0]] = keyAndValue[1];
+  }
+
+  const octokitResponse: OctokitResponse<any> = {
+    url,
+    status,
+    headers: responseHeaders,
+    data: "",
+  };
+
+  if ("deprecation" in responseHeaders) {
+    const matches =
+      responseHeaders.link &&
+      responseHeaders.link.match(/<([^>]+)>; rel="deprecation"/);
+    const deprecationLink = matches && matches.pop();
+    log.warn(
+      `[@octokit/request] "${requestOptions.method} ${
+        requestOptions.url
+      }" is deprecated. It is scheduled to be removed on ${responseHeaders.sunset}${
+        deprecationLink ? `. See ${deprecationLink}` : ""
+      }`,
+    );
+  }
+
+  if (status === 204 || status === 205) {
+    return octokitResponse;
+  }
+
+  // GitHub API returns 200 for HEAD requests
+  if (requestOptions.method === "HEAD") {
+    if (status < 400) {
+      return octokitResponse;
+    }
+
+    throw new RequestError(fetchResponse.statusText, status, {
+      response: octokitResponse,
+      request: requestOptions,
+    });
+  }
+
+  if (status === 304) {
+    octokitResponse.data = await getResponseData(fetchResponse);
+
+    throw new RequestError("Not modified", status, {
+      response: octokitResponse,
+      request: requestOptions,
+    });
+  }
+
+  if (status >= 400) {
+    octokitResponse.data = await getResponseData(fetchResponse);
+
+    const error = new RequestError(
+      toErrorMessage(octokitResponse.data),
+      status,
+      {
+        response: octokitResponse,
+        request: requestOptions,
+      },
+    );
+
+    throw error;
+  }
+
+  const responseBody = parseSuccessResponseBody
+    ? await getResponseData(fetchResponse)
+    : fetchResponse.body;
+
+  return {
+    status,
+    url,
+    headers: responseHeaders,
+    data: responseBody,
+  };
 }
 
 async function getResponseData(response: Response) {
@@ -167,7 +172,10 @@ async function getResponseData(response: Response) {
     );
   }
 
-  if (!contentType || /^text\/|charset=utf-8$/.test(contentType)) {
+  if (
+    (!contentType || /^text\/|charset=utf-8$/.test(contentType)) &&
+    response.text
+  ) {
     return response.text();
   }
 
