@@ -260,11 +260,21 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     ).rejects.toHaveProperty("status", 404);
   });
 
-  it.skip("Binary response with redirect (🤔 unclear how to mock fetch redirect properly)", () => {
+  it.skip("Binary response with redirect (🤔 unclear how to mock fetch redirect properly)", async () => {
     const mock = fetchMock
       .sandbox()
       .get(
-        "https://codeload.github.com/octokit-fixture-org/get-archive/legacy.tar.gz/master",
+        "https://codeload.github.com/repos/octokit-fixture-org/get-archive-1/tarball/master",
+        {
+          status: 301,
+          headers: {
+            location:
+              "https://codeload.github.com/repos/octokit-fixture-org/get-archive-2/tarball/master",
+          },
+        },
+      )
+      .get(
+        "https://codeload.github.com/repos/octokit-fixture-org/get-archive-2/tarball/master",
         {
           status: 200,
           body: Buffer.from(
@@ -278,17 +288,20 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         },
       );
 
-    return request("GET /repos/{owner}/{repo}/{archive_format}/{ref}", {
-      owner: "octokit-fixture-org",
-      repo: "get-archive",
-      archive_format: "tarball",
-      ref: "master",
-      request: {
-        fetch: mock,
+    const response = await request(
+      "GET https://codeload.github.com/repos/{owner}/{repo}/{archive_format}/{ref}",
+      {
+        owner: "octokit-fixture-org",
+        repo: "get-archive-1",
+        archive_format: "tarball",
+        ref: "master",
+        request: {
+          fetch: mock,
+        },
       },
-    }).then((response) => {
-      expect(response.data.length).toEqual(172);
-    });
+    );
+    expect(response.status).toEqual(200);
+    expect(response.data.length).toEqual(172);
   });
 
   it("Binary response", async () => {
@@ -968,7 +981,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     }
   });
 
-  it("Request timeout", async () => {
+  it("Request timeout via an AbortSignal", async () => {
     expect.assertions(3);
 
     const delay = (millis = 3000) => {
@@ -977,28 +990,25 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       });
     };
 
-    const mock = (url: string) => {
-      expect(url).toEqual("https://api.github.com/");
-      return delay().then(() => {
-        return {
-          status: 200,
-          headers: {},
-          body: {
-            message: "OK",
-          },
-        };
-      });
-    };
+    const mock = fetchMock.sandbox().get("https://api.github.com/", () =>
+      delay(3000).then(() => ({
+        message: "Not Found",
+        documentation_url:
+          "https://docs.github.com/en/rest/reference/repos#get-a-repository",
+      })),
+    );
 
     try {
       await request("GET /", {
         request: {
           fetch: mock,
+          signal: AbortSignal.timeout(500),
         },
       });
       throw new Error("should not resolve");
     } catch (error) {
-      expect(error.name).toEqual("HttpError");
+      expect(error.name).toEqual("AbortError");
+      expect(error.message).toEqual("The operation was aborted.");
       expect(error.status).toEqual(500);
     }
   });
