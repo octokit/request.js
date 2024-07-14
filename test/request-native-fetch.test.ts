@@ -1397,4 +1397,23 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
 
     request.closeMockServer();
   });
+
+  it("invalid json as response data", async () => {
+    expect.assertions(4);
+
+    const request = await mockRequestHttpServer(async (req, res) => {
+      expect(req.method).toBe("GET");
+      expect(req.url).toBe("/");
+
+      res.writeHead(200, {
+        "content-type": "application/json",
+      });
+      res.end('"invalid');
+    });
+
+    const response = await request("GET /");
+
+    expect(response.status).toEqual(200);
+    expect(response.data).toEqual('"invalid');
+  });
 });

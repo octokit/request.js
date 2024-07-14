@@ -146,34 +146,30 @@ export default async function fetchWrapper(
   return octokitResponse;
 }
 
-function getResponseData(response: Response): Promise<any> {
+async function getResponseData(response: Response): Promise<any> {
   const contentType = response.headers.get("content-type");
 
   if (!contentType) {
-    return response.text();
+    return response.text().catch(() => "");
   }
 
   const mimetype = safeParse(contentType);
 
   if (mimetype.type === "application/json") {
-    return (
-      response
-        .json()
-        // In the event that we get an empty response body we fallback to
-        // using .text(), but this should be investigated since if this were
-        // to occur in the GitHub API it really should not return an empty body.
-        .catch(() => response.text())
-        // `node-fetch` is throwing a "body used already for" error if `.text()` is run
-        // after a failed .json(). To account for that we fallback to an empty string
-        .catch(() => "")
-    );
+    let text = "";
+    try {
+      text = await response.text();
+      return JSON.parse(text);
+    } catch (err) {
+      return text;
+    }
   } else if (
     mimetype.type.startsWith("text/") ||
     mimetype.parameters.charset?.toLowerCase() === "utf-8"
   ) {
-    return response.text();
+    return response.text().catch(() => "");
   } else {
-    return response.arrayBuffer();
+    return response.arrayBuffer().catch(() => new ArrayBuffer(0));
   }
 }
 
