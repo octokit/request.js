@@ -168,23 +168,22 @@ async function getResponseData(response: Response): Promise<any> {
   return response.arrayBuffer();
 }
 
-function toErrorMessage(data: any) {
-  if (typeof data === "string") return data;
+function toErrorMessage(data: string | ArrayBuffer | Record<string, unknown>) {
+  if (typeof data === "string") {
+    return data;
+  }
 
-  let suffix: string;
-
-  if ("documentation_url" in data) {
-    suffix = ` - ${data.documentation_url}`;
-  } else {
-    suffix = "";
+  if (data instanceof ArrayBuffer) {
+    return "Unknown error";
   }
 
   if ("message" in data) {
-    if (Array.isArray(data.errors)) {
-      return `${data.message}: ${data.errors.map(JSON.stringify).join(", ")}${suffix}`;
-    }
+    const suffix =
+      "documentation_url" in data ? ` - ${data.documentation_url}` : "";
 
-    return `${data.message}${suffix}`;
+    return Array.isArray(data.errors)
+      ? `${data.message}: ${data.errors.map((v) => JSON.stringify(v)).join(", ")}${suffix}`
+      : `${data.message}${suffix}`;
   }
 
   return `Unknown error: ${JSON.stringify(data)}`;
