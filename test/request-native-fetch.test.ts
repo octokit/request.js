@@ -571,7 +571,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
   });
 
   it("422 error with details", async () => {
-    expect.assertions(8);
+    expect.assertions(9);
 
     const request = await mockRequestHttpServer((req, res) => {
       expect(req.method).toBe("POST");
@@ -607,6 +607,9 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       throw new Error("should not resolve");
     } catch (error) {
       expect(error.status).toEqual(422);
+      expect(error.message).toEqual(
+        'Validation Failed: {"resource":"Label","code":"invalid","field":"color"} - https://developer.github.com/v3/issues/labels/#create-a-label',
+      );
       expect(error.response.headers["x-foo"]).toEqual("bar");
       expect(error.response.data.documentation_url).toEqual(
         "https://developer.github.com/v3/issues/labels/#create-a-label",
@@ -614,6 +617,114 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       expect(error.response.data.errors).toEqual([
         { resource: "Label", code: "invalid", field: "color" },
       ]);
+    } finally {
+      request.closeMockServer();
+    }
+  });
+
+  it("422 error with details without documentation_url", async () => {
+    expect.assertions(9);
+
+    const request = await mockRequestHttpServer((req, res) => {
+      expect(req.method).toBe("POST");
+      expect(req.url).toBe("/repos/octocat/hello-world/labels");
+      expect(req.headers.accept).toBe("application/vnd.github.v3+json");
+      expect(req.headers["user-agent"]).toBe(userAgent);
+
+      res.writeHead(422, {
+        "Content-Type": "application/json; charset=utf-8",
+        "X-Foo": "bar",
+      });
+      res.end(
+        JSON.stringify({
+          message: "Validation Failed",
+          errors: [
+            {
+              resource: "Label",
+              code: "invalid",
+              field: "color",
+            },
+          ],
+        }),
+      );
+    });
+
+    try {
+      await request("POST /repos/octocat/hello-world/labels", {
+        name: "foo",
+        color: "invalid",
+      });
+      throw new Error("should not resolve");
+    } catch (error) {
+      expect(error.status).toEqual(422);
+      expect(error.message).toEqual(
+        'Validation Failed: {"resource":"Label","code":"invalid","field":"color"}',
+      );
+      expect(error.response.headers["x-foo"]).toEqual("bar");
+      expect(error.response.data.documentation_url).toEqual(undefined);
+      expect(error.response.data.errors).toEqual([
+        { resource: "Label", code: "invalid", field: "color" },
+      ]);
+    } finally {
+      request.closeMockServer();
+    }
+  });
+
+  it("422 error with ArrayBuffer as body", async () => {
+    expect.assertions(7);
+
+    const request = await mockRequestHttpServer((req, res) => {
+      expect(req.method).toBe("POST");
+      expect(req.url).toBe("/repos/octocat/hello-world/labels");
+      expect(req.headers.accept).toBe("application/vnd.github.v3+json");
+      expect(req.headers["user-agent"]).toBe(userAgent);
+
+      res.writeHead(422, {
+        "Content-Type": "application/octet-stream",
+      });
+      res.end("payload");
+    });
+
+    try {
+      await request("POST /repos/octocat/hello-world/labels", {
+        name: "foo",
+        color: "invalid",
+      });
+      throw new Error("should not resolve");
+    } catch (error) {
+      expect(error.status).toEqual(422);
+      expect(error.message).toEqual("Unknown error");
+      expect(error.response.data).instanceOf(ArrayBuffer);
+    } finally {
+      request.closeMockServer();
+    }
+  });
+
+  it("422 error without body", async () => {
+    expect.assertions(7);
+
+    const request = await mockRequestHttpServer((req, res) => {
+      expect(req.method).toBe("POST");
+      expect(req.url).toBe("/repos/octocat/hello-world/labels");
+      expect(req.headers.accept).toBe("application/vnd.github.v3+json");
+      expect(req.headers["user-agent"]).toBe(userAgent);
+
+      res.writeHead(422, {
+        "Content-Type": "text/plain",
+      });
+      res.end();
+    });
+
+    try {
+      await request("POST /repos/octocat/hello-world/labels", {
+        name: "foo",
+        color: "invalid",
+      });
+      throw new Error("should not resolve");
+    } catch (error) {
+      expect(error.status).toEqual(422);
+      expect(error.message).toEqual("");
+      expect(error.response.data).toEqual("");
     } finally {
       request.closeMockServer();
     }
@@ -967,6 +1078,35 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       expect(error.response.data.documentation_url).toEqual(
         "https://docs.github.com/en/rest/reference/repos#get-a-repository",
       );
+    } finally {
+      request.closeMockServer();
+    }
+  });
+
+  it("404 not found without documentation_url", { skip: true }, async () => {
+    expect.assertions(3);
+
+    const request = await mockRequestHttpServer(async (req, res) => {
+      expect(req.method).toBe("GET");
+      expect(req.url).toBe("/repos/octocat/unknown");
+
+      res.writeHead(404);
+      res.end(
+        JSON.stringify({
+          message: "Not Found",
+        }),
+      );
+    });
+
+    try {
+      await request("GET /repos/octocat/unknown");
+      throw new Error("Should have thrown");
+    } catch (error) {
+      expect(error.status).toEqual(404);
+      expect(error.response.data.message).toEqual("Not Found");
+      expect(error.response.data.documentation_url).toEqual("");
+    } finally {
+      request.closeMockServer();
     }
   });
 
