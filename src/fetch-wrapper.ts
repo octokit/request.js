@@ -1,3 +1,4 @@
+import { safeParse } from "fast-content-type-parse";
 import { isPlainObject } from "./is-plain-object.js";
 import { RequestError } from "@octokit/request-error";
 import type { EndpointInterface, OctokitResponse } from "@octokit/types";
@@ -145,15 +146,16 @@ export default async function fetchWrapper(
   return octokitResponse;
 }
 
-const applicationJsonRE = /^application\/json\b/;
-const textUtf8RE = /^text\/|(\b)+charset=utf-8$/;
-
 function getResponseData(response: Response): Promise<any> {
   const contentType = response.headers.get("content-type");
 
   if (!contentType) {
     return response.text();
-  } else if (applicationJsonRE.test(contentType)) {
+  }
+
+  const mimetype = safeParse(contentType);
+
+  if (mimetype.type === "application/json") {
     return (
       response
         .json()
@@ -165,7 +167,10 @@ function getResponseData(response: Response): Promise<any> {
         // after a failed .json(). To account for that we fallback to an empty string
         .catch(() => "")
     );
-  } else if (textUtf8RE.test(contentType)) {
+  } else if (
+    mimetype.type.startsWith("text/") ||
+    mimetype.parameters.charset?.toLowerCase() === "utf-8"
+  ) {
     return response.text();
   } else {
     return response.arrayBuffer();
