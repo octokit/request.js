@@ -65,6 +65,9 @@ describe("request()", () => {
             json() {
               return Promise.resolve("funk");
             },
+            text() {
+              return Promise.resolve("funk");
+            },
           }),
       },
     });

@@ -1,3 +1,4 @@
+import { safeParse } from "fast-content-type-parse";
 import { isPlainObject } from "./is-plain-object.js";
 import { RequestError } from "@octokit/request-error";
 import type { EndpointInterface, OctokitResponse } from "@octokit/types";
@@ -147,25 +148,29 @@ export default async function fetchWrapper(
 
 async function getResponseData(response: Response): Promise<any> {
   const contentType = response.headers.get("content-type");
-  if (/application\/json/.test(contentType!)) {
-    return (
-      response
-        .json()
-        // In the event that we get an empty response body we fallback to
-        // using .text(), but this should be investigated since if this were
-        // to occur in the GitHub API it really should not return an empty body.
-        .catch(() => response.text())
-        // `node-fetch` is throwing a "body used already for" error if `.text()` is run
-        // after a failed .json(). To account for that we fallback to an empty string
-        .catch(() => "")
-    );
+
+  if (!contentType) {
+    return response.text().catch(() => "");
   }
 
-  if (!contentType || /^text\/|charset=utf-8$/.test(contentType)) {
-    return response.text();
-  }
+  const mimetype = safeParse(contentType);
 
-  return response.arrayBuffer();
+  if (mimetype.type === "application/json") {
+    let text = "";
+    try {
+      text = await response.text();
+      return JSON.parse(text);
+    } catch (err) {
+      return text;
+    }
+  } else if (
+    mimetype.type.startsWith("text/") ||
+    mimetype.parameters.charset?.toLowerCase() === "utf-8"
+  ) {
+    return response.text().catch(() => "");
+  } else {
+    return response.arrayBuffer().catch(() => new ArrayBuffer(0));
+  }
 }
 
 function toErrorMessage(data: string | ArrayBuffer | Record<string, unknown>) {
