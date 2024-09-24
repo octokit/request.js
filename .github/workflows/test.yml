@@ -39,6 +39,10 @@ jobs:
       - run: exit 1
         if: ${{ needs.test_matrix.result != 'success' }}
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+          cache: npm
       - run: npm ci
       - run: npm run lint
     if: ${{ always() }}
