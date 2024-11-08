@@ -5,7 +5,7 @@ import { ReadableStream } from "node:stream/web";
 
 import { describe, it, expect, vi } from "vitest";
 import { getUserAgent } from "universal-user-agent";
-import fetchMock from "fetch-mock";
+import fetchMock, { FetchMock } from "fetch-mock";
 import { createAppAuth } from "@octokit/auth-app";
 import type {
   EndpointOptions,
@@ -28,15 +28,14 @@ describe("request()", () => {
 
   it("README example", async () => {
     expect.assertions(1);
-    const mock = fetchMock
-      .sandbox()
-      .mock("https://api.github.com/orgs/octokit/repos?type=private", [], {
-        headers: {
-          accept: "application/vnd.github.v3+json",
-          authorization: "token 0000000000000000000000000000000000000001",
-          "user-agent": userAgent,
-        },
-      });
+    const mock = fetchMock.createInstance();
+    mock.get("https://api.github.com/orgs/octokit/repos?type=private", [], {
+      headers: {
+        accept: "application/vnd.github.v3+json",
+        authorization: "token 0000000000000000000000000000000000000001",
+        "user-agent": userAgent,
+      },
+    });
 
     const response = await request("GET /orgs/{org}/repos", {
       headers: {
@@ -45,7 +44,7 @@ describe("request()", () => {
       org: "octokit",
       type: "private",
       request: {
-        fetch: mock,
+        fetch: mock.fetchHandler,
       },
     });
     expect(response.data).toEqual([]);
@@ -54,9 +53,8 @@ describe("request()", () => {
   it("README example alternative", async () => {
     expect.assertions(1);
 
-    const mock = fetchMock
-      .sandbox()
-      .mock("https://api.github.com/orgs/octokit/repos?type=private", []);
+    const mock = fetchMock.createInstance();
+    mock.get("https://api.github.com/orgs/octokit/repos?type=private", []);
 
     const response = await request({
       method: "GET",
@@ -67,7 +65,7 @@ describe("request()", () => {
       org: "octokit",
       type: "private",
       request: {
-        fetch: mock,
+        fetch: mock.fetchHandler,
       },
     });
     expect(response.data).toEqual([]);
@@ -111,8 +109,8 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     // see https://runkit.com/gr2m/reproducable-jwt
     const BEARER =
       "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOi0zMCwiZXhwIjo1NzAsImlzcyI6MX0.q3foRa78U3WegM5PrWLEh5N0bH1SD62OqW66ZYzArp95JBNiCbo8KAlGtiRENCIfBZT9ibDUWy82cI4g3F09mdTq3bD1xLavIfmTksIQCz5EymTWR5v6gL14LSmQdWY9lSqkgUG0XCFljWUglEP39H4yeHbFgdjvAYg3ifDS12z9oQz2ACdSpvxPiTuCC804HkPVw8Qoy0OSXvCkFU70l7VXCVUxnuhHnk8-oCGcKUspmeP6UdDnXk-Aus-eGwDfJbU2WritxxaXw6B4a3flTPojkYLSkPBr6Pi0H2-mBsW_Nvs0aLPVLKobQd4gqTkosX3967DoAG8luUMhrnxe8Q";
-    const mock = fetchMock
-      .sandbox()
+    const mock = fetchMock.createInstance();
+    mock
       .postOnce("https://api.github.com/app/installations/123/access_tokens", {
         token: "secret123",
         expires_at: "1970-01-01T01:00:00.000Z",
@@ -150,7 +148,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     });
     const requestWithAuth = request.defaults({
       request: {
-        fetch: mock,
+        fetch: mock.fetchHandler,
         hook: auth.hook,
       },
     });
@@ -161,20 +159,19 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       title: "Hello from the engine room",
     });
 
-    expect(mock.done()).toBe(true);
+    expect(mock.callHistory.done()).toBe(true);
     vi.useRealTimers();
   });
 
   it("Request with body", async () => {
     expect.assertions(1);
 
-    const mock = fetchMock
-      .sandbox()
-      .mock("https://api.github.com/repos/octocat/hello-world/issues", 201, {
-        headers: {
-          "content-type": "application/json; charset=utf-8",
-        },
-      });
+    const mock = fetchMock.createInstance();
+    mock.post("https://api.github.com/repos/octocat/hello-world/issues", 201, {
+      headers: {
+        "content-type": "application/json; charset=utf-8",
+      },
+    });
 
     const response = await request("POST /repos/{owner}/{repo}/issues", {
       owner: "octocat",
@@ -188,7 +185,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       milestone: 1,
       labels: ["bug"],
       request: {
-        fetch: mock,
+        fetch: mock.fetchHandler,
       },
     });
 
@@ -196,14 +193,13 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
   });
 
   it("Put without request body", async () => {
-    expect.assertions(1);
+    const mock = fetchMock.createInstance();
 
-    const mock = fetchMock
-      .sandbox()
-      .mock("https://api.github.com/user/starred/octocat/hello-world", 204, {
-        body: undefined,
-      });
+    mock.put("https://api.github.com/user/starred/octocat/hello-world", {
+      status: 204,
+    });
 
+    // Perform the request
     const response = await request("PUT /user/starred/{owner}/{repo}", {
       headers: {
         authorization: `token 0000000000000000000000000000000000000001`,
@@ -211,17 +207,18 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       owner: "octocat",
       repo: "hello-world",
       request: {
-        fetch: mock,
+        fetch: mock.fetchHandler,
       },
     });
+
     expect(response.status).toEqual(204);
   });
 
   it("HEAD requests (octokit/rest.js#841)", async () => {
     expect.assertions(2);
 
-    const mock = fetchMock
-      .sandbox()
+    const mock = fetchMock.createInstance();
+    mock
       .head("https://api.github.com/repos/whatwg/html/pulls/1", {
         status: 200,
         headers: {
@@ -242,7 +239,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       repo: "html",
       number: 1,
       request: {
-        fetch: mock,
+        fetch: mock.fetchHandler,
       },
     };
 
@@ -261,8 +258,8 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
   });
 
   it.skip("Binary response with redirect (🤔 unclear how to mock fetch redirect properly)", async () => {
-    const mock = fetchMock
-      .sandbox()
+    const mock = fetchMock.createInstance();
+    mock
       .get(
         "https://codeload.github.com/repos/octokit-fixture-org/get-archive-1/tarball/master",
         {
@@ -296,7 +293,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         archive_format: "tarball",
         ref: "master",
         request: {
-          fetch: mock,
+          fetch: mock.fetchHandler,
         },
       },
     );
@@ -309,31 +306,30 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
 
     const payload =
       "1f8b0800000000000003cb4f2ec9cfce2cd14dcbac28292d4ad5cd2f4ad74d4f2dd14d2c4acec82c4bd53580007d060a0050bfb9b9a90203c428741ac2313436343307222320dbc010a8dc5c81c194124b8905a5c525894540a714e5e797e05347481edd734304e41319ff41ae8e2ebeae7ab92964d801d46f66668227fe0d4d51e3dfc8d0c8d808284f75df6201233cfe951590627ba01d330a46c1281805a3806e000024cb59d6000a0000";
-    const mock = fetchMock
-      .sandbox()
-      .get(
-        "https://codeload.github.com/octokit-fixture-org/get-archive/legacy.tar.gz/master",
-        {
-          status: 200,
+    const mock = fetchMock.createInstance();
+    mock.get(
+      "https://codeload.github.com/octokit-fixture-org/get-archive/legacy.tar.gz/master",
+      {
+        status: 200,
 
-          // expect(response.data.length).toEqual(172)
-          // body: Buffer.from('1f8b0800000000000003cb4f2ec9cfce2cd14dcbac28292d4ad5cd2f4ad74d4f2dd14d2c4acec82c4bd53580007d060a0050bfb9b9a90203c428741ac2313436343307222320dbc010a8dc5c81c194124b8905a5c525894540a714e5e797e05347481edd734304e41319ff41ae8e2ebeae7ab92964d801d46f66668227fe0d4d51e3dfc8d0c8d808284f75df6201233cfe951590627ba01d330a46c1281805a3806e000024cb59d6000a0000', 'hex'),
-          body: Buffer.from(
-            "1f8b0800000000000003cb4f2ec9cfce2cd14dcbac28292d4ad5cd2f4ad74d4f2dd14d2c4acec82c4bd53580007d060a0050bfb9b9a90203c428741ac2313436343307222320dbc010a8dc5c81c194124b8905a5c525894540a714e5e797e05347481edd734304e41319ff41ae8e2ebeae7ab92964d801d46f66668227fe0d4d51e3dfc8d0c8d808284f75df6201233cfe951590627ba01d330a46c1281805a3806e000024cb59d6000a0000",
-            "hex",
-          ),
-          headers: {
-            "content-type": "application/x-gzip",
-            "content-length": "172",
-          },
+        // expect(response.data.length).toEqual(172)
+        // body: Buffer.from('1f8b0800000000000003cb4f2ec9cfce2cd14dcbac28292d4ad5cd2f4ad74d4f2dd14d2c4acec82c4bd53580007d060a0050bfb9b9a90203c428741ac2313436343307222320dbc010a8dc5c81c194124b8905a5c525894540a714e5e797e05347481edd734304e41319ff41ae8e2ebeae7ab92964d801d46f66668227fe0d4d51e3dfc8d0c8d808284f75df6201233cfe951590627ba01d330a46c1281805a3806e000024cb59d6000a0000', 'hex'),
+        body: Buffer.from(
+          "1f8b0800000000000003cb4f2ec9cfce2cd14dcbac28292d4ad5cd2f4ad74d4f2dd14d2c4acec82c4bd53580007d060a0050bfb9b9a90203c428741ac2313436343307222320dbc010a8dc5c81c194124b8905a5c525894540a714e5e797e05347481edd734304e41319ff41ae8e2ebeae7ab92964d801d46f66668227fe0d4d51e3dfc8d0c8d808284f75df6201233cfe951590627ba01d330a46c1281805a3806e000024cb59d6000a0000",
+          "hex",
+        ),
+        headers: {
+          "content-type": "application/x-gzip",
+          "content-length": "172",
         },
-      );
+      },
+    );
 
     const response = await request(
       "GET https://codeload.github.com/octokit-fixture-org/get-archive/legacy.tar.gz/master",
       {
         request: {
-          fetch: mock,
+          fetch: mock.fetchHandler,
         },
       },
     );
@@ -349,20 +345,21 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
 
   it("304 etag", async () => {
     expect.assertions(1);
+    const mock = fetchMock.createInstance();
 
-    const mock = fetchMock.sandbox().get((url, { headers }) => {
-      return (
-        url === "https://api.github.com/orgs/myorg" &&
-        (headers as ResponseHeaders)["if-none-match"] === "etag"
-      );
-    }, 304);
+    mock.get("https://api.github.com/orgs/myorg", {
+      status: 304,
+      headers: {
+        "If-None-Match": "etag",
+      },
+    });
 
     await expect(
       request("GET /orgs/{org}", {
         org: "myorg",
         headers: { "If-None-Match": "etag" },
         request: {
-          fetch: mock,
+          fetch: mock.fetchHandler,
         },
       }),
     ).rejects.toHaveProperty("status", 304);
@@ -371,13 +368,13 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
   it("304 last-modified", async () => {
     expect.assertions(1);
 
-    const mock = fetchMock.sandbox().get((url, { headers }) => {
-      return (
-        url === "https://api.github.com/orgs/myorg" &&
-        (headers as ResponseHeaders)["if-modified-since"] ===
-          "Sun Dec 24 2017 22:00:00 GMT-0600 (CST)"
-      );
-    }, 304);
+    const mock = fetchMock.createInstance();
+    mock.get("https://api.github.com/orgs/myorg", {
+      status: 304,
+      headers: {
+        "if-modified-since": "Sun Dec 24 2017 22:00:00 GMT-0600 (CST)",
+      },
+    });
 
     await expect(
       request("GET /orgs/{org}", {
@@ -386,7 +383,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
           "If-Modified-Since": "Sun Dec 24 2017 22:00:00 GMT-0600 (CST)",
         },
         request: {
-          fetch: mock,
+          fetch: mock.fetchHandler,
         },
       }),
     ).rejects.toHaveProperty("status", 304);
@@ -395,13 +392,14 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
   it("Not found", async () => {
     expect.assertions(3);
 
-    const mock = fetchMock.sandbox().get("path:/orgs/nope", 404);
+    const mock = fetchMock.createInstance();
+    mock.get("path:/orgs/nope", 404);
 
     try {
       await request("GET /orgs/{org}", {
         org: "nope",
         request: {
-          fetch: mock,
+          fetch: mock.fetchHandler,
         },
       });
       throw new Error("should not resolve");
@@ -433,15 +431,14 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
   it("error response with no body (octokit/request.js#649)", async () => {
     expect.assertions(1);
 
-    const mock = fetchMock
-      .sandbox()
-      .get("path:/repos/octokit-fixture-org/hello-world/contents/README.md", {
-        status: 500,
-        body: "",
-        headers: {
-          "content-type": "application/json",
-        },
-      });
+    const mock = fetchMock.createInstance();
+    mock.get("path:/repos/octokit-fixture-org/hello-world/contents/README.md", {
+      status: 500,
+      body: "",
+      headers: {
+        "content-type": "application/json",
+      },
+    });
 
     try {
       await request("GET /repos/{owner}/{repo}/contents/{path}", {
@@ -452,7 +449,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         repo: "hello-world",
         path: "README.md",
         request: {
-          fetch: mock,
+          fetch: mock.fetchHandler,
         },
       });
       throw new Error("should not resolve");
@@ -464,16 +461,15 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
   it("non-JSON response", async () => {
     expect.assertions(1);
 
-    const mock = fetchMock
-      .sandbox()
-      .get("path:/repos/octokit-fixture-org/hello-world/contents/README.md", {
-        status: 200,
-        body: "# hello-world",
-        headers: {
-          "content-length": "13",
-          "content-type": "application/vnd.github.v3.raw; charset=utf-8",
-        },
-      });
+    const mock = fetchMock.createInstance();
+    mock.get("path:/repos/octokit-fixture-org/hello-world/contents/README.md", {
+      status: 200,
+      body: "# hello-world",
+      headers: {
+        "content-length": "13",
+        "content-type": "application/vnd.github.v3.raw; charset=utf-8",
+      },
+    });
 
     const response = await request(
       "GET /repos/{owner}/{repo}/contents/{path}",
@@ -485,7 +481,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         repo: "hello-world",
         path: "README.md",
         request: {
-          fetch: mock,
+          fetch: mock.fetchHandler,
         },
       },
     );
@@ -505,7 +501,8 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
   it("Request TypeError error with an Error cause", async () => {
     expect.assertions(2);
 
-    const mock = fetchMock.sandbox().get("https://127.0.0.1:8/", {
+    const mock = fetchMock.createInstance();
+    mock.get("https://127.0.0.1:8/", {
       throws: Object.assign(new TypeError("fetch failed"), {
         cause: new Error("bad"),
       }),
@@ -515,7 +512,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       // port: 8 // officially unassigned port. See https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
       await request("GET https://127.0.0.1:8/", {
         request: {
-          fetch: mock,
+          fetch: mock.fetchHandler,
         },
       });
       throw new Error("should not resolve");
@@ -528,7 +525,8 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
   it("Request TypeError error with a string cause", async () => {
     expect.assertions(2);
 
-    const mock = fetchMock.sandbox().get("https://127.0.0.1:8/", {
+    const mock = fetchMock.createInstance();
+    mock.get("https://127.0.0.1:8/", {
       throws: Object.assign(new TypeError("fetch failed"), { cause: "bad" }),
     });
 
@@ -536,7 +534,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       // port: 8 // officially unassigned port. See https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
       await request("GET https://127.0.0.1:8/", {
         request: {
-          fetch: mock,
+          fetch: mock.fetchHandler,
         },
       });
       throw new Error("should not resolve");
@@ -547,54 +545,62 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
   });
 
   it("custom user-agent", async () => {
-    expect.assertions(1);
+    expect.assertions(2);
+    const mock = fetchMock.createInstance();
 
-    const mock = fetchMock.sandbox().get((_url, mockRequest) => {
-      expect(mockRequest.headers!["user-agent"]).toEqual("funky boom boom pow");
-      return true;
-    }, 200);
-
-    await request("GET /", {
+    mock.get("https://api.github.com/orgs/myorg", {
+      status: 200,
       headers: {
         "user-agent": "funky boom boom pow",
       },
+    });
+
+    const response = await request("GET /orgs/{owner}", {
+      headers: {
+        "user-agent": "funky boom boom pow",
+      },
+      owner: "myorg",
       request: {
-        fetch: mock,
+        fetch: mock.fetchHandler,
       },
     });
+
+    expect(response.status).toEqual(200);
+    expect(mock.callHistory.calls()[0].options.headers!["user-agent"]).toEqual(
+      "funky boom boom pow",
+    );
   });
 
   it("422 error with details", async () => {
     expect.assertions(4);
 
-    const mock = fetchMock
-      .sandbox()
-      .post("https://api.github.com/repos/octocat/hello-world/labels", {
-        status: 422,
-        headers: {
-          "Content-Type": "application/json; charset=utf-8",
-          "X-Foo": "bar",
-        },
-        body: {
-          message: "Validation Failed",
-          errors: [
-            {
-              resource: "Label",
-              code: "invalid",
-              field: "color",
-            },
-          ],
-          documentation_url:
-            "https://developer.github.com/v3/issues/labels/#create-a-label",
-        },
-      });
+    const mock = fetchMock.createInstance();
+    mock.post("https://api.github.com/repos/octocat/hello-world/labels", {
+      status: 422,
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+        "X-Foo": "bar",
+      },
+      body: {
+        message: "Validation Failed",
+        errors: [
+          {
+            resource: "Label",
+            code: "invalid",
+            field: "color",
+          },
+        ],
+        documentation_url:
+          "https://developer.github.com/v3/issues/labels/#create-a-label",
+      },
+    });
 
     try {
       await request("POST /repos/octocat/hello-world/labels", {
         name: "foo",
         color: "invalid",
         request: {
-          fetch: mock,
+          fetch: mock.fetchHandler,
         },
       });
       throw new Error("should not resolve");
@@ -613,7 +619,8 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
   it("redacts credentials from error.request.headers.authorization", async () => {
     expect.assertions(1);
 
-    const mock = fetchMock.sandbox().get("https://api.github.com/", {
+    const mock = fetchMock.createInstance();
+    mock.get("https://api.github.com/", {
       status: 500,
     });
 
@@ -623,7 +630,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
           authorization: "token secret123",
         },
         request: {
-          fetch: mock,
+          fetch: mock.fetchHandler,
         },
       });
       throw new Error("should not resolve");
@@ -634,18 +641,17 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
 
   it("redacts credentials from error.request.url", async () => {
     expect.assertions(1);
-    const mock = fetchMock
-      .sandbox()
-      .get("https://api.github.com/?client_id=123&client_secret=secret123", {
-        status: 500,
-      });
+    const mock = fetchMock.createInstance();
+    mock.get("https://api.github.com/?client_id=123&client_secret=secret123", {
+      status: 500,
+    });
 
     try {
       await request("/", {
         client_id: "123",
         client_secret: "secret123",
         request: {
-          fetch: mock,
+          fetch: mock.fetchHandler,
         },
       });
       throw new Error("should not resolve");
@@ -659,11 +665,12 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
   it("Just URL", async () => {
     expect.assertions(1);
 
-    const mock = fetchMock.sandbox().get("path:/", 200);
+    const mock = fetchMock.createInstance();
+    mock.get("path:/", 200);
 
     const response = await request("/", {
       request: {
-        fetch: mock,
+        fetch: mock.fetchHandler,
       },
     });
 
@@ -714,7 +721,8 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
   it("options.request.hook", async () => {
     expect.assertions(4);
 
-    const mock = fetchMock.sandbox().mock(
+    const mock = fetchMock.createInstance();
+    mock.get(
       "https://api.github.com/foo",
       { ok: true },
       {
@@ -738,7 +746,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         },
         method: "GET",
         request: {
-          fetch: mock,
+          fetch: mock.fetchHandler,
           hook,
         },
         url: "/",
@@ -749,14 +757,14 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
           "x-foo": "bar",
         },
         request: {
-          fetch: mock,
+          fetch: mock.fetchHandler,
         },
       });
     };
 
     const response = await request("/", {
       request: {
-        fetch: mock,
+        fetch: mock.fetchHandler,
         hook,
       },
     });
@@ -766,15 +774,14 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
   it("options.mediaType.format", async () => {
     expect.assertions(1);
 
-    const mock = fetchMock
-      .sandbox()
-      .mock("https://api.github.com/repos/octokit/request.js/issues/1", "ok", {
-        headers: {
-          accept: "application/vnd.github.v3.raw+json",
-          authorization: "token 0000000000000000000000000000000000000001",
-          "user-agent": userAgent,
-        },
-      });
+    const mock = fetchMock.createInstance();
+    mock.get("https://api.github.com/repos/octokit/request.js/issues/1", "ok", {
+      headers: {
+        accept: "application/vnd.github.v3.raw+json",
+        authorization: "token 0000000000000000000000000000000000000001",
+        "user-agent": userAgent,
+      },
+    });
 
     const response = await request(
       "GET /repos/{owner}/{repo}/issues/{number}",
@@ -789,7 +796,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         repo: "request.js",
         number: 1,
         request: {
-          fetch: mock,
+          fetch: mock.fetchHandler,
         },
       },
     );
@@ -799,16 +806,15 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
   it("options.mediaType.previews", async () => {
     expect.assertions(1);
 
-    const mock = fetchMock
-      .sandbox()
-      .mock("https://api.github.com/graphql", "ok", {
-        headers: {
-          accept:
-            "application/vnd.github.foo-preview+json,application/vnd.github.bar-preview+json",
-          authorization: "token 0000000000000000000000000000000000000001",
-          "user-agent": userAgent,
-        },
-      });
+    const mock = fetchMock.createInstance();
+    mock.get("https://api.github.com/graphql", "ok", {
+      headers: {
+        accept:
+          "application/vnd.github.foo-preview+json,application/vnd.github.bar-preview+json",
+        authorization: "token 0000000000000000000000000000000000000001",
+        "user-agent": userAgent,
+      },
+    });
 
     const response = await request("GET /graphql", {
       headers: {
@@ -818,14 +824,15 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         previews: ["foo", "bar"],
       },
       request: {
-        fetch: mock,
+        fetch: mock.fetchHandler,
       },
     });
     expect(response.data).toEqual("ok");
   });
 
   it("octokit/octokit.js#1497", async () => {
-    const mock = fetchMock.sandbox().mock(
+    const mock = fetchMock.createInstance();
+    mock.put(
       "https://request-errors-test.com/repos/gr2m/sandbox/branches/gr2m-patch-1/protection",
       {
         status: 400,
@@ -867,7 +874,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         },
         restrictions: { users: [], teams: [] },
         request: {
-          fetch: mock,
+          fetch: mock.fetchHandler,
         },
       }),
     ).rejects.toHaveProperty(
@@ -879,7 +886,8 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
   it("logs deprecation warning if `deprecation` header is present", async () => {
     expect.assertions(3);
 
-    const mock = fetchMock.sandbox().mock(
+    const mock = fetchMock.createInstance();
+    mock.get(
       "https://api.github.com/teams/123",
       {
         body: {
@@ -907,7 +915,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         authorization: "token 0000000000000000000000000000000000000001",
       },
       team_id: 123,
-      request: { fetch: mock, log: { warn } },
+      request: { fetch: mock.fetchHandler, log: { warn } },
     });
     expect(response.data).toEqual({ id: 123 });
     expect(warn).toHaveBeenCalledTimes(1);
@@ -917,7 +925,8 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
   });
 
   it("deprecation header without deprecation link", async () => {
-    const mock = fetchMock.sandbox().mock(
+    const mock = fetchMock.createInstance();
+    mock.get(
       "https://api.github.com/teams/123",
       {
         body: {
@@ -944,7 +953,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         authorization: "token 0000000000000000000000000000000000000001",
       },
       team_id: 123,
-      request: { fetch: mock, log: { warn } },
+      request: { fetch: mock.fetchHandler, log: { warn } },
     });
     expect(response.data).toEqual({ id: 123 });
     expect(warn).toHaveBeenCalledTimes(1);
@@ -956,22 +965,21 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
   it("404 not found", async () => {
     expect.assertions(3);
 
-    const mock = fetchMock
-      .sandbox()
-      .get("https://api.github.com/repos/octocat/unknown", {
-        status: 404,
-        headers: {},
-        body: {
-          message: "Not Found",
-          documentation_url:
-            "https://docs.github.com/en/rest/reference/repos#get-a-repository",
-        },
-      });
+    const mock = fetchMock.createInstance();
+    mock.get("https://api.github.com/repos/octocat/unknown", {
+      status: 404,
+      headers: {},
+      body: {
+        message: "Not Found",
+        documentation_url:
+          "https://docs.github.com/en/rest/reference/repos#get-a-repository",
+      },
+    });
 
     try {
       await request("GET /repos/octocat/unknown", {
         request: {
-          fetch: mock,
+          fetch: mock.fetchHandler,
         },
       });
       throw new Error("Should have thrown");
@@ -993,7 +1001,8 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       });
     };
 
-    const mock = fetchMock.sandbox().get("https://api.github.com/", () =>
+    const mock = fetchMock.createInstance();
+    mock.get("https://api.github.com/", () =>
       delay(3000).then(() => ({
         message: "Not Found",
         documentation_url:
@@ -1004,7 +1013,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     try {
       await request("GET /", {
         request: {
-          fetch: mock,
+          fetch: mock.fetchHandler,
           signal: AbortSignal.timeout(500),
         },
       });
@@ -1020,14 +1029,13 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     expect.assertions(3);
 
     const size = fs.statSync(__filename).size;
-    const mock = fetchMock
-      .sandbox()
-      .post(
-        "https://api.github.com/repos/octokit-fixture-org/release-assets/releases/v1.0.0/assets",
-        {
-          status: 200,
-        },
-      );
+    const mock = fetchMock.createInstance();
+    mock.post(
+      "https://api.github.com/repos/octokit-fixture-org/release-assets/releases/v1.0.0/assets",
+      {
+        status: 200,
+      },
+    );
 
     const response = await request(
       "POST /repos/{owner}/{repo}/releases/{release_id}/assets",
@@ -1036,7 +1044,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         repo: "release-assets",
         release_id: "v1.0.0",
         request: {
-          fetch: mock,
+          fetch: mock.fetchHandler,
         },
         headers: {
           "content-type": "text/json",
@@ -1047,22 +1055,24 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         label: "test",
       },
     );
+
+    expect(mock.callHistory.calls()[0].options.body).toBeInstanceOf(
+      stream.Readable,
+    );
     expect(response.status).toEqual(200);
-    expect(mock.lastOptions()?.body).toBeInstanceOf(stream.Readable);
-    expect(mock.done()).toBe(true);
+    expect(mock.callHistory.done()).toBe(true);
   });
 
   it("validate request with data set to Buffer type", async () => {
     expect.assertions(3);
 
-    const mock = fetchMock
-      .sandbox()
-      .post(
-        "https://api.github.com/repos/octokit-fixture-org/release-assets/releases/tags/v1.0.0",
-        {
-          status: 200,
-        },
-      );
+    const mock = fetchMock.createInstance();
+    mock.post(
+      "https://api.github.com/repos/octokit-fixture-org/release-assets/releases/tags/v1.0.0",
+      {
+        status: 200,
+      },
+    );
 
     const response = await request(
       "POST /repos/{owner}/{repo}/releases/tags/{tag}",
@@ -1071,7 +1081,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         repo: "release-assets",
         tag: "v1.0.0",
         request: {
-          fetch: mock,
+          fetch: mock.fetchHandler,
         },
         headers: {
           "content-type": "text/plain",
@@ -1082,21 +1092,22 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       },
     );
     expect(response.status).toEqual(200);
-    expect(mock.lastOptions()?.body).toEqual(Buffer.from("Hello, world!\n"));
-    expect(mock.done()).toBe(true);
+    expect(mock.callHistory.calls()[0].options.body).toEqual(
+      Buffer.from("Hello, world!\n"),
+    );
+    expect(mock.callHistory.done()).toBe(true);
   });
 
   it("validate request with data set to ArrayBuffer type", async () => {
     expect.assertions(3);
 
-    const mock = fetchMock
-      .sandbox()
-      .post(
-        "https://api.github.com/repos/octokit-fixture-org/release-assets/releases/tags/v1.0.0",
-        {
-          status: 200,
-        },
-      );
+    const mock = fetchMock.createInstance();
+    mock.post(
+      "https://api.github.com/repos/octokit-fixture-org/release-assets/releases/tags/v1.0.0",
+      {
+        status: 200,
+      },
+    );
 
     const response = await request(
       "POST /repos/{owner}/{repo}/releases/tags/{tag}",
@@ -1105,7 +1116,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         repo: "release-assets",
         tag: "v1.0.0",
         request: {
-          fetch: mock,
+          fetch: mock.fetchHandler,
         },
         headers: {
           "content-type": "text/plain",
@@ -1117,17 +1128,21 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     );
 
     expect(response.status).toEqual(200);
-    expect(mock.lastOptions()?.body).toEqual(
+    expect(mock.callHistory.calls()[0].options.body).toEqual(
       stringToArrayBuffer("Hello, world!\n"),
     );
-    expect(mock.done()).toBe(true);
+    // expect(mock.callHistory.lastCall()[1].body).toEqual(
+    //   stringToArrayBuffer("Hello, world!\n"),
+    // );
+    expect(mock.callHistory.done()).toBe(true);
   });
 
   it("bubbles up AbortError if the request is aborted", async () => {
     expect.assertions(1);
 
     const abortController = new AbortController();
-    const mock = fetchMock.sandbox().post(
+    const mock = fetchMock.createInstance();
+    mock.post(
       "https://api.github.com/repos/octokit-fixture-org/release-assets/releases/tags/v1.0.0",
       new Promise(() => {
         abortController.abort();
@@ -1140,7 +1155,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         repo: "release-assets",
         tag: "v1.0.0",
         request: {
-          fetch: mock,
+          fetch: mock.fetchHandler,
           signal: abortController.signal,
         },
         headers: {
@@ -1156,7 +1171,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
   it("request should pass the stream in the response", async () => {
     expect.assertions(4);
 
-    const mock = fetchMock.sandbox().get(
+    const mock = fetchMock.createInstance().get(
       "https://api.github.com/repos/octokit-fixture-org/release-assets/tarball/main",
       {
         status: 200,
@@ -1178,7 +1193,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         branch: "main",
         request: {
           parseSuccessResponseBody: false,
-          fetch: mock,
+          fetch: mock.fetchHandler,
         },
       },
     );
@@ -1186,7 +1201,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     expect(response.status).toEqual(200);
     expect(response.headers["content-type"]).toEqual("application/x-gzip");
     expect(response.data).toBeInstanceOf(ReadableStream);
-    expect(mock.done()).toBe(true);
+    expect(mock.callHistory.done()).toBe(true);
   });
 
   it("request should pass the `redirect` option to fetch", () => {
@@ -1208,7 +1223,8 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
   it("invalid error responses should result in errors with a message field describing the error as an unknown error", async () => {
     expect.assertions(1);
 
-    const mock = fetchMock.sandbox().mock(
+    const mock = fetchMock.createInstance();
+    mock.put(
       "https://request-errors-test.com/repos/gr2m/sandbox/branches/gr2m-patch-1/protection",
       {
         status: 400,
@@ -1242,7 +1258,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         },
         restrictions: { users: [], teams: [] },
         request: {
-          fetch: mock,
+          fetch: mock.fetchHandler,
         },
       }),
     ).rejects.toHaveProperty("message", "Unknown error: {}");

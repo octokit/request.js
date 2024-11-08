@@ -1,4 +1,4 @@
-import fetchMock from "fetch-mock";
+import fetchMock, { FetchMock } from "fetch-mock";
 
 import { describe, it, expect } from "vitest";
 import { request } from "../src/index.ts";
@@ -9,19 +9,18 @@ describe("endpoint.defaults()", () => {
   });
 
   it("README example", () => {
-    const mock = fetchMock
-      .sandbox()
-      .mock(
-        "https://github-enterprise.acme-inc.com/api/v3/orgs/my-project/repos?per_page=100",
-        [],
-        {
-          headers: {
-            accept: "application/vnd.github.v3+json",
-            authorization: "token 0000000000000000000000000000000000000001",
-            "user-agent": "myApp/1.2.3",
-          },
+    const mock = fetchMock.createInstance();
+    mock.get(
+      "https://github-enterprise.acme-inc.com/api/v3/orgs/my-project/repos?per_page=100",
+      [],
+      {
+        headers: {
+          accept: "application/vnd.github.v3+json",
+          authorization: "token 0000000000000000000000000000000000000001",
+          "user-agent": "myApp/1.2.3",
         },
-      );
+      },
+    );
 
     const myRequest = request.defaults({
       baseUrl: "https://github-enterprise.acme-inc.com/api/v3",
@@ -32,7 +31,7 @@ describe("endpoint.defaults()", () => {
       org: "my-project",
       per_page: 100,
       request: {
-        fetch: mock,
+        fetch: mock.fetchHandler,
       },
     });
 
@@ -42,19 +41,18 @@ describe("endpoint.defaults()", () => {
   });
 
   it("repeated defaults", () => {
-    const mock = fetchMock
-      .sandbox()
-      .get(
-        "https://github-enterprise.acme-inc.com/api/v3/orgs/my-project/repos",
-        [],
-        {
-          headers: {
-            accept: "application/vnd.github.v3.raw+json",
-            authorization: "token 0000000000000000000000000000000000000001",
-            "user-agent": "myApp/1.2.3",
-          },
+    const mock = fetchMock.createInstance();
+    mock.get(
+      "https://github-enterprise.acme-inc.com/api/v3/orgs/my-project/repos",
+      [],
+      {
+        headers: {
+          accept: "application/vnd.github.v3.raw+json",
+          authorization: "token 0000000000000000000000000000000000000001",
+          "user-agent": "myApp/1.2.3",
         },
-      );
+      },
+    );
 
     const myProjectRequest = request.defaults({
       baseUrl: "https://github-enterprise.acme-inc.com/api/v3",
@@ -66,7 +64,7 @@ describe("endpoint.defaults()", () => {
       },
       org: "my-project",
       request: {
-        fetch: mock,
+        fetch: mock.fetchHandler,
       },
     });
     const myProjectRequestWithAuth = myProjectRequest.defaults({
