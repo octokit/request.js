@@ -173,7 +173,7 @@ async function getResponseData(response: Response): Promise<any> {
   }
 }
 
-function isJSONResponse(mimetype: { type: string }) {
+function isJSONResponse(mimetype: { type: string }): boolean {
   return (
     mimetype.type === "application/json" ||
     mimetype.type === "application/scim+json"
