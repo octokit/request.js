@@ -869,7 +869,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         required_pull_request_reviews: {
           required_approving_review_count: 1,
           dismiss_stale_reviews: true,
-          require_code owner_reviews: true,
+          require_code_owner_reviews: true,
           dismissal_restrictions: { users: [], teams: [] },
         },
         restrictions: { users: [], teams: [] },
