@@ -174,7 +174,10 @@ async function getResponseData(response: Response): Promise<any> {
 }
 
 function isJSONResponse(mimetype: { type: string }) {
-  return mimetype.type === "application/json" || mimetype.type === "application/scim+json";
+  return (
+    mimetype.type === "application/json" ||
+    mimetype.type === "application/scim+json"
+  );
 }
 
 function toErrorMessage(data: string | ArrayBuffer | Record<string, unknown>) {
