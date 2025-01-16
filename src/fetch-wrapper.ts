@@ -3,6 +3,8 @@ import { isPlainObject } from "./is-plain-object.js";
 import { RequestError } from "@octokit/request-error";
 import type { EndpointInterface, OctokitResponse } from "@octokit/types";
 
+type ContentType = ReturnType<typeof safeParse>;
+
 export default async function fetchWrapper(
   requestOptions: ReturnType<EndpointInterface>,
 ): Promise<OctokitResponse<any>> {
@@ -173,7 +175,7 @@ async function getResponseData(response: Response): Promise<any> {
   }
 }
 
-function isJSONResponse(mimetype: { type: string }): boolean {
+function isJSONResponse(mimetype: ContentType): boolean {
   return (
     mimetype.type === "application/json" ||
     mimetype.type === "application/scim+json"
