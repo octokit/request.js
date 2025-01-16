@@ -1263,4 +1263,41 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       }),
     ).rejects.toHaveProperty("message", "Unknown error: {}");
   });
+
+  it("parses response bodies as JSON when Content-Type is application/scim+json", async () => {
+    expect.assertions(1);
+
+    const mock = fetchMock.createInstance();
+    mock.get("https://api.github.com/scim/v2/Users", {
+      status: 200,
+      body: {
+        totalResults: 1,
+        Resources: [
+          {
+            id: "123",
+            userName: "octocat",
+          },
+        ],
+      },
+      headers: {
+        "Content-Type": "application/scim+json",
+      },
+    });
+
+    const response = await request("GET /scim/v2/Users", {
+      request: {
+        fetch: mock.fetchHandler,
+      },
+    });
+
+    expect(response.data).toEqual({
+      totalResults: 1,
+      Resources: [
+        {
+          id: "123",
+          userName: "octocat",
+        },
+      ],
+    });
+  });
 });
