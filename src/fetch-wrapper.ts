@@ -155,7 +155,7 @@ async function getResponseData(response: Response): Promise<any> {
 
   const mimetype = safeParse(contentType);
 
-  if (mimetype.type === "application/json") {
+  if (isJSONResponse(mimetype)) {
     let text = "";
     try {
       text = await response.text();
@@ -171,6 +171,10 @@ async function getResponseData(response: Response): Promise<any> {
   } else {
     return response.arrayBuffer().catch(() => new ArrayBuffer(0));
   }
+}
+
+function isJSONResponse(mimetype: { type: string }) {
+  return mimetype.type === "application/json" || mimetype.type === "application/scim+json";
 }
 
 function toErrorMessage(data: string | ArrayBuffer | Record<string, unknown>) {
