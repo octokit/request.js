@@ -32,17 +32,19 @@ describe("request()", () => {
       return new Response(response.body, {
         status: response.status,
         statusText: response.statusText,
-        headers: fakeHeaders
+        headers: fakeHeaders,
       });
     };
     const startTime = performance.now();
     request("GET /repos/octocat/hello-world");
     const endTime = performance.now();
     const elapsedTime = endTime - startTime;
-    const reDosThreshold = 2000; 
+    const reDosThreshold = 2000;
     expect(elapsedTime).toBeLessThanOrEqual(reDosThreshold);
     if (elapsedTime > reDosThreshold) {
-      console.warn(`🚨 Potential ReDoS Attack! getDuration method took ${elapsedTime.toFixed(2)} ms, exceeding threshold of ${reDosThreshold} ms.`);
+      console.warn(
+        `🚨 Potential ReDoS Attack! getDuration method took ${elapsedTime.toFixed(2)} ms, exceeding threshold of ${reDosThreshold} ms.`,
+      );
     }
   });
 
