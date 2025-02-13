@@ -96,7 +96,7 @@ export default async function fetchWrapper(
   if ("deprecation" in responseHeaders) {
     const matches =
       responseHeaders.link &&
-      responseHeaders.link.match(/<([^>]+)>; rel="deprecation"/);
+      responseHeaders.link.match(/<([^<>]+)>; rel="deprecation"/);
     const deprecationLink = matches && matches.pop();
     log.warn(
       `[@octokit/request] "${requestOptions.method} ${
