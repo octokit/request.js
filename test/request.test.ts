@@ -23,9 +23,8 @@ function stringToArrayBuffer(str: string) {
 
 describe("request()", () => {
   it("Test ReDoS - attack string", () => {
-    const originalFetch = globalThis.fetch;
-    globalThis.fetch = async (url, options) => {
-      const response = await originalFetch(url, options);
+    const fakeFetch = async (url, options) => {
+      const response = await fetch(url, options);
       const fakeHeaders = new Headers(response.headers);
       fakeHeaders.set("link", "<".repeat(100000) + ">");
       fakeHeaders.set("deprecation", "true");
@@ -36,7 +35,9 @@ describe("request()", () => {
       });
     };
     const startTime = performance.now();
-    request("GET /repos/octocat/hello-world");
+    request("GET /repos/octocat/hello-world", {
+      request: { fetch: fakeFetch },
+    });
     const endTime = performance.now();
     const elapsedTime = endTime - startTime;
     const reDosThreshold = 2000;
