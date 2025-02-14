@@ -19,7 +19,7 @@ const stringToArrayBuffer = require("string-to-arraybuffer");
 
 describe("request()", () => {
   it("Test ReDoS - attack string", () => {
-    const fakeFetch = async (url, options) => {
+    const fakeFetch = async (url: string, options?: RequestInit) => {
       const response = await fetch(url, options);
       const fakeHeaders = new Headers(response.headers);
       fakeHeaders.set("link", "<".repeat(100000) + ">");
