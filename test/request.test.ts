@@ -18,27 +18,30 @@ const userAgent = `octokit-request.js/0.0.0-development ${getUserAgent()}`;
 const stringToArrayBuffer = require("string-to-arraybuffer");
 
 describe("request()", () => {
-    it("Test ReDoS - attack string", () => {
-    const originalFetch = globalThis.fetch;
-    globalThis.fetch = async (url, options) => {
-      const response = await originalFetch(url, options);
+  it("Test ReDoS - attack string", () => {
+    const fakeFetch = async (url, options) => {
+      const response = await fetch(url, options);
       const fakeHeaders = new Headers(response.headers);
       fakeHeaders.set("link", "<".repeat(100000) + ">");
       fakeHeaders.set("deprecation", "true");
       return new Response(response.body, {
         status: response.status,
         statusText: response.statusText,
-        headers: fakeHeaders
+        headers: fakeHeaders,
       });
     };
     const startTime = performance.now();
-    request("GET /repos/octocat/hello-world");
+    request("GET /repos/octocat/hello-world", {
+      request: { fetch: fakeFetch },
+    });
     const endTime = performance.now();
     const elapsedTime = endTime - startTime;
-    const reDosThreshold = 2000; 
+    const reDosThreshold = 2000;
     expect(elapsedTime).toBeLessThanOrEqual(reDosThreshold);
     if (elapsedTime > reDosThreshold) {
-      console.warn(`🚨 Potential ReDoS Attack! getDuration method took ${elapsedTime.toFixed(2)} ms, exceeding threshold of ${reDosThreshold} ms.`);
+      console.warn(
+        `🚨 Potential ReDoS Attack! getDuration method took ${elapsedTime.toFixed(2)} ms, exceeding threshold of ${reDosThreshold} ms.`,
+      );
     }
   });
 
