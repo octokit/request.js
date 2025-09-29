@@ -25,8 +25,8 @@
   "author": "Gregor Martynus (https://github.com/gr2m)",
   "license": "MIT",
   "dependencies": {
-    "@octokit/endpoint": "^11.0.0",
-    "@octokit/request-error": "^7.0.0",
+    "@octokit/endpoint": "^11.0.1",
+    "@octokit/request-error": "^7.0.1",
     "@octokit/types": "^15.0.0",
     "fast-content-type-parse": "^3.0.0",
     "universal-user-agent": "^7.0.2"
