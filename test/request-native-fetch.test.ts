@@ -6,7 +6,7 @@ import { describe, it, expect, vi } from "vitest";
 import { getUserAgent } from "universal-user-agent";
 import { createAppAuth } from "@octokit/auth-app";
 import type { EndpointOptions, RequestInterface } from "@octokit/types";
-import { fetch as undiciFetch, Agent, RequestInit } from "undici";
+import { fetch as undiciFetch, Agent, type RequestInit } from "undici";
 
 import bodyParser from "./body-parser.ts";
 import mockRequestHttpServer from "./mock-request-http-server.ts";
@@ -476,7 +476,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         org: "nope",
       });
       throw new Error("should not resolve");
-    } catch (error) {
+    } catch (error: any) {
       expect(error.status).toEqual(404);
       expect(error.request.method).toEqual("GET");
       expect(error.request.url).toMatch(/\/orgs\/nope$/);
@@ -512,7 +512,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         path: "README.md",
       });
       throw new Error("should not resolve");
-    } catch (error) {
+    } catch (error: any) {
       expect(error.response.data).toBe("");
     } finally {
       request.closeMockServer();
@@ -605,7 +605,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         color: "invalid",
       });
       throw new Error("should not resolve");
-    } catch (error) {
+    } catch (error: any) {
       expect(error.status).toEqual(422);
       expect(error.message).toEqual(
         'Validation Failed: {"resource":"Label","code":"invalid","field":"color"} - https://developer.github.com/v3/issues/labels/#create-a-label',
@@ -655,7 +655,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         color: "invalid",
       });
       throw new Error("should not resolve");
-    } catch (error) {
+    } catch (error: any) {
       expect(error.status).toEqual(422);
       expect(error.message).toEqual(
         'Validation Failed: {"resource":"Label","code":"invalid","field":"color"}',
@@ -691,7 +691,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         color: "invalid",
       });
       throw new Error("should not resolve");
-    } catch (error) {
+    } catch (error: any) {
       expect(error.status).toEqual(422);
       expect(error.message).toEqual("Unknown error");
       expect(error.response.data).instanceOf(ArrayBuffer);
@@ -721,7 +721,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         color: "invalid",
       });
       throw new Error("should not resolve");
-    } catch (error) {
+    } catch (error: any) {
       expect(error.status).toEqual(422);
       expect(error.message).toEqual("");
       expect(error.response.data).toEqual("");
@@ -750,7 +750,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         },
       });
       throw new Error("should not resolve");
-    } catch (error) {
+    } catch (error: any) {
       expect(error.request.headers.authorization).toEqual("token [REDACTED]");
     } finally {
       request.closeMockServer();
@@ -775,7 +775,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         client_secret: "secret123",
       });
       throw new Error("should not resolve");
-    } catch (error) {
+    } catch (error: any) {
       expect(error.request.url).toMatch(
         /\?client_id=123&client_secret=\[REDACTED\]$/,
       );
@@ -1072,7 +1072,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     try {
       await request("GET /repos/octocat/unknown");
       throw new Error("Should have thrown");
-    } catch (error) {
+    } catch (error: any) {
       expect(error.status).toEqual(404);
       expect(error.response.data.message).toEqual("Not Found");
       expect(error.response.data.documentation_url).toEqual(
@@ -1101,7 +1101,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     try {
       await request("GET /repos/octocat/unknown");
       throw new Error("Should have thrown");
-    } catch (error) {
+    } catch (error: any) {
       expect(error.status).toEqual(404);
       expect(error.response.data.message).toEqual("Not Found");
       expect(error.response.data.documentation_url).toEqual("");
@@ -1133,7 +1133,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         },
       });
       throw new Error("should not resolve");
-    } catch (error) {
+    } catch (error: any) {
       expect(error.name).toEqual("HttpError");
       expect(error.status).toEqual(500);
     }
@@ -1174,7 +1174,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         },
       });
       throw new Error("should not resolve");
-    } catch (error) {
+    } catch (error: any) {
       expect(error.message).not.toEqual("should not resolve");
       expect(error.name).toEqual("HttpError");
       expect(error.status).toEqual(500);
