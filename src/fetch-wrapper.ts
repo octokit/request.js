@@ -5,6 +5,9 @@ import type { EndpointInterface, OctokitResponse } from "@octokit/types";
 
 type ContentType = ReturnType<typeof safeParse>;
 
+/* v8 ignore next -- @preserve */
+const noop = () => "";
+
 export default async function fetchWrapper(
   requestOptions: ReturnType<EndpointInterface>,
 ): Promise<OctokitResponse<any>> {
@@ -50,6 +53,8 @@ export default async function fetchWrapper(
     // wrap fetch errors as RequestError if it is not a AbortError
   } catch (error) {
     let message = "Unknown Error";
+    /* v8 ignore else -- @preserve */
+    /* vitest coverage bug where it thinks that there is an else */
     if (error instanceof Error) {
       if (error.name === "AbortError") {
         (error as RequestError).status = 500;
@@ -62,6 +67,7 @@ export default async function fetchWrapper(
       // and puts the error message in `error.cause`
       // https://github.com/nodejs/undici/blob/e5c9d703e63cd5ad691b8ce26e3f9a81c598f2e3/lib/fetch/index.js#L227
       if (error.name === "TypeError" && "cause" in error) {
+        /* v8 ignore else -- @preserve */
         if (error.cause instanceof Error) {
           message = error.cause.message;
         } else if (typeof error.cause === "string") {
@@ -152,7 +158,7 @@ async function getResponseData(response: Response): Promise<any> {
   const contentType = response.headers.get("content-type");
 
   if (!contentType) {
-    return response.text().catch(() => "");
+    return response.text().catch(noop);
   }
 
   const mimetype = safeParse(contentType);
@@ -169,9 +175,12 @@ async function getResponseData(response: Response): Promise<any> {
     mimetype.type.startsWith("text/") ||
     mimetype.parameters.charset?.toLowerCase() === "utf-8"
   ) {
-    return response.text().catch(() => "");
+    return response.text().catch(noop);
   } else {
-    return response.arrayBuffer().catch(() => new ArrayBuffer(0));
+    return response.arrayBuffer().catch(
+      /* v8 ignore next -- @preserve */
+      () => new ArrayBuffer(0),
+    );
   }
 }
 
