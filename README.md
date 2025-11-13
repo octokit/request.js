@@ -566,10 +566,8 @@ const { data } = await request("GET /users/{username}", {
   headers: {
     "X-GitHub-Api-Version": "2022-11-28",
   },
-  options: {
-    request: {
-      fetch: myFetch,
-    },
+  request: {
+    fetch: myFetch,
   },
 });
 ```
