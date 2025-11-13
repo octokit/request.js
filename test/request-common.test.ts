@@ -28,6 +28,12 @@ describe("request()", () => {
     // GitHub API requests are usually blocked due to IP rate limiting
     const response = await request(
       "https://www.githubstatus.com/api/v2/status.json",
+      {
+        headers: {
+          "user-agent":
+            "Mozilla/5.0 (X11; Linux x86_64; rv:144.0) Gecko/20100101 Firefox/144.0",
+        },
+      },
     );
     expect(response.url).toEqual(
       "https://www.githubstatus.com/api/v2/status.json",
