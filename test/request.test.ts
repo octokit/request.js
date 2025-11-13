@@ -5,7 +5,7 @@ import { ReadableStream } from "node:stream/web";
 
 import { describe, it, expect, vi } from "vitest";
 import { getUserAgent } from "universal-user-agent";
-import fetchMock, { FetchMock } from "fetch-mock";
+import fetchMock from "fetch-mock";
 import { createAppAuth } from "@octokit/auth-app";
 import type {
   EndpointOptions,
@@ -23,7 +23,7 @@ function stringToArrayBuffer(str: string) {
 
 describe("request()", () => {
   it("Test ReDoS - attack string", () => {
-    const fakeFetch = async (url, options) => {
+    const fakeFetch = async (url: string, options: RequestInit) => {
       const response = await fetch(url, options);
       const fakeHeaders = new Headers(response.headers);
       fakeHeaders.set("link", "<".repeat(100000) + ">");
@@ -430,7 +430,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         },
       });
       throw new Error("should not resolve");
-    } catch (error) {
+    } catch (error: any) {
       expect(error.status).toEqual(404);
       expect(error.request.method).toEqual("GET");
       expect(error.request.url).toEqual("https://api.github.com/orgs/nope");
@@ -446,7 +446,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
 
     try {
       await request("GET /orgs/me");
-    } catch (error) {
+    } catch (error: any) {
       expect(error.message).toEqual(
         "fetch is not set. Please pass a fetch implementation as new Octokit({ request: { fetch }}). Learn more at https://github.com/octokit/octokit.js/#fetch-missing",
       );
@@ -480,7 +480,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         },
       });
       throw new Error("should not resolve");
-    } catch (error) {
+    } catch (error: any) {
       expect(error.response.data).toBe("");
     }
   });
@@ -543,7 +543,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         },
       });
       throw new Error("should not resolve");
-    } catch (error) {
+    } catch (error: any) {
       expect(error.status).toEqual(500);
       expect(error.message).toEqual("bad");
     }
@@ -565,7 +565,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         },
       });
       throw new Error("should not resolve");
-    } catch (error) {
+    } catch (error: any) {
       expect(error.status).toEqual(500);
       expect(error.message).toEqual("bad");
     }
@@ -593,9 +593,11 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     });
 
     expect(response.status).toEqual(200);
-    expect(mock.callHistory.calls()[0].options.headers!["user-agent"]).toEqual(
-      "funky boom boom pow",
-    );
+    const headers = mock.callHistory.calls()[0].options.headers as Record<
+      string,
+      string
+    >;
+    expect(headers["user-agent"]).toEqual("funky boom boom pow");
   });
 
   it("422 error with details", async () => {
@@ -631,7 +633,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         },
       });
       throw new Error("should not resolve");
-    } catch (error) {
+    } catch (error: any) {
       expect(error.status).toEqual(422);
       expect(error.response.headers["x-foo"]).toEqual("bar");
       expect(error.response.data.documentation_url).toEqual(
@@ -661,7 +663,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         },
       });
       throw new Error("should not resolve");
-    } catch (error) {
+    } catch (error: any) {
       expect(error.request.headers.authorization).toEqual("token [REDACTED]");
     }
   });
@@ -682,7 +684,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         },
       });
       throw new Error("should not resolve");
-    } catch (error) {
+    } catch (error: any) {
       expect(error.request.url).toMatch(
         /\?client_id=123&client_secret=\[REDACTED\]$/,
       );
@@ -719,7 +721,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     expect(response.url).toEqual(
       "https://www.githubstatus.com/api/v2/status.json",
     );
-  });
+  }, 10000);
 
   it("options.request.fetch", async () => {
     expect.assertions(1);
@@ -1010,7 +1012,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         },
       });
       throw new Error("Should have thrown");
-    } catch (error) {
+    } catch (error: any) {
       expect(error.status).toEqual(404);
       expect(error.response.data.message).toEqual("Not Found");
       expect(error.response.data.documentation_url).toEqual(
@@ -1045,7 +1047,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
         },
       });
       throw new Error("should not resolve");
-    } catch (error) {
+    } catch (error: any) {
       expect(error.name).toEqual("AbortError");
       expect(error.message).toEqual("The operation was aborted.");
       expect(error.status).toEqual(500);
@@ -1198,19 +1200,18 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
   it("request should pass the stream in the response", async () => {
     expect.assertions(4);
 
-    const mock = fetchMock.createInstance().get(
-      "https://api.github.com/repos/octokit-fixture-org/release-assets/tarball/main",
-      {
-        status: 200,
-        headers: {
-          "content-type": "application/x-gzip",
+    const mock = fetchMock
+      .createInstance()
+      .get(
+        "https://api.github.com/repos/octokit-fixture-org/release-assets/tarball/main",
+        {
+          status: 200,
+          headers: {
+            "content-type": "application/x-gzip",
+          },
+          body: fs.createReadStream(__filename),
         },
-        body: fs.createReadStream(__filename),
-      },
-      {
-        sendAsJson: false,
-      },
-    );
+      );
 
     const response = await request(
       "GET /repos/{owner}/{repo}/tarball/{branch}",
