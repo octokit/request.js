@@ -13,7 +13,7 @@ describe("request()", () => {
 
     try {
       await request("GET /orgs/me");
-    } catch (error) {
+    } catch (error: any) {
       expect(error.message).toEqual(
         "fetch is not set. Please pass a fetch implementation as new Octokit({ request: { fetch }}). Learn more at https://github.com/octokit/octokit.js/#fetch-missing",
       );

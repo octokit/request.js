@@ -90,7 +90,7 @@ describe("request()", () => {
         },
       });
       throw new Error("should not resolve");
-    } catch (error) {
+    } catch (error: any) {
       expect(error.status).toEqual(500);
       expect(error.message).toEqual("bad");
     }
@@ -112,7 +112,7 @@ describe("request()", () => {
         },
       });
       throw new Error("should not resolve");
-    } catch (error) {
+    } catch (error: any) {
       expect(error.status).toEqual(500);
       expect(error.message).toEqual("bad");
     }
