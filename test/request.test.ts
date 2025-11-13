@@ -721,7 +721,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     expect(response.url).toEqual(
       "https://www.githubstatus.com/api/v2/status.json",
     );
-  });
+  }, 10000);
 
   it("options.request.fetch", async () => {
     expect.assertions(1);
