@@ -38,7 +38,7 @@ describe("request()", () => {
     expect(response.url).toEqual(
       "https://www.githubstatus.com/api/v2/status.json",
     );
-  });
+  }, 10000);
 
   it("request should pass the `redirect` option to fetch", () => {
     expect.assertions(1);
