@@ -164,12 +164,10 @@ async function getResponseData(response: Response): Promise<any> {
   const mimetype = safeParse(contentType);
 
   if (isJSONResponse(mimetype)) {
-    let text = "";
     try {
-      text = await response.text();
-      return JSON.parse(text);
+      return await response.json();
     } catch (err) {
-      return text;
+      return "";
     }
   } else if (
     mimetype.type.startsWith("text/") ||
