@@ -14,6 +14,7 @@ import type {
 } from "@octokit/types";
 
 import { request } from "../src/index.ts";
+import { JSONStringify } from "json-with-bigint";
 
 const userAgent = `octokit-request.js/0.0.0-development ${getUserAgent()}`;
 const __filename = new URL(import.meta.url);
@@ -1364,5 +1365,32 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
 
     expect(response.status).toEqual(200);
     expect(response.data[0].id).toEqual(BigInt(Number.MAX_SAFE_INTEGER) + 9n);
+  });
+
+  it("properly serialises request bodies that contain int64 (BigInt)", async () => {
+    expect.assertions(2);
+
+    const id = BigInt(Number.MAX_SAFE_INTEGER) + 9n;
+    const mock = fetchMock.createInstance();
+    mock.get("https://api.github.com/app/hook/deliveries", {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+      },
+      body: JSONStringify({
+        id: id,
+      }),
+    });
+
+    const response = await request("GET /app/hook/deliveries/{delivery_id}", {
+      // @ts-expect-error The types won't allw BigInt until https://github.com/octokit/openapi-types.ts/pull/489 is merged and released
+      delivery_id: id,
+      request: {
+        fetch: mock.fetchHandler,
+      },
+    });
+
+    expect(response.status).toEqual(200);
+    expect(response.data.id).toEqual(id);
   });
 });
