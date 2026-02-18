@@ -1,4 +1,5 @@
 import { safeParse } from "fast-content-type-parse";
+import { JSONParse } from "json-with-bigint";
 import { isPlainObject } from "./is-plain-object.js";
 import { RequestError } from "@octokit/request-error";
 import type { EndpointInterface, OctokitResponse } from "@octokit/types";
@@ -167,8 +168,7 @@ async function getResponseData(response: Response): Promise<any> {
     let text = "";
     try {
       text = await response.text();
-      JSON.parse(text);
-      return await response.json();
+      return JSONParse(text);
     } catch (err) {
       return text;
     }
