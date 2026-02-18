@@ -1328,4 +1328,41 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
       ],
     });
   });
+
+  it("parses JSON response bodies that contain int64 (BigInt)", async () => {
+    expect.assertions(2);
+
+    const mock = fetchMock.createInstance();
+    mock.get("https://api.github.com/app/hook/deliveries", {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+      },
+      body: [
+        {
+          id: Number.MAX_SAFE_INTEGER + 9,
+          guid: "0b989ba4-242f-11e5-81e1-c7b6966d2516",
+          delivered_at: "2019-06-03T00:57:16Z",
+          redelivery: false,
+          duration: 0.27,
+          status: "OK",
+          status_code: 200,
+          event: "issues",
+          action: "opened",
+          installation_id: 123,
+          repository_id: 456,
+          throttled_at: "2019-06-03T00:57:16Z",
+        },
+      ],
+    });
+
+    const response = await request("GET /app/hook/deliveries", {
+      request: {
+        fetch: mock.fetchHandler,
+      },
+    });
+
+    expect(response.status).toEqual(200);
+    expect(response.data[0].id).toEqual(BigInt(Number.MAX_SAFE_INTEGER) + 9n);
+  });
 });
