@@ -1,4 +1,5 @@
 import { safeParse } from "fast-content-type-parse";
+import { JSONParse, JSONStringify } from "json-with-bigint";
 import { isPlainObject } from "./is-plain-object.js";
 import { RequestError } from "@octokit/request-error";
 import type { EndpointInterface, OctokitResponse } from "@octokit/types";
@@ -26,7 +27,7 @@ export default async function fetchWrapper(
 
   const body =
     isPlainObject(requestOptions.body) || Array.isArray(requestOptions.body)
-      ? JSON.stringify(requestOptions.body)
+      ? JSONStringify(requestOptions.body)
       : requestOptions.body;
 
   // Header values must be `string`
@@ -167,7 +168,7 @@ async function getResponseData(response: Response): Promise<any> {
     let text = "";
     try {
       text = await response.text();
-      return JSON.parse(text);
+      return JSONParse(text);
     } catch (err) {
       return text;
     }

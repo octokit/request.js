@@ -25,10 +25,11 @@
   "author": "Gregor Martynus (https://github.com/gr2m)",
   "license": "MIT",
   "dependencies": {
-    "@octokit/endpoint": "^11.0.2",
+    "@octokit/endpoint": "^11.0.3",
     "@octokit/request-error": "^7.0.2",
     "@octokit/types": "^16.0.0",
     "fast-content-type-parse": "^3.0.0",
+    "json-with-bigint": "^3.5.3",
     "universal-user-agent": "^7.0.2"
   },
   "devDependencies": {
@@ -38,9 +39,9 @@
     "@vitest/coverage-v8": "^4.0.0",
     "esbuild": "^0.27.0",
     "fetch-mock": "^12.0.0",
-    "tinyglobby": "^0.2.15",
     "prettier": "3.6.2",
     "semantic-release-plugin-update-version-in-files": "^2.0.0",
+    "tinyglobby": "^0.2.15",
     "typescript": "^5.0.0",
     "undici": "^7.0.0",
     "vitest": "^4.0.0"
