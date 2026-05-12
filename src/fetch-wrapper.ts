@@ -1,10 +1,8 @@
-import { safeParse } from "fast-content-type-parse";
+import { parse, type ContentType } from "content-type";
 import { JSONParse, JSONStringify } from "json-with-bigint";
 import { isPlainObject } from "./is-plain-object.js";
 import { RequestError } from "@octokit/request-error";
 import type { EndpointInterface, OctokitResponse } from "@octokit/types";
-
-type ContentType = ReturnType<typeof safeParse>;
 
 /* v8 ignore next -- @preserve */
 const noop = () => "";
@@ -162,7 +160,7 @@ async function getResponseData(response: Response): Promise<any> {
     return response.text().catch(noop);
   }
 
-  const mimetype = safeParse(contentType);
+  const mimetype = parse(contentType);
 
   if (isJSONResponse(mimetype)) {
     let text = "";
