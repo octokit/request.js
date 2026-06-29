@@ -190,7 +190,7 @@ function isJSONResponse(mimetype: ContentType): boolean {
   );
 }
 
-function toErrorMessage(data: string | ArrayBuffer | Record<string, unknown>) {
+function toErrorMessage(data: unknown) {
   if (typeof data === "string") {
     return data;
   }
@@ -199,13 +199,20 @@ function toErrorMessage(data: string | ArrayBuffer | Record<string, unknown>) {
     return "Unknown error";
   }
 
-  if ("message" in data) {
+  // Guard the object-shaped branch before using the `in` operator: a JSON error
+  // body can be a primitive (`null`, a number, a boolean), and `"message" in
+  // data` throws a raw TypeError on non-object values. Primitives fall through
+  // to the generic unknown-error message below. See #819.
+  if (typeof data === "object" && data !== null && "message" in data) {
+    const objectData = data as Record<string, unknown>;
     const suffix =
-      "documentation_url" in data ? ` - ${data.documentation_url}` : "";
+      "documentation_url" in objectData
+        ? ` - ${objectData.documentation_url}`
+        : "";
 
-    return Array.isArray(data.errors)
-      ? `${data.message}: ${data.errors.map((v) => JSON.stringify(v)).join(", ")}${suffix}`
-      : `${data.message}${suffix}`;
+    return Array.isArray(objectData.errors)
+      ? `${objectData.message}: ${objectData.errors.map((v) => JSON.stringify(v)).join(", ")}${suffix}`
+      : `${objectData.message}${suffix}`;
   }
 
   return `Unknown error: ${JSON.stringify(data)}`;
