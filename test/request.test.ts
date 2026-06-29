@@ -1293,6 +1293,38 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     ).rejects.toHaveProperty("message", "Unknown error: {}");
   });
 
+  it("primitive JSON error bodies should result in a RequestError, not a raw TypeError", async () => {
+    // Regression test for #819: an error response with content-type
+    // application/json but a primitive body (null, a number, a boolean) used to
+    // throw a raw TypeError from `"message" in data` before RequestError was
+    // constructed, losing the status/request/response fields.
+    const cases: Array<[string, string]> = [
+      ["null", "Unknown error: null"],
+      ["42", "Unknown error: 42"],
+      ["false", "Unknown error: false"],
+    ];
+
+    expect.assertions(cases.length * 4);
+
+    for (const [body, expectedMessage] of cases) {
+      const fakeFetch = async () =>
+        new Response(body, {
+          status: 400,
+          headers: { "content-type": "application/json" },
+        });
+
+      const error: any = await request("GET /demo", {
+        baseUrl: "https://request-errors-test.com",
+        request: { fetch: fakeFetch },
+      }).catch((error) => error);
+
+      expect(error.name).toEqual("HttpError");
+      expect(error.status).toEqual(400);
+      expect(error.message).toEqual(expectedMessage);
+      expect(error.response).toBeDefined();
+    }
+  });
+
   it("parses response bodies as JSON when Content-Type is application/scim+json", async () => {
     expect.assertions(1);
 
