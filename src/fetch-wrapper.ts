@@ -172,7 +172,11 @@ async function getResponseData(response: Response): Promise<any> {
     }
   } else if (
     mimetype.type.startsWith("text/") ||
-    mimetype.parameters.charset?.toLowerCase() === "utf-8"
+    // `application/octet-stream` is the canonical "arbitrary binary" type
+    // (RFC 2046) and must never be decoded as text, even when the response
+    // carries a (misleading) `charset=utf-8` parameter — see #751.
+    (mimetype.parameters.charset?.toLowerCase() === "utf-8" &&
+      mimetype.type !== "application/octet-stream")
   ) {
     return response.text().catch(noop);
   } else {
