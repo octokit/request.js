@@ -406,6 +406,33 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     );
   });
 
+  it("Binary response with utf-8 charset is not mangled to text (#751)", async () => {
+    expect.assertions(3);
+
+    const payload =
+      "1f8b0800000000000003cb4f2ec9cfce2cd14dcbac28292d4ad5cd2f4ad74d4f2dd14d2c4acec82c4bd53580007d060a0050bfb9b9a90203c428741ac2313436343307222320dbc010a8dc5c81c194124b8905a5c525894540a714e5e797e05347481edd734304e41319ff41ae8e2ebeae7ab92964d801d46f66668227fe0d4d51e3dfc8d0c8d808284f75df6201233cfe951590627ba01d330a46c1281805a3806e000024cb59d6000a0000";
+
+    const request = await mockRequestHttpServer((req, res) => {
+      // Binary payload that (incorrectly) carries a charset parameter.
+      // It must still be returned as an ArrayBuffer, not decoded as text.
+      res.writeHead(200, {
+        "content-type": "application/octet-stream; charset=utf-8",
+        "content-length": "172",
+      });
+      res.end(Buffer.from(payload, "hex"));
+    });
+
+    const response = await request(
+      `GET ${request.baseUrlMockServer}/octokit-fixture-org/get-archive/legacy.tar.gz/master`,
+    );
+
+    expect(response.status).toEqual(200);
+    expect(response.data).toBeInstanceOf(ArrayBuffer);
+    expect(zlib.gunzipSync(Buffer.from(payload, "hex")).buffer).toEqual(
+      response.data,
+    );
+  });
+
   it("304 etag", async () => {
     expect.assertions(6);
 
