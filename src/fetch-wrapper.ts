@@ -52,8 +52,8 @@ export default async function fetchWrapper(
     // wrap fetch errors as RequestError if it is not a AbortError
   } catch (error) {
     let message = "Unknown Error";
-    /* v8 ignore else -- @preserve */
     /* vitest coverage bug where it thinks that there is an else */
+    /* v8 ignore else -- @preserve */
     if (error instanceof Error) {
       if (error.name === "AbortError") {
         (error as RequestError).status = 500;
