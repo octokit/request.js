@@ -27,7 +27,7 @@
   "dependencies": {
     "@octokit/endpoint": "^11.0.3",
     "@octokit/request-error": "^7.1.1",
-    "@octokit/types": "^17.0.0",
+    "@octokit/types": "^18.0.0",
     "content-type": "^3.0.0",
     "json-with-bigint": "^3.5.12",
     "universal-user-agent": "^7.0.2"
